@@ -71,6 +71,9 @@ func Check(binDir, arch, pinned string, run Running, applied string) (Plan, bool
 	if err != nil {
 		return Plan{}, false, err
 	}
+	if err := forArch(m, arch); err != nil {
+		return Plan{}, false, err
+	}
 	if !run.BuiltAt.IsZero() && !m.BuiltAt.After(run.BuiltAt) {
 		return Plan{}, false, nil // never a downgrade or a replay
 	}

@@ -35,6 +35,9 @@ Versions follow [semantic versioning](docs/stability.md) from v1.0.0 on.
   lands in the wrong category.
 
 ### Fixed
+- The Linux updater's signed manifest now names its arch, so a signed
+  arm64 build copied into the amd64 folder of the sync folder is refused
+  instead of installed.
 - `tock start` on Windows checks that trackd stays up.
 - Started on an idle machine, trackd no longer dates the idle span from
   before it ran.

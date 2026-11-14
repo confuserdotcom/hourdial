@@ -29,6 +29,36 @@ and the tag. It works for the tarballs, the `.dmg`, `SHA256SUMS`, the SBOM
 and `tock.rb`, from v1.0.0 on. Verify `SHA256SUMS` this way and step 1
 becomes as strong as step 2 for every file it lists.
 
+## The built-in updater
+
+tock never downloads itself from GitHub, and no command replaces the
+installed binaries with a release asset. Releases are checked by you,
+with the two steps above.
+
+The only thing that installs a build by itself is the Linux updater
+(`[sync] update = true`, off by default): trackd on a Linux machine
+installs the build your Mac publishes to your own sync folder
+(`internal/update`). The sums it checks come from that same folder, so
+they are not trusted on their own. What it trusts is an ed25519 key:
+
+- The Mac signs `manifest.json` (version, build time, arch and the sha256
+  of `tock` and `trackd`) with a private key that never enters the sync
+  folder (`tockpub` refuses one inside it).
+- The Linux machine takes the public key only through `tock update trust
+  <fingerprint>`, with the fingerprint you read on the Mac's own terminal
+  (`make bootstrap-hint`). A key in the sync folder is never trusted by
+  itself, and a different one there stops updates until you trust it.
+- Before anything is installed, trackd checks the signature, that the
+  manifest names this machine's arch, that the build is newer than the
+  one running, and the sha256 of the bytes it copies; any failure leaves
+  the old binaries in place.
+
+So someone who can write to the sync folder, but not to your Mac's key,
+can stop updates (by deleting or breaking files) but cannot make the
+Linux machine run their code, an older build, or the other arch's build.
+A build without a build time baked in (`go build` by hand, not `make`)
+takes any signed build, older ones included.
+
 ## What is inside
 
 `tock-<version>.cdx.json` is the SBOM: every Go module the build uses, with

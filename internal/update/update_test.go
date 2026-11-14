@@ -365,6 +365,54 @@ func TestCheckRefusesOlderSignedBuild(t *testing.T) {
 	}
 }
 
+// moveArch copies the signed arm64 build over the amd64 one, as whoever can
+// write to the sync folder could.
+func moveArch(t *testing.T, bin string) {
+	t.Helper()
+	for _, n := range []string{"trackd", "tock", SigFile, ManifestFile} {
+		b := read(t, filepath.Join(bin, "linux-arm64", n))
+		if err := os.WriteFile(filepath.Join(bin, "linux-amd64", n), []byte(b), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// The signed manifest names its arch, so a build signed for arm64 is never
+// installed on an amd64 machine.
+func TestCheckRefusesAnotherArchsBuild(t *testing.T) {
+	bin, pinned, key := published(t, "v2", t0)
+	if err := Publish(bin, "arm64", src(t, "ARM-TRACKD", "ARM-TOCK"), "v3", t0.Add(time.Hour), key); err != nil {
+		t.Fatal(err)
+	}
+	m, err := Verify([]byte(read(t, filepath.Join(bin, "linux-arm64", ManifestFile))),
+		[]byte(read(t, filepath.Join(bin, "linux-arm64", SigFile))), key.Public().(ed25519.PublicKey))
+	if err != nil || m.Arch != "arm64" {
+		t.Fatalf("arm64 manifest: arch %q, err %v", m.Arch, err)
+	}
+	moveArch(t, bin)
+	_, ok, err := Check(bin, "amd64", pinned, Running{Version: "v1"}, "")
+	if ok || err == nil || !strings.Contains(err.Error(), "arm64") {
+		t.Fatalf("ok=%v err=%v; want a refusal naming arm64", ok, err)
+	}
+	if _, err := Bootstrap(filepath.Dir(bin), "", "amd64", key.Public().(ed25519.PublicKey)); err == nil {
+		t.Fatal("printed a command for another arch's build")
+	}
+}
+
+// A manifest with no arch (written before it was signed in) is refused.
+func TestCheckRefusesAManifestWithNoArch(t *testing.T) {
+	bin, pinned, key := published(t, "v2", t0)
+	dir := filepath.Join(bin, "linux-amd64")
+	m := goodManifest()
+	m.Version = "v3"
+	mb, sig := signed(t, key, m)
+	os.WriteFile(filepath.Join(dir, SigFile), sig, 0o600)
+	os.WriteFile(filepath.Join(dir, ManifestFile), mb, 0o600)
+	if _, ok, err := Check(bin, "amd64", pinned, Running{Version: "v1"}, ""); ok || err == nil {
+		t.Fatalf("ok=%v err=%v; want a refusal", ok, err)
+	}
+}
+
 func plan(t *testing.T, v string) (Plan, string) {
 	t.Helper()
 	bin, pinned, _ := published(t, v, t0)

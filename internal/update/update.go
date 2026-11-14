@@ -83,6 +83,7 @@ func validArch(arch string) bool { return arch == "amd64" || arch == "arm64" }
 // Manifest says what a published build is.
 type Manifest struct {
 	Version string            `json:"version"`
+	Arch    string            `json:"arch"` // signed, so a build cannot move to another arch's folder
 	BuiltAt time.Time         `json:"built_at"`
 	Files   map[string]string `json:"files"` // name to sha256 hex
 }
@@ -173,7 +174,7 @@ func Publish(binDir, arch, src, version string, builtAt time.Time, key ed25519.P
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return fmt.Errorf("update: publish: %w", err)
 	}
-	m := Manifest{Version: version, BuiltAt: builtAt.UTC(), Files: map[string]string{}}
+	m := Manifest{Version: version, Arch: arch, BuiltAt: builtAt.UTC(), Files: map[string]string{}}
 	for _, name := range Names {
 		s, err := copyFile(filepath.Join(src, name), dir, name)
 		if err != nil {
@@ -273,6 +274,16 @@ func Verify(manifest, sig []byte, pub ed25519.PublicKey) (Manifest, error) {
 		}
 	}
 	return m, nil
+}
+
+// forArch refuses a verified manifest signed for another arch (or, from
+// before the arch was signed in, for none), so a signed arm64 build copied
+// into the amd64 folder is never installed.
+func forArch(m Manifest, arch string) error {
+	if m.Arch != arch {
+		return fmt.Errorf("update: the manifest in %s was signed for %q, not %s; nothing installed", ArchDir(arch), m.Arch, arch)
+	}
+	return nil
 }
 
 // Pinned is the key this machine trusts. It never takes the one offered
@@ -409,6 +420,9 @@ func Bootstrap(syncDir, home, arch string, pub ed25519.PublicKey) (string, error
 	}
 	m, err := Verify(mb, sig, pub)
 	if err != nil {
+		return "", err
+	}
+	if err := forArch(m, arch); err != nil {
 		return "", err
 	}
 	return BootstrapCommand(syncDir, home, arch, m, Fingerprint(pub)), nil

@@ -34,9 +34,23 @@ if they existed; the database, its WAL and SHM, backups (VACUUM INTO then
 chmod), sync files, tokens and keys are 0600 (`internal/store/store.go`,
 `internal/snapshot/file.go`, `internal/syncdir`, `cmd/tock/cmd_slack.go`).
 
-**Updates** (`internal/update`) — a manifest of sha256 sums signed with
-ed25519; the key is trusted once with `tock update trust` and pinned by
-fingerprint; each file is checked before it replaces the old one.
+**Updates** (`internal/update`, `cmd/trackd/update.go`) — tock has no
+self-update from GitHub; release downloads are checked by hand
+([verify.md](verify.md)). The one updater is the opt-in Linux one, which
+installs what the Mac publishes to the sync folder. The sums come from
+that same folder, so the question was whether a swapped binary plus a
+swapped sum list would be accepted. It would not: the manifest is signed
+with ed25519, the private key stays on the Mac (`cmd/tockpub` refuses a
+key inside the sync folder), and the public key is pinned on the Linux
+machine only through `tock update trust <fingerprint>`, never taken from
+the folder (`Pinned`, `Trust`). The bytes copied are hashed as they are
+written and checked before any rename (`Apply`, `stage`); older builds
+are refused by build time. Found and fixed 2026-11-14: the manifest did
+not name its arch, so a signed arm64 build moved into the amd64 folder
+would have been installed (and trackd would not start). The arch is now
+signed and checked (`forArch`). Left as is: a binary built without a
+build time (plain `go build`) accepts older signed builds, and anyone who
+can write the sync folder can stop updates.
 
 **Stopping trackd on Windows** (`internal/stopsignal/stopsignal_windows.go`)
 — the event's DACL grants only the current user's SID.
