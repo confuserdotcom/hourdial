@@ -7,7 +7,7 @@ import { Empty, Panel } from "@/components/Panel";
 import { LabelSheet, undoToast, type Target } from "@/components/LabelSheet";
 import { get, post, useApi, type Done, type Inbox as InboxT, type Item, type Labels, type Propose } from "@/lib/api";
 import { clock, doneText, dur, entries } from "@/lib/format";
-import { guessText } from "@/lib/inbox";
+import { guessText, topMS } from "@/lib/inbox";
 import { kindColor } from "@/lib/kinds";
 import { cn } from "@/lib/utils";
 import { openShortcuts } from "@/components/Shortcuts";
@@ -79,9 +79,15 @@ export default function Inbox({ onChange }: { onChange: () => void }) {
         </h1>
         <button className="text-xs text-faint hover:text-foreground" onClick={openShortcuts} title="Keys and gestures">j k move · return accept · l label · i ignore · u undo · ?</button>
       </div>
+      {items.length > 1 && (
+        <p className="text-sm text-muted-foreground">
+          The top {Math.min(5, items.length)} hold <span className="num">{dur(topMS(items, 5))}</span> of <span className="num">{dur(data.totalMS)}</span>.
+          Each label here becomes a rule, so the same app, window or site is labelled from then on.
+        </p>
+      )}
       <Panel label="To label" aside={data.smallKeys ? `${data.smallKeys} small things (${dur(data.smallMS)}) left out` : undefined}>
         {items.length === 0 ? (
-          <Empty>Everything is filed. tock asks again when something new shows up.</Empty>
+          <Empty>{data.firstRun ? "Nothing recorded yet. Leave tock running for a few minutes and what it can't label shows up here." : "Everything is filed. tock asks again when something new shows up."}</Empty>
         ) : (
           <ul className="divide-y">
             {items.map((it, i) => (

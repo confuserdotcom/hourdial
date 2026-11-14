@@ -27,6 +27,30 @@ import { byKindRows, kindColor, kindHelp, kindLabel } from "@/lib/kinds";
 import { onDay } from "@/lib/outage";
 import { useGroups } from "@/lib/groups";
 import { cn } from "@/lib/utils";
+import { firstDay, type FirstDay } from "@/lib/firstday";
+
+/** FirstDayPanel tells a new install what is recorded and what to do next. */
+function FirstDayPanel({ f }: { f: FirstDay }) {
+  return (
+    <Panel className="anim-rise" label="Your first day">
+      <div className="space-y-2 text-sm">
+        <p>
+          tock has recorded <span className="num font-medium">{f.recorded}</span> so far
+          {f.top.length > 0 && <>, most of it in {f.top.join(", ")}</>}. It notes the app, window title and site in front of you, and keeps it on this computer.
+        </p>
+        <p className="text-muted-foreground">
+          {f.unlabelledMS > 0
+            ? <>Your rules label <span className="num">{f.labelled}</span> of it; <span className="num">{f.unlabelled}</span> is not labelled yet. Label the biggest groups once and a rule labels them from then on.</>
+            : <>Your rules label all of it so far.</>}
+          {" "}The score, comparisons with your usual day and goals fill in over the next days.
+        </p>
+        {f.unlabelledMS > 0 && (
+          <Button size="sm" className="mt-1" onClick={() => go({ view: "inbox" })}>Label the top groups</Button>
+        )}
+      </div>
+    </Panel>
+  );
+}
 
 export default function Today({ date, tick }: { date: string; tick: number }) {
   const { data: d, error, loading, reload } = useApi<Day>(`/api/day?date=${date}`, tick);
@@ -82,9 +106,11 @@ export default function Today({ date, tick }: { date: string; tick: number }) {
   const sph = d.score.switchesPerHour;
   const notRec = onDay(d.outages, day0, day0 + 86_400_000).ms;
   const help = statHelp(d);
+  const first = firstDay({ today: d.today, usual: u, trackedMS: d.trackedMS, byKind: d.byKind, apps });
 
   return (
     <div className="space-y-5">
+      {first && <FirstDayPanel f={first} />}
       <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-[minmax(260px,300px)_minmax(0,1fr)_minmax(0,1.15fr)]">
         <Panel className="anim-rise" label={d.today ? "Your day so far" : "Around the clock"} aside="click an hour">
           <DayDial d={d} onHour={(h) => zoomTo(day0 + h * 3_600_000, day0 + (h + 1) * 3_600_000)} />
