@@ -140,14 +140,18 @@ func printTemplatePlan(w io.Writer, p app.TemplatePlan) {
 // terminal it answers "own", which is closest to tock without templates.
 func chooseTemplates(env Env, prompt bool) []string {
 	if !prompt || !env.Interactive {
-		return []string{"own"}
+		return []string{classify.DefaultTemplate}
 	}
 	all := classify.AllTemplates()
-	fmt.Fprintln(env.Stdout, "What do you use this computer for? (one or more, e.g. 1,2)")
+	def := 0
+	fmt.Fprintln(env.Stdout, "What do you use this computer for? (one or more, e.g. 1,4)")
 	for i, t := range all {
 		fmt.Fprintf(env.Stdout, "  %d) %s\n", i+1, t.Title)
+		if t.Name == classify.DefaultTemplate {
+			def = i
+		}
 	}
-	fmt.Fprintf(env.Stdout, "[%d] ", len(all))
+	fmt.Fprintf(env.Stdout, "[%d] ", def+1)
 	line, _ := bufio.NewReader(env.Stdin).ReadString('\n')
 	var out []string
 	for _, f := range strings.FieldsFunc(line, func(r rune) bool { return r == ',' || r == ' ' || r == '\n' || r == '\r' }) {
@@ -157,7 +161,7 @@ func chooseTemplates(env Env, prompt bool) []string {
 		}
 	}
 	if len(out) == 0 {
-		return []string{all[len(all)-1].Name}
+		return []string{classify.DefaultTemplate}
 	}
 	return out
 }

@@ -1,0 +1,39 @@
+# Template "writing": writing apps and editors the starter rules do not
+# name, and the reference tools writers keep open.
+
+[[category]]
+name = "Writing"
+kind = "deep"
+
+[[category]]
+name = "Research"
+kind = "shallow"
+
+[[rule]]
+bundle = [
+  "pro.writer.mac",
+  "com.ulyssesapp.mac",
+  "com.literatureandlatte.scrivener3",
+  "com.microsoft.Word",
+  "net.shinyfrog.bear",
+  "abnerworks.Typora",
+  "com.apple.TextEdit",
+  "com.grammarly.ProjectLlama",
+]
+category = "Writing"
+
+[[rule]]
+app = '^(libreoffice|libreoffice-writer|ghostwriter|apostrophe|typora|focuswriter|manuskript)$'
+category = "Writing"
+
+[[rule]]
+url = '^(www\.)?(hemingwayapp\.com|app\.grammarly\.com|wordpress\.com/post|[a-z0-9-]+\.ghost\.io/ghost)(/|$)'
+category = "Writing"
+
+[[rule]]
+bundle = ["org.zotero.zotero", "com.devon-technologies.think3"]
+category = "Research"
+
+[[rule]]
+url = '^(www\.)?(thesaurus\.com|merriam-webster\.com|dictionary\.cambridge\.org|oed\.com)(/|$)'
+category = "Research"

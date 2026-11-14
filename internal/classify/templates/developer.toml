@@ -1,0 +1,47 @@
+# Template "software development": editors, terminals and developer tools
+# the starter rules do not name, and the sites you read docs and code on.
+
+[[category]]
+name = "Code"
+kind = "deep"
+
+[[category]]
+name = "Research"
+kind = "shallow"
+
+[[rule]]
+bundle = [
+  "com.jetbrains.intellij",
+  "com.jetbrains.intellij.ce",
+  "com.jetbrains.goland",
+  "com.jetbrains.pycharm",
+  "com.jetbrains.pycharm.ce",
+  "com.jetbrains.WebStorm",
+  "com.jetbrains.rider",
+  "com.jetbrains.rustrover",
+  "com.jetbrains.CLion",
+  "com.google.android.studio",
+  "com.sublimetext.4",
+  "com.panic.Nova",
+  "dev.warp.Warp-Stable",
+  "net.kovidgoyal.kitty",
+  "org.alacritty",
+  "com.postmanlabs.mac",
+  "com.tinyapp.TablePlus",
+  "com.docker.docker",
+  "com.github.GitHubClient",
+  "com.fournova.Tower3",
+]
+category = "Code"
+
+[[rule]]
+app = '^(code|code - oss|codium|neovim|nvim|emacs|kitty|alacritty|foot|wezterm|konsole|gnome-terminal|jetbrains-[a-z]+)$'
+category = "Code"
+
+[[rule]]
+url = '^(www\.)?(bitbucket\.org|codeberg\.org|crates\.io|docs\.rs|npmjs\.com|pypi\.org|go\.dev|developer\.mozilla\.org|developer\.apple\.com|docs\.python\.org|vercel\.com|app\.netlify\.com|localhost|127\.0\.0\.1)(/|:|$)'
+category = "Code"
+
+[[rule]]
+url = '^(www\.)?(devdocs\.io|([a-z0-9-]+\.)?readthedocs\.io|man7\.org)(/|$)'
+category = "Research"

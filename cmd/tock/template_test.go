@@ -60,6 +60,26 @@ func TestSetupTemplateBeforeTrackd(t *testing.T) {
 	}
 }
 
+// A role pack on a machine with no rules yet: the starter is written, the
+// pack appended, and the result passes tock rules check.
+func TestSetupRolePackFresh(t *testing.T) {
+	for _, role := range []string{"developer", "designer", "writer"} {
+		te := newTestEnv(t, "")
+		os.Remove(te.rulesPath())
+		code, out := te.run(t, "", "setup", "--template", role, "--yes")
+		if code != 0 {
+			t.Fatalf("%s: exit %d: %s %s", role, code, out, te.errb)
+		}
+		b, _ := os.ReadFile(te.rulesPath())
+		if !strings.Contains(string(b), "from template") || !strings.Contains(string(b), "Written by `tock init`") {
+			t.Fatalf("%s: starter plus pack not written:\n%s", role, b)
+		}
+		if code, out := te.run(t, "", "rules", "check"); code != 0 {
+			t.Fatalf("%s: rules check exit %d: %s %s", role, code, out, te.errb)
+		}
+	}
+}
+
 func TestSetupTemplateUnknown(t *testing.T) {
 	te := newTestEnv(t, testRules)
 	if code, _ := te.run(t, "", "setup", "--template", "student", "--yes"); code == 0 {
@@ -73,9 +93,13 @@ func TestChooseTemplates(t *testing.T) {
 		t.Fatalf("off a terminal: %v", got)
 	}
 	te.Interactive = true
-	te.Stdin = strings.NewReader("1, 2\n")
+	te.Stdin = strings.NewReader("4, 5\n")
 	if got := chooseTemplates(te.Env, true); strings.Join(got, ",") != "client,own" {
-		t.Fatalf("1,2: %v", got)
+		t.Fatalf("4,5: %v", got)
+	}
+	te.Stdin = strings.NewReader("1,3\n")
+	if got := chooseTemplates(te.Env, true); strings.Join(got, ",") != "developer,writer" {
+		t.Fatalf("1,3: %v", got)
 	}
 	te.Stdin = strings.NewReader("\n")
 	if got := chooseTemplates(te.Env, true); strings.Join(got, ",") != "own" {

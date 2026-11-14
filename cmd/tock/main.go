@@ -113,7 +113,8 @@ Setup and data:
                                          curl localhost:5600/api/0/export); again replaces it
   tock setup [--check] [--no-doctor]    after brew install: make the signing certificate, install
                                          and start trackd and the menu bar app (safe to run again)
-  tock setup --template client[,own] [--past] [--yes]
+  tock setup --template NAME[,NAME] [--past] [--yes]
+                                         NAME: developer, designer, writer, client, own;
                                          add the categories and rules a template has and you lack;
                                          they label from now on unless --past (tock undo takes back)
   tock uninstall [--purge]              stop trackd and the menu bar, remove the apps and tock;

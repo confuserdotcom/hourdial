@@ -1,0 +1,40 @@
+# Template "design": design, image and 3D apps, design files in the browser,
+# and the sites you look at for references.
+
+[[category]]
+name = "Design"
+kind = "deep"
+
+[[category]]
+name = "Research"
+kind = "shallow"
+
+[[rule]]
+bundle = [
+  "com.figma.Desktop",
+  "com.bohemiancoding.sketch3",
+  "com.adobe.Photoshop",
+  "com.adobe.illustrator",
+  "com.adobe.InDesign",
+  "com.adobe.xd",
+  "com.adobe.AfterEffects",
+  "com.seriflabs.affinitydesigner2",
+  "com.seriflabs.affinityphoto2",
+  "com.seriflabs.affinitypublisher2",
+  "com.pixelmatorteam.pixelmator.x",
+  "org.blenderfoundation.blender",
+  "com.framer.electron",
+]
+category = "Design"
+
+[[rule]]
+app = '^(figma|gimp|gimp-[0-9.]+|inkscape|krita|blender|penpot)$'
+category = "Design"
+
+[[rule]]
+url = '^(www\.)?(figma\.com/(file|design|proto|board|slides)|canva\.com/design|excalidraw\.com|design\.penpot\.app|framer\.com/projects)(/|$)'
+category = "Design"
+
+[[rule]]
+url = '^(www\.)?(dribbble\.com|behance\.net|mobbin\.com|awwwards\.com|fonts\.google\.com|coolors\.co|unsplash\.com)(/|$)'
+category = "Research"

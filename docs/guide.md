@@ -768,12 +768,22 @@ The starter rules have Reading (neutral, for books and long reads), Research
 
 ### Templates
 
-A fresh `tock setup` asks what the computer is for and applies a template:
-**client work** (Code, Meeting, Admin & Planning, editor, call and invoicing
-apps) or **my own projects** (Code, Writing, Research, editor, writing and
-reference apps). Apply one later the same way:
+A fresh `tock setup` asks what the computer is for and applies one or more
+templates on top of the starter rules:
+
+| template | adds |
+|---|---|
+| `developer` | IDEs, terminals and dev tools beyond the starter's, docs and package sites, localhost (Code, Research) |
+| `designer` | Figma, Sketch, Adobe, Affinity, Blender, GIMP, Inkscape, design files in the browser (Design), reference sites (Research) |
+| `writer` | iA Writer, Ulysses, Scrivener, Word, Bear, Typora, Zotero, dictionaries (Writing, Research) |
+| `client` | Code, Meeting, Admin & Planning: editor, call and invoicing apps |
+| `own` | Code, Writing, Research: editor, writing and reference apps |
+
+Off a terminal, or with `--no-prompt`, setup applies `own`. Pick one
+without the question, on a fresh install or later, the same way:
 
 ```
+tock setup --template developer --yes  starter rules (if none yet) plus the pack
 tock setup --template client          shows the plan, asks, applies
 tock setup --template client,own --yes
 tock setup --template own --past      also label past days (the plan says how much)

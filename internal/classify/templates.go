@@ -22,9 +22,15 @@ type Template struct {
 }
 
 var templates = []struct{ name, title, group string }{
+	{"developer", "software development", "focus"},
+	{"designer", "design", "focus"},
+	{"writer", "writing", "focus"},
 	{"client", "client work", "billing"},
 	{"own", "my own projects", "focus"},
 }
+
+// DefaultTemplate is what a fresh setup applies when nobody answers.
+const DefaultTemplate = "own"
 
 // AllTemplates returns every template, in the order setup offers them.
 func AllTemplates() []Template {
