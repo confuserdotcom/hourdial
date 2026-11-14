@@ -66,6 +66,51 @@ They hold your and your client's names, addresses and tax numbers, and the
 time billed per day, but no window titles or URLs, so `tock prune` and
 `keep_titles` leave them alone. They are never synced.
 
+## Encryption at rest
+
+`tock.db` is not encrypted; titles and URLs are plain text in a file only
+you can read. We looked at encrypting it (2026-11-14) and decided not to,
+for now. What we weighed:
+
+**CPU is not the obstacle.** Measured on an Apple M2 with Go's AES-256-GCM:
+sealing one 79-byte title takes 0.35 µs and opening it 0.1 µs; a 4 KiB
+database page takes about 0.9 µs either way. Building a day view (about
+180 spans) already takes 2.8 ms and a week 12 ms (`BenchmarkDay`,
+`BenchmarkWeek` in `internal/app`), so decrypting every title in them
+would add well under 1 %. trackd writes a span every few seconds, far
+inside its 1 % idle CPU budget either way.
+
+**Whole-file (SQLCipher-style) does not fit the build.** SQLCipher is C,
+and trackd and tock are pure Go with no cgo (the Linux builds use
+`CGO_ENABLED=0`). The SQLite driver tock uses (`modernc.org/sqlite`) has
+no encrypting storage layer. The pure-Go route would be a different
+driver with an encrypting VFS, which means replacing the database layer
+and re-measuring trackd's memory, for the whole data set.
+
+**Per-column (titles and URLs only) fits the build but covers less than it
+seems.** The same titles also sit in snapshots, `tock backup` archives,
+the sync folder's day files, screen text (`ocr`), other machines' views,
+the agent index and crash logs; each would need the same treatment, and
+URL hosts must stay readable for the rules.
+
+**The key is the real problem.** Encryption protects against whoever
+cannot read the key. Kept in a file next to the database, it protects a
+copied `tock.db` that was copied without the key, nothing else. Another
+program running as you, the main risk on a personal machine, can read
+the key as easily as the database. A key in the macOS Keychain or a Linux
+secret service would help, but that needs cgo or a helper program on
+macOS and a running keyring on Linux (headless machines have none).
+
+**Decision.** No encryption at rest in 1.x for now. What protects the data
+today: full-disk encryption (FileVault, LUKS), which covers a lost or
+stolen machine better than anything tock could add; 0600 files in 0700
+folders; `keep_titles` and `tock prune`, which delete titles after N
+days; and `[privacy] hide_apps` and `hide_sites`, which keep titles and
+URLs from being stored at all.
+If people ask for it, the candidate is per-column AES-GCM with the key in
+the OS keychain, applied to every copy listed above, and it would come as
+a minor release with its own migration.
+
 ## What leaves the machine
 
 trackd and the menu bar app have no network code at all; tests check that
