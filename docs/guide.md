@@ -1026,7 +1026,8 @@ page to your browser and runs until you press ctrl-c.
   day a second. **Video** saves the replay as a 20-second clip
   (1280x720 webm, mp4 where the browser records only that), drawn in the
   dashboard's theme; it takes as long as the clip, and clicking it again
-  stops it.
+  stops it. The clip shows the window titles the replay shows, so watch
+  it before you share it.
   Then the focus score with its change against your usual same weekday
   (the middle of the last four), and four stats with their changes:
   focus time, longest block, distraction and switches per hour. Next to it,

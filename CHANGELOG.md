@@ -42,6 +42,11 @@ Versions follow [semantic versioning](docs/stability.md) from v1.0.0 on.
 - The Linux updater's signed manifest now names its arch, so a signed
   arm64 build copied into the amd64 folder of the sync folder is refused
   instead of installed.
+- `tock agents` and the dashboard no longer read a whole Claude Code log
+  line into memory however big it is; lines over 1 MB (pasted images) are
+  skipped.
+- trackd on X11 refuses a reply from the X server that claims more than
+  1 MB, instead of allocating whatever it claims.
 - `tock start` on Windows checks that trackd stays up.
 - Started on an idle machine, trackd no longer dates the idle span from
   before it ran.
