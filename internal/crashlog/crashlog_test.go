@@ -4,11 +4,31 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 	"testing"
 
 	"tock/internal/testfs"
 )
+
+// install is Install for a test in this process: it lets go of the file
+// at the end (and the runtime's copy of it), so Windows can remove the
+// temp dir.
+func install(t *testing.T, dir, prog, ver string) {
+	t.Helper()
+	if err := Install(dir, prog, ver); err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		debug.SetCrashOutput(nil, debug.CrashOptions{})
+		mu.Lock()
+		defer mu.Unlock()
+		if out != nil {
+			out.Close()
+			out = nil
+		}
+	})
+}
 
 // child runs this test binary as a program that crashes the way mode says,
 // with its crash log in dir, and returns the log.
@@ -101,9 +121,7 @@ func TestCrashesAppendAndQuietRunsWriteNothing(t *testing.T) {
 		t.Fatalf("%d notes, want 2:\n%s", n, log)
 	}
 	quiet := t.TempDir()
-	if err := Install(quiet, "tock", "v1"); err != nil {
-		t.Fatal(err)
-	}
+	install(t, quiet, "tock", "v1")
 	Recover("nothing") // no panic: a no-op
 	if fi, err := os.Stat(Path(quiet, "tock")); err != nil || fi.Size() != 0 {
 		t.Fatalf("quiet run wrote %v bytes (err %v)", fi.Size(), err)
@@ -122,9 +140,7 @@ func TestInstallRotates(t *testing.T) {
 	if err := os.WriteFile(path+".1", []byte("older"), 0o600); err != nil {
 		t.Fatal(err)
 	}
-	if err := Install(dir, "tockbar", "v1"); err != nil {
-		t.Fatal(err)
-	}
+	install(t, dir, "tockbar", "v1")
 	if fi, _ := os.Stat(path); fi.Size() != 0 {
 		t.Fatalf("new log holds %d bytes, want 0", fi.Size())
 	}
@@ -133,9 +149,7 @@ func TestInstallRotates(t *testing.T) {
 	}
 	// Under the cap, nothing moves.
 	os.WriteFile(path, []byte("small"), 0o600)
-	if err := Install(dir, "tockbar", "v1"); err != nil {
-		t.Fatal(err)
-	}
+	install(t, dir, "tockbar", "v1")
 	if b, _ := os.ReadFile(path); string(b) != "small" {
 		t.Fatalf("log = %q, want it kept", b)
 	}
