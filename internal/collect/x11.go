@@ -105,6 +105,10 @@ func xAuthFiles(env func(string) string, home string) []string {
 func pad4(n int) int { return (4 - n%4) % 4 }
 
 // xConn is one connection to the X server.
+// xMaxReply bounds one reply. The largest tock asks for is a property of
+// 16384 longs (64 KiB); a server claiming more is not believed.
+const xMaxReply = 1 << 20
+
 type xConn struct {
 	c    net.Conn
 	root uint32
@@ -190,7 +194,11 @@ func (x *xConn) request(req []byte) ([]byte, error) {
 		case 0:
 			return nil, fmt.Errorf("x11: error %d on request %d", m[1], m[10])
 		case 1:
-			extra := make([]byte, int(binary.LittleEndian.Uint32(m[4:]))*4)
+			n := int64(binary.LittleEndian.Uint32(m[4:])) * 4
+			if n > xMaxReply {
+				return nil, fmt.Errorf("x11: reply of %d bytes", n)
+			}
+			extra := make([]byte, n)
 			if _, err := io.ReadFull(x.c, extra); err != nil {
 				return nil, err
 			}

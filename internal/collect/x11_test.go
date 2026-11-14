@@ -310,3 +310,22 @@ func TestWMClass(t *testing.T) {
 		t.Fatal(c)
 	}
 }
+
+// A reply claiming more than xMaxReply bytes is refused before anything is
+// allocated for it: trackd's memory budget is not the X server's to spend.
+func TestX11RefusesAHugeReply(t *testing.T) {
+	a, b := net.Pipe()
+	defer a.Close()
+	defer b.Close()
+	go func() {
+		io.ReadFull(b, make([]byte, 8)) // the request
+		m := reply(nil, nil)
+		binary.LittleEndian.PutUint32(m[4:], 1<<30) // 4 GiB to follow
+		b.Write(m)
+	}()
+	x := &xConn{c: a}
+	_, err := x.request(make([]byte, 8))
+	if err == nil || !strings.Contains(err.Error(), "reply of") {
+		t.Fatalf("err = %v; want a refusal", err)
+	}
+}
