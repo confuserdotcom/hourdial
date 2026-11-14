@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
@@ -152,5 +153,43 @@ func TestIndexIncremental(t *testing.T) {
 	os.WriteFile(p, []byte("junk"), 0o600)
 	if ix := Load(p); len(ix.Files) != 0 {
 		t.Fatal("corrupt index loaded")
+	}
+}
+
+// A line longer than maxLine (a pasted image, a huge tool result) is
+// stepped over without being held in memory; the lines around it count,
+// and the index ends past it.
+func TestLongLineIsSkipped(t *testing.T) {
+	dir := t.TempDir()
+	long := `{"type":"user","timestamp":"2026-11-12T10:00:07.000Z","cwd":"/u/tock","sessionId":"s1","message":{"content":"` +
+		strings.Repeat("A", maxLine+10) + `"}}` + "\n"
+	body := `{"type":"user","origin":{"kind":"human"},"timestamp":"2026-11-12T10:00:05.000Z","cwd":"/u/tock","sessionId":"s1","message":{}}` + "\n" +
+		long +
+		`{"type":"assistant","timestamp":"2026-11-12T10:00:09.000Z","cwd":"/u/tock","sessionId":"s1","message":{}}` + "\n"
+	path := filepath.Join(dir, "s1.jsonl")
+	if err := os.WriteFile(path, []byte(body), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	ix := &Index{}
+	if _, err := ix.Update(dir); err != nil {
+		t.Fatal(err)
+	}
+	got := ix.Sessions(0, ms("2026-11-13T00:00:00Z"))
+	want := []int64{ms("2026-11-12T10:00:05Z"), ms("2026-11-12T10:00:09Z")}
+	if len(got) != 1 || !reflect.DeepEqual(got[0].Events, want) {
+		t.Fatalf("sessions = %+v; want events %v", got, want)
+	}
+	if off := ix.Files[path].Offset; off != int64(len(body)) {
+		t.Fatalf("offset %d, want %d", off, len(body))
+	}
+
+	// A long line still being written waits, as a short one does.
+	partial := filepath.Join(dir, "s2.jsonl")
+	os.WriteFile(partial, []byte(strings.Repeat("B", maxLine+10)), 0o600)
+	if _, err := ix.Update(dir); err != nil {
+		t.Fatal(err)
+	}
+	if off := ix.Files[partial].Offset; off != 0 {
+		t.Fatalf("partial long line: offset %d, want 0", off)
 	}
 }

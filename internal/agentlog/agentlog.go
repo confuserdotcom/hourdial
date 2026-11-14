@@ -245,14 +245,41 @@ func readFrom(path, session string, st *FileState) bool {
 	}
 	r := bufio.NewReaderSize(f, 1<<16)
 	for {
-		line, err := r.ReadBytes('\n')
+		line, n, long, err := readLine(r, maxLine)
 		if err != nil {
 			return true // EOF: a partial line waits for its newline
 		}
-		st.Offset += int64(len(line))
-		if !skipLine(line) {
+		st.Offset += n
+		if !long && !skipLine(line) {
 			take(line, session, st.Sessions)
 		}
+	}
+}
+
+// maxLine is the longest log line read. Longer ones (a pasted image, a
+// huge tool result) are stepped over: their one timestamp is not worth
+// holding megabytes in tock web, which reads these logs for hours.
+const maxLine = 1 << 20
+
+// readLine reads up to and including the next '\n', n bytes in all. A line
+// longer than max is read through but not kept (long is true, line nil),
+// so memory stays bounded whatever the file holds. err is set, and nothing
+// counts as read, when the file ends before the newline.
+func readLine(r *bufio.Reader, max int) (line []byte, n int64, long bool, err error) {
+	for {
+		chunk, err := r.ReadSlice('\n')
+		n += int64(len(chunk))
+		if !long {
+			if len(line)+len(chunk) > max {
+				line, long = nil, true
+			} else {
+				line = append(line, chunk...)
+			}
+		}
+		if err == bufio.ErrBufferFull {
+			continue
+		}
+		return line, n, long, err
 	}
 }
 
