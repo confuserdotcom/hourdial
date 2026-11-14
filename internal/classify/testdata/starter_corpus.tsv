@@ -1,7 +1,7 @@
 # bundle	app	title	url	category	project
-com.github.wez.wezterm	WezTerm	tock │ ✳ fix tests	<nil>	Code	tock
-com.github.wez.wezterm	WezTerm	ATLAS │ nvim scan.go	<nil>	Code	ATLAS
-com.github.wez.wezterm	WezTerm	mandarin-anki │ make deck	<nil>	Code	mandarin-anki
+com.github.wez.wezterm	WezTerm	tock │ ✳ fix tests	<nil>	Code	-
+com.github.wez.wezterm	WezTerm	ATLAS │ nvim scan.go	<nil>	Code	-
+com.github.wez.wezterm	WezTerm	mandarin-anki │ make deck	<nil>	Code	-
 com.github.wez.wezterm	WezTerm	[1/3] ✳ workflow phase 1 init	<nil>	Code	-
 com.github.wez.wezterm	WezTerm	<nil>	<nil>	Code	-
 com.mitchellh.ghostty	Ghostty	nvim	<nil>	Code	-
@@ -15,12 +15,12 @@ company.thebrowser.Browser	Arc	someone/tock: tracker	github.com/someone/tock	Cod
 com.apple.Safari	Safari	GitHub	github.com	Code	-
 com.google.Chrome	Google Chrome	sqlite package	pkg.go.dev/modernc.org/sqlite	Code	-
 company.thebrowser.Browser	Arc	go - How to x	stackoverflow.com/questions/123/how-to-x	Code	-
-md.obsidian	Obsidian	Exercises 1–9 - Licence - Obsidian 1.14.4	<nil>	Study	Licence
-md.obsidian	Obsidian	Chapter 2 — Notes - Analyse 1 - Obsidian 1.14.4	<nil>	Study	Analyse 1
+md.obsidian	Obsidian	Exercises 1–9 - Licence - Obsidian 1.14.4	<nil>	Writing	-
+md.obsidian	Obsidian	Chapter 2 — Notes - Analyse 1 - Obsidian 1.14.4	<nil>	Writing	-
 md.obsidian	Obsidian	Daily 2026-10-10 - Journal - Obsidian 1.14.4	<nil>	Writing	-
 md.obsidian	Obsidian	<nil>	<nil>	Writing	-
-net.ankiweb.dtop	Anki	Mandarin HSK3 - Anki	<nil>	Study	mandarin-anki
-net.ankiweb.dtop	Anki	中文 deck - Anki	<nil>	Study	mandarin-anki
+net.ankiweb.dtop	Anki	Mandarin HSK3 - Anki	<nil>	Study	-
+net.ankiweb.dtop	Anki	中文 deck - Anki	<nil>	Study	-
 net.ankiweb.dtop	Anki	Biology - Anki	<nil>	Study	-
 company.thebrowser.Browser	Arc	MIT 18.06 Linear Algebra Lecture 1	www.youtube.com/watch	Study	-
 com.apple.Safari	Safari	Cours d'analyse - chapitre 2	www.youtube.com/watch	Study	-

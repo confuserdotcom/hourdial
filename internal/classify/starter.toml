@@ -93,45 +93,20 @@ category = "Meeting"
 # repos = ["~/code/client"]
 # rate = 80
 
-[[project]]
-name = "tock"
-
-[[project]]
-name = "ATLAS"
-
-[[project]]
-name = "mandarin-anki"
-
-[[project]]
-name = "Licence"
-
-[[project]]
-name = "Analyse 1"
-
-# --- Projects from terminal titles ------------------------------------------
-# Needs the WezTerm title hook in docs/wezterm-title.md: "<dir> │ <title>".
-
-[[rule]]
-bundle = ["com.github.wez.wezterm"]
-title = '^tock │'
-project = "tock"
-
-[[rule]]
-bundle = ["com.github.wez.wezterm"]
-title = '^ATLAS │'
-project = "ATLAS"
-
-[[rule]]
-bundle = ["com.github.wez.wezterm"]
-title = '^mandarin-anki │'
-project = "mandarin-anki"
-
+# --- Projects ---------------------------------------------------------------
 # Any terminal, by working directory: needs the shell hook in
 # docs/shell-hook.md (eval "$(tock shell-init zsh)" in ~/.zshrc).
 #
 # [[rule]]
-# dir = '^~/code/tock(/|$)'
-# project = "tock"
+# dir = '^~/code/myapp(/|$)'
+# project = "myapp"
+#
+# WezTerm, by tab title: needs the title hook in docs/wezterm-title.md.
+#
+# [[rule]]
+# bundle = ["com.github.wez.wezterm"]
+# title = '^myapp │'
+# project = "myapp"
 
 # --- Code -------------------------------------------------------------------
 
@@ -153,23 +128,6 @@ url = '^(www\.)?(github\.com|gitlab\.com|pkg\.go\.dev|stackoverflow\.com)(/|$)'
 category = "Code"
 
 # --- Study ------------------------------------------------------------------
-
-[[rule]]
-bundle = ["md.obsidian"]
-title = ' - Licence - Obsidian'
-category = "Study"
-project = "Licence"
-
-[[rule]]
-bundle = ["md.obsidian"]
-title = ' - Analyse 1 - Obsidian'
-category = "Study"
-project = "Analyse 1"
-
-[[rule]]
-bundle = ["net.ankiweb.dtop"]
-title = 'mandarin|中文|汉语'
-project = "mandarin-anki"
 
 [[rule]]
 bundle = ["net.ankiweb.dtop"]
