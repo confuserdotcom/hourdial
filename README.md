@@ -94,8 +94,19 @@ tock setup
 
 `tock setup` makes a local code-signing certificate (so the Accessibility
 grant survives upgrades), installs and starts trackd and the menu bar app,
-and writes starter rules. Run it again after `brew upgrade tock`. trackd
-asks for Accessibility on first start; browsers ask for Automation.
+and writes starter rules. Run it again after `brew upgrade tock`. What it
+asks, in order:
+
+1. your password, once, to trust that certificate for code signing;
+2. what the computer is for (developer, designer, writer, client work, own
+   projects), which adds a rule pack; `tock setup --template developer`
+   answers it up front;
+3. Accessibility for trackd: setup opens the pane, switch trackd on;
+4. notifications for the menu bar app.
+
+Each browser asks for Automation the first time trackd reads its address.
+After a few minutes the dashboard (`tock web`) shows what was recorded and
+sends you to the Inbox to label the biggest groups.
 
 There's also a `.dmg` on the [releases page](https://github.com/confuserdotcom/tock/releases).
 It isn't notarized (no Apple Developer ID), so the first open needs
@@ -116,6 +127,7 @@ against `SHA256SUMS` and GitHub's signed build record:
 ```sh
 tar xzf tock-v*-linux-amd64.tar.gz && cd tock-v*-linux-amd64
 install -m 755 trackd tock ~/.local/bin/ && ~/.local/bin/trackd install && tock init
+tock setup --template developer --yes   # optional: a rule pack (developer, designer, writer, client, own)
 ```
 
 Windows 10 and 11 are experimental, not in a release yet. Build it with
