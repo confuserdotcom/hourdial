@@ -149,8 +149,9 @@ trust`; the folder alone can never make a machine trust a key. See
 ## Who can read your record
 
 tock.db is an ordinary SQLite file: titles and URLs are stored as plain
-text, protected by file permissions (0600) and nothing else. This is what
-that does and does not cover.
+text, protected by file permissions (0600) and nothing else (see
+[Encryption at rest](#encryption-at-rest) for why). This is what that
+does and does not cover.
 
 | Who | Can they read it? |
 |---|---|
