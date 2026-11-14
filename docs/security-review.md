@@ -57,7 +57,12 @@ can write the sync folder can stop updates.
 
 **Bug reports** (`cmd/tock/cmd_bugreport.go`) — config values are
 stripped, log lines that could hold a title or URL are dropped, rules
-are left out unless asked for; nothing is sent.
+are left out unless asked for; nothing is sent. Home folders (any user's
+`/Users/…`, `/home/…`), Claude and Slack tokens and the dashboard token
+are replaced in every file (`scrubSecrets`). Crash logs keep only lines
+shaped like a Go trace and the runtime's own messages (`redactCrash`);
+`TestBugReportCrashLogs` plants a title, URL, tokens and a user name in
+a panic and checks none comes out.
 
 **Dependencies** — `govulncheck` runs in CI and before every release
 (`.github/workflows/ci.yml`, `release.yml`); `npm audit --omit=dev` on

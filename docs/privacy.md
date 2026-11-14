@@ -138,6 +138,14 @@ similar laws elsewhere) that tock does nothing to meet.
 tock sends no usage data, crash reports or analytics. `tock bug-report`
 writes a file for you to look through and attach to an issue yourself:
 `tock doctor --json`, `config.toml` with every text value removed, the
-end of the logs without lines that could hold a title or URL, and when
-trackd ran in the last two weeks. Your home and sync folders are replaced
-by `~` and `<sync>`. Your rules go in only with `--include-rules`.
+end of the logs without lines that could hold a title or URL, the crash
+logs, and when trackd ran in the last two weeks. Your home and sync
+folders are replaced by `~` and `<sync>`, and Claude, Slack and dashboard
+tokens by `<token>`. Your rules go in only with `--include-rules`.
+
+Crashes are written only to `~/.local/state/tock/<program>-crash.log`
+(mode 600). A panic's message can be any value, a window title included,
+so the bug report keeps only the trace (function names, files, line
+numbers, addresses) and the Go runtime's own errors (`runtime error:
+index out of range`, `concurrent map writes`); every other line becomes
+`<removed>`.

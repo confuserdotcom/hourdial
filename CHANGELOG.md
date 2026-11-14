@@ -23,6 +23,10 @@ Versions follow [semantic versioning](docs/stability.md) from v1.0.0 on.
   open notch starts one too.
 - **`tock model` scores the labeller** against the spans you labelled by
   hand and lists what it leaves blank, by window.
+- **Crash logs.** A panic or fatal error in trackd, tock or the menu bar
+  app is written, with its stack, to `<program>-crash.log` in the state
+  folder (mode 600, kept under about 512 KB). `tock bug-report` includes
+  them, redacted. Nothing is sent.
 - **Releases carry an SBOM and signed build provenance** for the tarballs,
   `tock.rb` and the `.dmg`; [docs/verify.md](docs/verify.md) shows how to
   check them.

@@ -304,6 +304,7 @@ removes that line, so the file is as it was.
 | `~/.config/tock/slack.token` | the Slack token, when you use Slack |
 | `~/.local/share/tock/tock.db` | the spans (SQLite) |
 | `~/.local/state/tock/trackd.log` | trackd's log |
+| `~/.local/state/tock/*-crash.log` | crashes of `trackd`, `tock` and the menu bar app, if any: the panic and its stack, written by the program as it dies; empty when nothing crashed. A file over 256 KB is moved to `.1` at the next start |
 | `~/.local/state/tock/shell.log` | working directories from the shell hook, see [docs/shell-hook.md](https://github.com/confuserdotcom/tock/blob/main/docs/shell-hook.md) |
 | `~/.local/state/tock/agents.index` | times, directories and titles read from coding agents' session logs (see [Agents](#agents)); safe to delete |
 
@@ -2113,6 +2114,11 @@ titles up to 7 days past `[privacy] keep_titles`.
 `tock doctor` names each with when it happened and what to do. After 24
 hours a failure is history: doctor still counts it, status no longer
 marks it.
+
+When a program crashes, the panic and its stack also go to
+`~/.local/state/tock/trackd-crash.log` (or `tock-crash.log`,
+`tockbar-crash.log`), next to the logs. Nothing is sent anywhere;
+`tock bug-report` puts them in its file, redacted, for you to attach.
 
 ## Restore
 

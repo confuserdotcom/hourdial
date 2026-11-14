@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"tock/internal/config"
+	"tock/internal/crashlog"
 )
 
 // bugReportLogLines is how much of each log goes in.
@@ -53,7 +54,9 @@ func cmdBugReport(env Env, args []string) error {
 		body []byte
 	}
 	var members []member
-	add := func(name string, b []byte) { members = append(members, member{name, []byte(scrub(string(b)))}) }
+	add := func(name string, b []byte) {
+		members = append(members, member{name, []byte(scrubSecrets(scrub(string(b))))})
+	}
 
 	var doc bytes.Buffer
 	denv := env
@@ -67,6 +70,14 @@ func cmdBugReport(env Env, args []string) error {
 	for _, l := range []string{"trackd.log", "web.log", "tockbar.log"} {
 		if b, err := logTail(filepath.Join(env.StateDir, l)); err == nil {
 			add(l, b)
+		}
+	}
+	for _, prog := range []string{"trackd", "tock", "tockbar"} {
+		p := crashlog.Path(env.StateDir, prog)
+		for _, f := range []string{p, p + ".1"} {
+			if b, err := os.ReadFile(f); err == nil && len(bytes.TrimSpace(b)) > 0 {
+				add(filepath.Base(f), []byte(redactCrash(string(b))))
+			}
 		}
 	}
 	if b, err := bugReportRuns(env); err == nil {
@@ -227,6 +238,90 @@ func logTail(path string) ([]byte, error) {
 		return nil, err
 	}
 	return []byte(strings.Join(lines, "\n") + "\n"), nil
+}
+
+// secretPatterns are replaced in every member: other people's home folders
+// (a binary built elsewhere names its builder's), Claude and Slack tokens,
+// and the dashboard's per-run token.
+var secretPatterns = []struct {
+	re   *regexp.Regexp
+	with string
+}{
+	{regexp.MustCompile(`/(?:Users|home)/[^/\s"'` + "`" + `]+`), "~"},
+	{regexp.MustCompile(`(?i)\b[a-z]:\\Users\\[^\\\s"']+`), "~"},
+	{regexp.MustCompile(`sk-ant-[A-Za-z0-9_\-]+`), "<token>"},
+	{regexp.MustCompile(`xox[a-z]-[A-Za-z0-9\-]+`), "<token>"},
+	{regexp.MustCompile(`(?i)(bearer\s+)\S+`), "${1}<token>"},
+	{regexp.MustCompile(`#[0-9a-f]{32,}`), "#<token>"},
+}
+
+func scrubSecrets(s string) string {
+	for _, p := range secretPatterns {
+		s = p.re.ReplaceAllString(s, p.with)
+	}
+	return s
+}
+
+// Crash log lines are kept only when they have the shape of a Go trace,
+// which holds code (function names, files, addresses), never data.
+var crashKeep = []*regexp.Regexp{
+	regexp.MustCompile(`^--- \S+ \S+ \S+ pid \d+: panic in [\w .-]+$`),                // crashlog's note
+	regexp.MustCompile(`^goroutine \d+ .*\]:$`),                                       // goroutine 20 [running]:
+	regexp.MustCompile(`^\S+\((?:0x[0-9a-f]+\??|\.\.\.|[{}, ])*\)$`),                  // pkg.F({0x1, 0x2})
+	regexp.MustCompile(`^\t\S+:\d+(?: \+0x[0-9a-f]+)?(?: [a-z]+=0x[0-9a-f]+)*$`),      // \tfile.go:12 +0x54 [fp=0x…]
+	regexp.MustCompile(`^created by \S+(?: in goroutine \d+)?$`),                      // created by …
+	regexp.MustCompile(`^\[(?:signal [^\]]*|originating from goroutine \d+)\]:?$`),    // [signal SIGSEGV …]
+	regexp.MustCompile(`^SIG[A-Z]+: [a-z ]+$`),                                        // SIGQUIT: quit
+	regexp.MustCompile(`^PC=0x[0-9a-f]+ m=\d+ sigcode=\d+(?: addr=0x[0-9a-f]+)?$`),    // PC=0x… m=0 sigcode=0
+	regexp.MustCompile(`^signal arrived during [a-z ]+$`),                             // … cgo execution
+	regexp.MustCompile(`^[a-z0-9]+ +0x[0-9a-f]+$`),                                    // registers
+	regexp.MustCompile(`^(?:runtime stack:|\.\.\.additional frames elided\.\.\.)$`),   // runtime's own
+	regexp.MustCompile(`^goroutine \d+ gp=0x[0-9a-f]+ m=\S+ mp=0x[0-9a-f]+ \[.*\]:$`), // with GOTRACEBACK=system
+}
+
+// crashMessage is a panic or fatal error line; its message is kept only
+// when the runtime wrote it (runtime errors and fatal errors carry
+// indexes, sizes and types, never data), else it is <removed>.
+var crashMessage = regexp.MustCompile(`^(\t?(?:panic|fatal error): )(.*?)((?: \[recovered(?:, repanicked)?\])?)$`)
+
+var runtimeMessage = regexp.MustCompile(`^(?:runtime error: [\w .:\[\]-]+|interface conversion: [\w .*,{}()\[\]-]+|` +
+	`concurrent map [a-z ]+|all goroutines are asleep - deadlock!|out of memory|stack overflow|` +
+	`unexpected signal during runtime execution|sync: [a-z ]+|send on closed channel|close of (?:closed|nil) channel)$`)
+
+// redactCrash keeps the shape of a crash log and the runtime's own
+// messages, and replaces every other line (a panic's message can be any
+// value, a window title included) with <removed>, one per run of them.
+func redactCrash(s string) string {
+	var out []string
+	removed := false
+	for _, line := range strings.Split(s, "\n") {
+		line = strings.TrimRight(line, "\r")
+		if m := crashMessage.FindStringSubmatch(line); m != nil {
+			msg := m[2]
+			if !runtimeMessage.MatchString(msg) {
+				msg = "<removed>"
+			}
+			out, removed = append(out, m[1]+msg+m[3]), false
+			continue
+		}
+		keep := strings.TrimSpace(line) == ""
+		for _, re := range crashKeep {
+			if keep {
+				break
+			}
+			keep = re.MatchString(line)
+		}
+		switch {
+		case keep:
+			out, removed = append(out, line), false
+		case !removed:
+			out, removed = append(out, "<removed>"), true
+		}
+	}
+	if len(out) > bugReportLogLines {
+		out = out[len(out)-bugReportLogLines:]
+	}
+	return strings.Join(out, "\n")
 }
 
 // bugReportRuns is trackd's runs of the last two weeks: when it ran,
