@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"tock/internal/crashlog"
 	"tock/internal/web"
 )
 
@@ -78,6 +79,7 @@ func cmdWeb(env Env, args []string) error {
 
 // stopWhenIdle calls stop once no request has come for idle.
 func stopWhenIdle(ctx context.Context, stop func(), act *web.Activity, idle time.Duration, now func() time.Time) {
+	defer crashlog.Recover("web idle timer")
 	t := time.NewTicker(min(idle/10, 30*time.Second))
 	defer t.Stop()
 	for {

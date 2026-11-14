@@ -16,6 +16,7 @@ import (
 	"tock/internal/classify"
 	"tock/internal/collect"
 	"tock/internal/config"
+	"tock/internal/crashlog"
 	"tock/internal/span"
 	"tock/internal/store"
 )
@@ -131,6 +132,7 @@ func newOCRCoord(c *ocrCoord) *ocrCoord {
 		c.jobs = make(chan ocrJob, 1)
 		c.done = make(chan struct{})
 		go func() {
+			defer crashlog.Recover("ocr queue")
 			defer close(c.done)
 			for j := range c.jobs {
 				c.run(j)

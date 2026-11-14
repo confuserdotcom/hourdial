@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"tock/internal/app"
+	"tock/internal/crashlog"
 )
 
 // syncEvery is how often trackd writes its day files to the sync folder and
@@ -83,6 +84,7 @@ func startLoop(s loop, every time.Duration) (stop func()) {
 	t := time.NewTicker(every)
 	done, finished := make(chan struct{}), make(chan struct{})
 	go func() {
+		defer crashlog.Recover("sync loop")
 		defer close(finished)
 		s.tick()
 		for {

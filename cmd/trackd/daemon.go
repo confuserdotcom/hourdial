@@ -16,6 +16,7 @@ import (
 	"tock/internal/classify"
 	"tock/internal/collect"
 	"tock/internal/config"
+	"tock/internal/crashlog"
 	"tock/internal/service"
 	"tock/internal/span"
 	"tock/internal/stopsignal"
@@ -242,6 +243,7 @@ func runWithStore(o daemonOpts, log *slog.Logger, st *store.Store) int {
 	}
 	pipeErr := make(chan error, 1)
 	go func() {
+		defer crashlog.Recover("pipeline")
 		err := p.run()
 		if err != nil {
 			src.Stop() // a dead pipeline must not leave the run loop spinning
@@ -312,6 +314,7 @@ func runWithStore(o daemonOpts, log *slog.Logger, st *store.Store) int {
 		defer releaseStop()
 	}
 	go func() {
+		defer crashlog.Recover("signal watcher")
 		select {
 		case _, ok := <-sigs:
 			if !ok {

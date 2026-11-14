@@ -14,6 +14,7 @@ import (
 
 	"tock/internal/collect"
 	"tock/internal/config"
+	"tock/internal/crashlog"
 	"tock/internal/desktop"
 	"tock/internal/focus"
 )
@@ -114,6 +115,7 @@ func (w *hookWorker) enqueue(argv []string) {
 }
 
 func (w *hookWorker) loop(done <-chan struct{}) {
+	defer crashlog.Recover("focus hooks")
 	for {
 		select {
 		case argv := <-w.q:

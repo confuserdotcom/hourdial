@@ -8,6 +8,7 @@ import (
 	"tock/internal/app"
 	"tock/internal/classify"
 	"tock/internal/config"
+	"tock/internal/crashlog"
 	"tock/internal/focus"
 	"tock/internal/shell"
 )
@@ -176,6 +177,7 @@ func startFocus(f *focusLoop, sh *shared, every time.Duration, log *slog.Logger)
 	f.hooks = w.enqueue
 	go w.loop(done)
 	go func() {
+		defer crashlog.Recover("focus loop")
 		defer close(finished)
 		for {
 			select {

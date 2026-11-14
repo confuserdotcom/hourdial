@@ -13,6 +13,7 @@ import (
 	"tock/internal/app"
 	"tock/internal/classify"
 	"tock/internal/config"
+	"tock/internal/crashlog"
 	tockpaths "tock/internal/paths"
 	"tock/internal/service"
 	"tock/internal/shell"
@@ -79,6 +80,10 @@ func paths() app.Paths {
 }
 
 func main() {
+	if err := crashlog.Install(stateDir(), "tockbar", version); err != nil {
+		fmt.Fprintf(os.Stderr, "tockbar: %v\n", err)
+	}
+	defer crashlog.Recover("main")
 	if len(os.Args) > 1 {
 		var err error
 		switch os.Args[1] {

@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"tock/internal/collect"
+	"tock/internal/crashlog"
 	"tock/internal/fronttab"
 	"tock/internal/paths"
 	"tock/internal/store"
@@ -71,6 +72,12 @@ const (
 )
 
 func main() {
+	// Crashes, the workers' included, go to trackd-crash.log as well as
+	// the log; it costs one open file and nothing until something crashes.
+	if err := crashlog.Install(stateDir(), "trackd", version); err != nil {
+		fmt.Fprintf(os.Stderr, "trackd: %v\n", err)
+	}
+	defer crashlog.Recover("main")
 	if len(os.Args) > 1 && os.Args[1] == "ocr-worker" {
 		os.Exit(runOCRWorker(os.Args[2:], os.Stdout))
 	}

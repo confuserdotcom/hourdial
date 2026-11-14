@@ -13,6 +13,7 @@ import (
 	"tock/internal/app"
 	"tock/internal/bar"
 	"tock/internal/classify"
+	"tock/internal/crashlog"
 	"tock/internal/focus"
 	"tock/internal/report"
 	"tock/internal/store"
@@ -152,6 +153,7 @@ func (r *runner) loadPages(now time.Time) {
 
 // loop runs until events closes.
 func (r *runner) loop(events <-chan event) {
+	defer crashlog.Recover("runner")
 	t := time.NewTicker(time.Second)
 	defer t.Stop()
 	ready := false

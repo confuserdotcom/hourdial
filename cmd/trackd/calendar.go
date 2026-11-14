@@ -8,6 +8,7 @@ import (
 	"tock/internal/classify"
 	"tock/internal/collect"
 	"tock/internal/config"
+	"tock/internal/crashlog"
 	"tock/internal/store"
 )
 
@@ -136,6 +137,7 @@ func startCalendar(c *calendarLoop, every time.Duration) (stop func()) {
 	t := time.NewTicker(every)
 	done, finished := make(chan struct{}), make(chan struct{})
 	go func() {
+		defer crashlog.Recover("calendar loop")
 		defer close(finished)
 		c.tick()
 		for {

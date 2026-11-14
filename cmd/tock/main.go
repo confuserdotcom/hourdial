@@ -18,6 +18,7 @@ import (
 
 	"tock/internal/app"
 	"tock/internal/claude"
+	"tock/internal/crashlog"
 	"tock/internal/desktop"
 	"tock/internal/gitlog"
 	"tock/internal/paths"
@@ -384,5 +385,10 @@ func run(args []string, env Env) int {
 var version = "dev"
 
 func main() {
-	os.Exit(run(os.Args[1:], defaultEnv()))
+	env := defaultEnv()
+	// A crash also lands in tock-crash.log, for tock bugreport. Silent when
+	// the state folder cannot be written: the command itself matters more.
+	_ = crashlog.Install(env.StateDir, "tock", version)
+	defer crashlog.Recover("main")
+	os.Exit(run(os.Args[1:], env))
 }

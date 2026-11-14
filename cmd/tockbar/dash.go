@@ -9,6 +9,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"tock/internal/crashlog"
 )
 
 // dashIdle is how long the dashboard runs with no request before it stops.
@@ -61,6 +63,7 @@ func (d *dash) start() (string, error) {
 	}
 	got := make(chan string, 1)
 	go func() {
+		defer crashlog.Recover("dashboard link reader")
 		sc := bufio.NewScanner(out)
 		link := ""
 		if sc.Scan() {
@@ -83,6 +86,7 @@ func (d *dash) start() (string, error) {
 	d.proc, d.link = c, link
 	d.mu.Unlock()
 	go func() {
+		defer crashlog.Recover("dashboard waiter")
 		c.Wait()
 		d.mu.Lock()
 		if d.proc == c {
