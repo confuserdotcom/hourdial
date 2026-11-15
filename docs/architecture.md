@@ -29,7 +29,10 @@ last input event; sleep, wake, lock and unlock come from `NSWorkspace`
 notifications. This is the only cgo in the project (`internal/collect`).
 
 On Hyprland, trackd reads the compositor's event socket (`.socket2.sock`)
-and gets idle and active from hypridle hooks.
+and gets idle and active from hypridle hooks. On Sway and i3 it reads the
+window manager's IPC socket, with idle from swayidle on Sway and from the
+X server under i3; on any other X11 window manager it asks the X server for
+the active window and the idle time.
 
 A merger turns these events into **spans**: one row per stretch of the same
 app, title and URL, with a start and an end in Unix milliseconds. A span is
@@ -121,7 +124,7 @@ client.
 `tock` reaches the internet only for the features you turn on: Claude
 suggestions and summaries (through the `claude` CLI or the API), and Slack
 status. What they send goes through deny lists first, and `--dry-run` prints
-it. The details are in [Privacy in detail](guide#privacy-in-detail).
+it. The details are in [Privacy in detail](guide.md#privacy-in-detail).
 
 `tock web` listens on 127.0.0.1 only. Each run makes a new token, which the
 page keeps in the URL fragment so it never reaches a server log. The page
@@ -136,7 +139,6 @@ Measured on an Apple Silicon Mac, November 2026:
 | trackd memory | 43 MB footprint after warming up |
 | trackd CPU | 0.75 % over 10 minutes with a browser in front |
 | Building a day | about 2 ms after six months of history, the same as after a week |
-| Database | about 9 MB after the first month |
 
 `scripts/trackd-usage.sh [minutes]` measures both on a running trackd: CPU
 as CPU time over wall time for the window, memory as `footprint`, not `ps`.
@@ -144,6 +146,6 @@ SQLite's memory is allocated outside the Go heap, and `ps` misses part of it.
 
 ## Testing
 
-About 1,300 tests run with `make test`. The terminal UI has golden
+`make test` runs every test, about 1,800 test functions. The terminal UI has golden
 snapshots in `internal/tui/testdata`. CI runs the tests without cgo on
 Linux and with cgo on macOS.
