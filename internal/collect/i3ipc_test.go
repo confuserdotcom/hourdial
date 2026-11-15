@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -227,5 +228,41 @@ func TestI3RefusesAHugeReply(t *testing.T) {
 	_, _, err := i3Read(a)
 	if err == nil || !strings.Contains(err.Error(), "payload of") {
 		t.Fatalf("err = %v; want a refusal", err)
+	}
+}
+
+// A tree too big to read does not stop tracking: the poll says so once and
+// carries on with the window the last focus event named, so idle and time
+// still reach trackd.
+func TestSwayRefusedTreeKeepsTracking(t *testing.T) {
+	f := newFakeSway(t)
+	f.tree = `{"name":"` + strings.Repeat("x", i3MaxPayload) + `"}`
+	var mu sync.Mutex
+	var warned []string
+	src, err := NewSway(f.sock, LinuxOptions{PollInterval: 20 * time.Millisecond, Proc: t.TempDir(),
+		Warn: func(msg string) { mu.Lock(); warned = append(warned, msg); mu.Unlock() }})
+	if err != nil {
+		t.Fatal(err)
+	}
+	runErr := make(chan error, 1)
+	go func() { runErr <- src.Run() }()
+	f.events <- `{"change":"focus","container":{"app_id":"foot","name":"~/tock"}}`
+	if s := next(t, src.Inputs()); s.BundleID != "foot" || !s.Activation {
+		t.Fatalf("event sample = %+v", s)
+	}
+	for range 3 {
+		if s := next(t, src.Inputs()); s.BundleID != "foot" || *s.Title != "~/tock" || s.Activation {
+			t.Fatalf("poll sample = %+v", s)
+		}
+	}
+	src.Stop()
+	close(f.events)
+	if err := <-runErr; err != nil {
+		t.Fatalf("Run = %v", err)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if len(warned) != 1 || !strings.Contains(warned[0], "payload of") {
+		t.Fatalf("warnings = %q, want one about the refused reply", warned)
 	}
 }
