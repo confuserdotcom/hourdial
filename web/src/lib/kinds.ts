@@ -36,6 +36,14 @@ export function kindColor(k: string): string {
   return `hsl(var(--k-${isKind(k) ? k : "neutral"}))`;
 }
 
+/** kindInk is the colour of text drawn on a kind's bar: black or white,
+ *  whichever keeps 4.5:1 on that kind in the theme (--on-k-*). Unlabelled
+ *  bars are a see-through grey, so their text is the usual foreground. */
+export function kindInk(k: string): string {
+  if (k === "") return "hsl(var(--foreground))";
+  return `hsl(var(--on-k-${isKind(k) ? k : "neutral"}))`;
+}
+
 /** PATTERNED kinds carry a texture as well as a colour, so they read without
  *  colour: Distracting is striped, Browsing dotted (Away is hatched). */
 export const PATTERNED: Record<string, string> = { distract: "k-pat-distract", browse: "k-pat-browse" };

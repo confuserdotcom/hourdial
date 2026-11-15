@@ -62,10 +62,11 @@ function BarList({ rows, total, onRow }: { rows: TopRow[]; total: number; onRow:
             <div className="relative flex items-center gap-3 px-2 py-1">
               <span className="min-w-0 flex-1 truncate">
                 {r.name}
-                {r.mostly && <span className="ml-2 text-xs text-muted-foreground">mostly {r.mostly}</span>}
+                {/* muted grey is too faint over the share bar; a softer foreground keeps 4.5:1 */}
+                {r.mostly && <span className="ml-2 text-xs text-foreground/75">mostly {r.mostly}</span>}
               </span>
               <span className="num">{clock(r.ms)}</span>
-              <span className="num w-10 text-right text-muted-foreground">{pct(r.ms, total)}</span>
+              <span className="num w-10 text-right text-foreground/75">{pct(r.ms, total)}</span>
             </div>
           </>
         );

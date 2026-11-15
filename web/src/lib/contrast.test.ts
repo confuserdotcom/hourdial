@@ -31,4 +31,16 @@ for (const [name, t] of [["dark", dark], ["light", light]] as const) {
       }
     }
   });
+
+  test(`${name}: names on a kind's bar keep 4.5:1`, () => {
+    for (const k of ["deep", "shallow", "browse", "neutral", "distract"]) {
+      expect(t[`on-k-${k}`], `on-k-${k} missing`).toBeTruthy();
+      expect(ratio(rgb(t[`on-k-${k}`]), rgb(t[`k-${k}`])), `on-k-${k} on k-${k}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
 }
+
+test("the light theme is the same in both of its blocks", () => {
+  const media = tokens(css.slice(css.indexOf("@media (prefers-color-scheme: light)"), css.indexOf(':root[data-theme="light"]')));
+  expect(media).toEqual(light);
+});
