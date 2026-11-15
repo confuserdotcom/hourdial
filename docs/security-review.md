@@ -131,8 +131,8 @@ the bug report redacts it (below).
 `web/`: 0 vulnerabilities. Dependabot is on.
 
 **Releases** — tarballs and the .dmg get GitHub build provenance
-(`gh attestation verify <file> -R confuserdotcom/tock`) and are listed in
-`SHA256SUMS`. The macOS app is ad-hoc signed, not notarized: there is no
+(`gh attestation verify <file> -R confuserdotcom/tock`). The tarballs are
+listed in `SHA256SUMS`; the .dmg has its own `.dmg.sha256`. The macOS app is ad-hoc signed, not notarized: there is no
 Apple Developer ID, so the first open needs Privacy & Security → Open
 Anyway.
 
