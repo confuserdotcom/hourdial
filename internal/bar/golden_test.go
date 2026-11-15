@@ -13,6 +13,7 @@ import (
 	"tock/internal/classify"
 	"tock/internal/clockfmt"
 	"tock/internal/config"
+	"tock/internal/datefmt"
 	"tock/internal/focus"
 	"tock/internal/recommend"
 	"tock/internal/report"
@@ -303,11 +304,11 @@ func TestGoldenNotchMoments(t *testing.T) {
 		i    Island
 	}{
 		{"budget 85%", BudgetIsland(store.Notice{ID: 7, Topic: focus.TopicBudget, Title: "tock: 85% of its 40h budget", Body: "34h spent, 6h left."},
-			app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 34 * h, RunsOutMS: goldenAt(12, 0) + 15*24*h}, islandLoc)},
+			app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 34 * h, RunsOutMS: goldenAt(12, 0) + 15*24*h}, islandLoc, datefmt.DMY)},
 		{"budget over", BudgetIsland(store.Notice{ID: 8, Topic: focus.TopicBudget, Title: "tock is over its 40h budget", Body: "44h spent."},
-			app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 44 * h}, islandLoc)},
+			app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 44 * h}, islandLoc, datefmt.DMY)},
 		{"budget from an older trackd", BudgetIsland(store.Notice{ID: 9, Topic: focus.TopicBudget, Title: "tock: 80% of its budget", Body: "32h spent."},
-			app.NoticeData{}, islandLoc)},
+			app.NoticeData{}, islandLoc, datefmt.DMY)},
 		{"session done", DoneIsland(store.Notice{ID: 10, Topic: focus.TopicDone, Title: "Session done", Body: "50m · 78% deep"},
 			app.NoticeData{Session: 41, Minutes: 50, Project: "Licence", Refile: true}, det, islandLoc, 48*60_000)},
 		{"drift", DriftIsland(store.Notice{ID: 11, Topic: focus.TopicFocus, Title: "Back to tock notch?", Body: "YouTube for 2 min"},

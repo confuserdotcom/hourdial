@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"tock/internal/app"
+	"tock/internal/datefmt"
 	"tock/internal/focus"
 	"tock/internal/store"
 )
@@ -14,7 +15,7 @@ func TestBudgetIsland(t *testing.T) {
 	const h = int64(3600_000)
 	n := store.Notice{ID: 7, Topic: focus.TopicBudget, Title: "tock: 85% of its 40h budget", Body: "34h spent, 6h left."}
 	runs := time.Date(2026, 11, 20, 12, 0, 0, 0, time.UTC).UnixMilli()
-	i := BudgetIsland(n, app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 34 * h, RunsOutMS: runs}, time.UTC)
+	i := BudgetIsland(n, app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 34 * h, RunsOutMS: runs}, time.UTC, datefmt.DMY)
 	if i.State != IslandBudget || !i.Open || i.Notice != 7 || i.AutoClose == 0 {
 		t.Fatalf("island = %+v", i)
 	}
@@ -32,6 +33,13 @@ func TestBudgetIsland(t *testing.T) {
 	if cells["Spent"].V != "34h00" || cells["Budget"].V != "40h" || cells["Left"].V != "6h00" || cells["Runs out"].V != "Fri 20 Nov" {
 		t.Fatalf("cells = %+v", p.Cells)
 	}
+	for style, want := range map[datefmt.Style]string{datefmt.MDY: "Fri Nov 20", datefmt.ISO: "Fri 2026-11-20"} {
+		for _, c := range BudgetIsland(n, app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 34 * h, RunsOutMS: runs}, time.UTC, style).Panel.Cells {
+			if c.K == "Runs out" && c.V != want {
+				t.Errorf("%v: runs out %q, want %q", style, c.V, want)
+			}
+		}
+	}
 	if len(p.Strip) != budgetCells || p.Strip[0] != "break" || p.Strip[budgetCells-1] != "none" {
 		t.Fatalf("strip = %v", p.Strip)
 	}
@@ -42,7 +50,7 @@ func TestBudgetIsland(t *testing.T) {
 		t.Fatalf("buttons = %+v", p.Buttons)
 	}
 
-	over := BudgetIsland(n, app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 50 * h}, time.UTC)
+	over := BudgetIsland(n, app.NoticeData{Project: "tock", BudgetMS: 40 * h, SpentMS: 50 * h}, time.UTC, datefmt.DMY)
 	if over.Face.Dot != "distract" || over.Face.Right != "125%" {
 		t.Fatalf("over face = %+v", over.Face)
 	}
@@ -61,7 +69,7 @@ func TestBudgetIsland(t *testing.T) {
 	}
 
 	// A notice queued by an older trackd carries no numbers: its text stands in.
-	old := BudgetIsland(n, app.NoticeData{}, time.UTC)
+	old := BudgetIsland(n, app.NoticeData{}, time.UTC, datefmt.DMY)
 	if old.Panel.Lead != n.Title || old.Panel.Sub != n.Body || len(old.Panel.Cells) != 0 || old.Panel.Strip != nil {
 		t.Fatalf("old = %+v", old.Panel)
 	}

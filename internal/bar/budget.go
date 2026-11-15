@@ -6,6 +6,7 @@ import (
 
 	"tock/internal/app"
 	"tock/internal/classify"
+	"tock/internal/datefmt"
 	"tock/internal/report"
 	"tock/internal/store"
 )
@@ -15,7 +16,7 @@ const budgetCells = 24
 
 // BudgetIsland is the moment a project's budget reaches 80% or runs out. A
 // notice queued by an older trackd has no numbers: its text stands in.
-func BudgetIsland(n store.Notice, d app.NoticeData, loc *time.Location) Island {
+func BudgetIsland(n store.Notice, d app.NoticeData, loc *time.Location, dates datefmt.Style) Island {
 	name := d.Project
 	if name == "" {
 		name = n.Title
@@ -36,7 +37,7 @@ func BudgetIsland(n store.Notice, d app.NoticeData, loc *time.Location) Island {
 		} else {
 			p.Cells = append(p.Cells, Cell{K: "Left", V: report.Dur(d.BudgetMS - d.SpentMS)})
 			if d.RunsOutMS > 0 {
-				p.Cells = append(p.Cells, Cell{K: "Runs out", V: time.UnixMilli(d.RunsOutMS).In(loc).Format("Mon 2 Jan")})
+				p.Cells = append(p.Cells, Cell{K: "Runs out", V: dates.Day(time.UnixMilli(d.RunsOutMS).In(loc))})
 			}
 		}
 		p.Strip, p.Axis = budgetGauge(d.BudgetMS, d.SpentMS)

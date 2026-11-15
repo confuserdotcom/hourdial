@@ -8,6 +8,7 @@ import (
 	"tock/internal/app"
 	"tock/internal/bar"
 	"tock/internal/classify"
+	"tock/internal/datefmt"
 	"tock/internal/focus"
 	"tock/internal/report"
 	"tock/internal/stats"
@@ -89,7 +90,7 @@ func demoSteps() []demoStep {
 		}, 8 * time.Second},
 		{func(now time.Time) bar.Island {
 			return bar.BudgetIsland(store.Notice{ID: 5, Topic: focus.TopicBudget, Title: "tock: 85% of its 40h budget"},
-				app.NoticeData{Project: "tock", BudgetMS: 40 * 3600_000, SpentMS: 34 * 3600_000, RunsOutMS: ms(now) + 5*86_400_000}, time.Local)
+				app.NoticeData{Project: "tock", BudgetMS: 40 * 3600_000, SpentMS: 34 * 3600_000, RunsOutMS: ms(now) + 5*86_400_000}, time.Local, datefmt.DMY)
 		}, 6 * time.Second},
 		// a session end nobody saw waits as a dot
 		{func(now time.Time) bar.Island { return bar.Missed(quiet(now), done(now)) }, 4 * time.Second},
