@@ -113,3 +113,25 @@ func TestRun(t *testing.T) {
 		t.Fatalf("by kind = %+v", r)
 	}
 }
+
+// Imported Xcode is Xcode: an answer names it once, and asking about
+// "xcode" counts the imported time too.
+func TestRunImportedApp(t *testing.T) {
+	day := time.Date(2026, 10, 10, 0, 0, 0, 0, loc)
+	at := func(h int) int64 { return day.Add(time.Duration(h) * time.Hour).UnixMilli() }
+	vs := []classify.SpanView{
+		{Start: at(9), End: at(11), App: "Xcode", BundleID: "xcode"},
+		{ID: -(classify.RemoteIDBase + 1), Start: at(11), End: at(12), App: classify.ImportMachine + " · Xcode", BundleID: "xcode"},
+		{Start: at(12), End: at(13), App: "WezTerm", BundleID: "term"},
+	}
+	ls := []classify.Label{{Category: "Code"}, {Category: "Code"}, {Category: "Code"}}
+	q, _ := Parse(json.RawMessage(`{"range":"today","group_by":"app"}`), ruleset(t))
+	f, to := q.Bounds(today, time.Monday)
+	if r := Run(q, f, to, vs, ls); len(r.Rows) != 2 || r.Rows[0] != (Row{"Xcode", 3 * 3600_000}) {
+		t.Fatalf("by app = %+v", r.Rows)
+	}
+	q, _ = Parse(json.RawMessage(`{"range":"today","group_by":"total","app":"xcode"}`), ruleset(t))
+	if r := Run(q, f, to, vs, ls); r.MS != 3*3600_000 {
+		t.Fatalf("app filter = %+v", r)
+	}
+}

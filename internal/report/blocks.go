@@ -123,7 +123,7 @@ func buildBlock(g blockRun, views []classify.SpanView, labels []classify.Label) 
 		case classify.KindDistract:
 			b.DistractMS += d
 		}
-		name := v.App
+		name := classify.DisplayApp(v.App)
 		if !v.Private && v.URL != nil && *v.URL != "" {
 			h, _, _ := strings.Cut(strings.TrimPrefix(*v.URL, "www."), "/")
 			name = strings.ToLower(h)

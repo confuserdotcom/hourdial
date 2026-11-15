@@ -66,7 +66,7 @@ func BuildTop(from, to time.Time, views []classify.SpanView, labels []classify.L
 		if l.Project != "" {
 			ms[TopProject][l.Project] += d
 		}
-		names := map[string]string{TopApp: v.App}
+		names := map[string]string{TopApp: classify.DisplayApp(v.App)}
 		if !v.Private && v.URL != nil && *v.URL != "" {
 			h, _, _ := strings.Cut(strings.TrimPrefix(*v.URL, "www."), "/")
 			names[TopSite] = strings.ToLower(h)

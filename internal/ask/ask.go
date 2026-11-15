@@ -204,7 +204,8 @@ func host(v classify.SpanView) string {
 }
 
 // match reports whether a view passes q's filters. App names match without
-// case and on a prefix; sites match the host or a parent domain.
+// case and on a prefix, of the name as shown or as stored; sites match the
+// host or a parent domain.
 func (q Query) match(v classify.SpanView, l classify.Label) bool {
 	eq := func(a, b string) bool { return strings.EqualFold(a, b) }
 	if q.Category != nil && !eq(l.Category, *q.Category) {
@@ -216,8 +217,11 @@ func (q Query) match(v classify.SpanView, l classify.Label) bool {
 	if q.Kind != nil && l.Kind != *q.Kind {
 		return false
 	}
-	if q.App != nil && !strings.HasPrefix(strings.ToLower(v.App), strings.ToLower(strings.TrimSpace(*q.App))) {
-		return false
+	if q.App != nil {
+		want := strings.ToLower(strings.TrimSpace(*q.App))
+		if !strings.HasPrefix(strings.ToLower(classify.DisplayApp(v.App)), want) && !strings.HasPrefix(strings.ToLower(v.App), want) {
+			return false
+		}
 	}
 	if q.Site != nil {
 		s := strings.TrimPrefix(strings.ToLower(strings.TrimSpace(*q.Site)), "www.")
@@ -251,7 +255,7 @@ func Run(q Query, from, to time.Time, views []classify.SpanView, labels []classi
 		case ByProject:
 			name = l.Project
 		case ByApp:
-			name = v.App
+			name = classify.DisplayApp(v.App)
 		case BySite:
 			name = host(v)
 		case ByKind:

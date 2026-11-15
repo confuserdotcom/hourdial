@@ -51,7 +51,7 @@ func Window(views []classify.SpanView, labels []classify.Label, from, to int64, 
 			cats[l.Category] += d
 		}
 		if v.App != "" {
-			apps[v.App] += d
+			apps[classify.DisplayApp(v.App)] += d
 		}
 		if l.Project != "" {
 			projs[l.Project] += d

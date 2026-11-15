@@ -146,10 +146,12 @@ func BuildWeek(in WeekInput) Week {
 }
 
 // AppName names a view for the week's apps and sites: the host of its URL
-// without a leading "www." when it has one and is not private, else its app.
+// without a leading "www." when it has one and is not private, else its app
+// as a person reads it (see classify.DisplayApp), so imported and local time
+// in one app add up.
 func AppName(v classify.SpanView) string {
 	if v.Private || v.URL == nil || *v.URL == "" {
-		return v.App
+		return classify.DisplayApp(v.App)
 	}
 	host, _, _ := strings.Cut(*v.URL, "/")
 	return strings.TrimPrefix(host, "www.")
