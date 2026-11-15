@@ -3,7 +3,7 @@ import { Film, Pause, Play, RotateCcw, X } from "lucide-react";
 import { Panel } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
 import type { Row } from "@/lib/api";
-import { dur, hhmm, is12h } from "@/lib/format";
+import { dayTitleLong, dur, hhmm, is12h } from "@/lib/format";
 import { kindColor, kindLabel } from "@/lib/kinds";
 import { saveBlob } from "@/lib/download";
 import { frame, ordered } from "@/lib/replay";
@@ -95,7 +95,7 @@ export function Replay({ rows: raw, from, to, onClose }: { rows: Row[]; from: nu
     setVideoNote("");
     setRendering(0);
     try {
-      const title = new Date(from).toLocaleDateString(undefined, { weekday: "long", day: "numeric", month: "long" });
+      const title = dayTitleLong(new Date(from));
       const { blob, mime } = await recordReplay(rows, start, to, {
         title, palette: readPalette(), signal: ac.signal, onProgress: (p) => setRendering(p),
       });

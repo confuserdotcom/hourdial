@@ -83,9 +83,69 @@ export function addDays(d: Date, n: number): Date {
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-/** dayTitle(2026-11-05) = "Thu 5 Nov". */
+const LONG_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const LONG_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/** dateStyle is config.toml's [display] date: "dmy" (5 Nov), "mdy"
+ *  (Nov 5) or "iso" (2026-11-05). Names stay English. */
+let dateStyle: "dmy" | "mdy" | "iso" = "dmy";
+
+/** setDateStyle takes date as /api/status sends it; anything else is
+ *  day first. */
+export function setDateStyle(name?: string) {
+  dateStyle = name === "mdy" || name === "iso" ? name : "dmy";
+}
+
+/** dayMonth is the day and month in the date style: "5 Nov", "Nov 5", or
+ *  the whole ISO date. */
+function dayMonth(d: Date): string {
+  if (dateStyle === "iso") return isoDate(d);
+  return dateStyle === "mdy" ? `${MONTHS[d.getMonth()]} ${d.getDate()}` : `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+}
+
+/** dayTitle(2026-11-05) = "Thu 5 Nov", "Thu Nov 5" or "Thu 2026-11-05". */
 export function dayTitle(d: Date): string {
-  return `${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`;
+  return `${DAYS[d.getDay()]} ${dayMonth(d)}`;
+}
+
+/** dayTitleYear is dayTitle with the year: "Thu 5 Nov 2026",
+ *  "Thu Nov 5, 2026", "Thu 2026-11-05". */
+export function dayTitleYear(d: Date): string {
+  if (dateStyle === "iso") return dayTitle(d);
+  return dateStyle === "mdy" ? `${dayTitle(d)}, ${d.getFullYear()}` : `${dayTitle(d)} ${d.getFullYear()}`;
+}
+
+/** dayTitleLong(2026-11-05) = "Thursday 5 November", "Thursday,
+ *  November 5" or "Thursday 2026-11-05". */
+export function dayTitleLong(d: Date): string {
+  const wd = LONG_DAYS[d.getDay()];
+  if (dateStyle === "iso") return `${wd} ${isoDate(d)}`;
+  return dateStyle === "mdy" ? `${wd}, ${LONG_MONTHS[d.getMonth()]} ${d.getDate()}` : `${wd} ${d.getDate()} ${LONG_MONTHS[d.getMonth()]}`;
+}
+
+/** NUMBER_SEPS maps config.toml's [display] numbers, written as 1234.5
+ *  would be, to its decimal mark and grouping. */
+const NUMBER_SEPS: Record<string, [string, string]> = {
+  "1234.5": [".", ""], "1,234.5": [".", ","], "1.234,5": [",", "."], "1 234,5": [",", " "], "1234,5": [",", ""],
+};
+let numberSeps: [string, string] = [".", ""];
+
+/** setNumbers takes numbers as /api/status sends it; anything else is
+ *  "1234.5". */
+export function setNumbers(name?: string) {
+  numberSeps = NUMBER_SEPS[name ?? ""] ?? [".", ""];
+}
+
+/** num(1234.5, 2) is "1234.50", or "1.234,50" with numbers "1.234,5": the
+ *  text the commands print. Money comes formatted from the server. */
+export function num(v: number, digits: number): string {
+  const [dec, group] = numberSeps;
+  let s = v.toFixed(digits);
+  const sign = s.startsWith("-") ? "-" : "";
+  if (sign) s = s.slice(1);
+  const [w, frac] = s.split(".");
+  const whole = group && w.length > 3 ? w.replace(/\B(?=(\d{3})+$)/g, group) : w;
+  return sign + whole + (frac !== undefined ? dec + frac : "");
 }
 
 export function shortDay(d: Date): string {
@@ -167,9 +227,10 @@ export function periodTitle(date: string, unit: Unit, today = new Date()): strin
   if (unit === "week") {
     if (holdsToday(date, unit, today)) return "This week";
     const m = weekStartOf(d), s = addDays(m, 6);
-    return m.getMonth() === s.getMonth()
-      ? `${m.getDate()}–${s.getDate()} ${MONTHS[m.getMonth()]}`
-      : `${m.getDate()} ${MONTHS[m.getMonth()]} – ${s.getDate()} ${MONTHS[s.getMonth()]}`;
+    if (dateStyle === "iso" || m.getMonth() !== s.getMonth()) return `${dayMonth(m)} – ${dayMonth(s)}`;
+    return dateStyle === "mdy"
+      ? `${MONTHS[m.getMonth()]} ${m.getDate()}–${s.getDate()}`
+      : `${m.getDate()}–${s.getDate()} ${MONTHS[m.getMonth()]}`;
   }
   return monthTitle(d);
 }

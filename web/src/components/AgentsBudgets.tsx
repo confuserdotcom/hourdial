@@ -1,6 +1,6 @@
 import { Panel } from "@/components/Panel";
 import { useApi, type Agents, type Budget } from "@/lib/api";
-import { dur } from "@/lib/format";
+import { dayTitle, dayTitleYear, dur, num } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /** AgentsAndBudgets is the day's agent ledger and the project budgets, each
@@ -22,7 +22,7 @@ export function AgentsAndBudgets({ date, tick }: { date: string; tick: number })
 function AgentsPanel({ ag }: { ag: Agents }) {
   const lev = ag.youMS > 0 ? ag.agentMS / ag.youMS : 0;
   return (
-    <Panel label="Agents" aside={<span className="num">{dur(ag.agentMS)} worked{lev >= 1 ? ` · ${lev.toFixed(1)}× your time` : ""}</span>}>
+    <Panel label="Agents" aside={<span className="num">{dur(ag.agentMS)} worked{lev >= 1 ? ` · ${num(lev, 1)}× your time` : ""}</span>}>
       <table className="w-full text-sm">
         <thead>
           <tr className="lbl text-left">
@@ -82,7 +82,5 @@ function BudgetsPanel({ bs }: { bs: Budget[] }) {
 /** runsOut is a day like "Fri 8 Jan", with the year when it is not this one. */
 function runsOut(ms: number): string {
   const d = new Date(ms);
-  const opts: Intl.DateTimeFormatOptions = { weekday: "short", day: "numeric", month: "short" };
-  if (d.getFullYear() !== new Date().getFullYear()) opts.year = "numeric";
-  return d.toLocaleDateString("en-GB", opts);
+  return d.getFullYear() !== new Date().getFullYear() ? dayTitleYear(d) : dayTitle(d);
 }

@@ -20,7 +20,7 @@ import { useLive } from "@/lib/live";
 import { moves } from "@/lib/moves";
 import { Button } from "@/components/ui/button";
 import { useApi, type Day } from "@/lib/api";
-import { addDays, delta, dur, hhmm, is12h, parseDate } from "@/lib/format";
+import { addDays, delta, dur, hhmm, is12h, num, parseDate } from "@/lib/format";
 import { go } from "@/lib/route";
 import { fit, type Win } from "@/lib/zoom";
 import { byKindRows, kindColor, kindHelp, kindLabel } from "@/lib/kinds";
@@ -136,8 +136,8 @@ export default function Today({ date, tick }: { date: string; tick: number }) {
             <Stat k="Longest block" v={dur(d.stats.longestMS)} c={u ? d.stats.longestMS - u.longestMS : null} help={help.longest} />
             <Stat k="Distracting" v={dur(d.stats.distractMS)} c={u ? d.stats.distractMS - u.distractMS : null} lowerIsGood help={help.distract} />
             <dt><Explain title="Switches / hour" label="Switches / hour">{help.switches}</Explain></dt>
-            <dd className="num text-right">{sph.toFixed(1)}</dd>
-            <dd className="num text-right text-xs">{u ? <Change v={sph - u.switchesPerHour} text={(sph - u.switchesPerHour >= 0 ? "+" : "−") + Math.abs(sph - u.switchesPerHour).toFixed(1)} lowerIsGood /> : null}</dd>
+            <dd className="num text-right">{num(sph, 1)}</dd>
+            <dd className="num text-right text-xs">{u ? <Change v={sph - u.switchesPerHour} text={(sph - u.switchesPerHour >= 0 ? "+" : "−") + num(Math.abs(sph - u.switchesPerHour), 1)} lowerIsGood /> : null}</dd>
           </dl>
         </Panel>
 
@@ -362,7 +362,7 @@ function statHelp(d: Day): Record<"focus" | "longest" | "distract" | "switches",
     switches: (
       <>
         <Why>A switch is a move to another kind of time that lasts at least {STATS.switchMinS}s; shorter visits are ignored. Idle time, or a gap of {STATS.resetGapMin}m, starts the count afresh.</Why>
-        <Sum rows={[["Switches", String(s.switches)], ["Active time", dur(s.activeMS)]]} total={["Per active hour", d.score.switchesPerHour.toFixed(1)]} />
+        <Sum rows={[["Switches", String(s.switches)], ["Active time", dur(s.activeMS)]]} total={["Per active hour", num(d.score.switchesPerHour, 1)]} />
         <Usual d={d} />
       </>
     ),

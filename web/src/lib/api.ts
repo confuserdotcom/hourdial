@@ -134,6 +134,8 @@ export type Status = {
   presets?: number[]; // session lengths in minutes, the default first
   weekStart?: string; // "monday", "sunday" or "saturday"
   clock?: string; // "24h" or "12h"
+  date?: string; // "dmy", "mdy" or "iso"
+  numbers?: string; // "1234.5", "1,234.5", "1.234,5", "1 234,5" or "1234,5"
 };
 export type WeekDay = { billedMS?: number; date: string; trackedMS: number; byKind: ByKind; future: boolean; score: number; deepMS: number };
 export type Week = {

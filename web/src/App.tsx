@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useApi, type Inbox as InboxT, type Status } from "@/lib/api";
-import { holdsToday, hhmm, isoDate, setClock, setWeekStart, stepDate, dur } from "@/lib/format";
+import { holdsToday, hhmm, isoDate, setClock, setDateStyle, setNumbers, setWeekStart, stepDate, dur } from "@/lib/format";
 import { DATED, go, useRoute, VIEWS, type View } from "@/lib/route";
 import { cn } from "@/lib/utils";
 import { GroupsContext, groupsOf } from "@/lib/groups";
@@ -45,6 +45,8 @@ export default function App() {
   const status = useApi<Status>("/api/status", tick + n);
   setWeekStart(status.data?.weekStart);
   setClock(status.data?.clock);
+  setDateStyle(status.data?.date);
+  setNumbers(status.data?.numbers);
   const inbox = useApi<InboxT>("/api/inbox?days=7", tick);
   const unit = DATED[route.view];
   const step = (k: number) => unit && go({ date: stepDate(route.date, unit, k) });

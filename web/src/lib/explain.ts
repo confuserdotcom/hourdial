@@ -1,6 +1,6 @@
 // How the dashboard's numbers are made, for the explanations behind them.
 import type { Score } from "./api";
-import { dur } from "./format";
+import { dur, num } from "./format";
 
 /** STATS mirrors the constants of internal/stats/stats.go and the usual day
  *  of internal/app/usual.go; TestExplainMirrorsStats checks they agree. */
@@ -31,7 +31,7 @@ export function scoreParts(s: Score): { parts: Part[]; sum: number; rounded: num
   const all: Omit<Part, "points">[] = [
     { key: "depth", name: "Focus time", detail: `against your ${dur(s.targetMS)} target`, weight: w.depth, value: s.depth },
     { key: "blocks", name: "Long blocks", detail: `share of focus in blocks of ${STATS.longBlockMin}m or more`, weight: w.blocks, value: s.blocks },
-    { key: "calm", name: "Calm", detail: `${s.switchesPerHour.toFixed(1)} switches an hour; ${STATS.calmZeroPerHour} makes it 0`, weight: w.calm, value: s.calm },
+    { key: "calm", name: "Calm", detail: `${num(s.switchesPerHour, 1)} switches an hour; ${STATS.calmZeroPerHour} makes it 0`, weight: w.calm, value: s.calm },
     { key: "stretch", name: "Longest run", detail: `without a switch; ${STATS.stretchFullMin}m makes it full`, weight: w.stretch, value: s.stretch },
   ];
   const parts = all.filter((p) => p.weight > 0).map((p) => ({ ...p, points: Math.round(1000 * p.weight * p.value) / 10 }));

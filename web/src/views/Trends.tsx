@@ -10,7 +10,7 @@ import { Explain, Sum, Why } from "@/components/Explain";
 import { STATS } from "@/lib/explain";
 import type { ReactNode } from "react";
 import { useApi, type Hours, type Month } from "@/lib/api";
-import { dayTitle, delta, dur, hourLabel, monthTitle, parseDate } from "@/lib/format";
+import { dayTitle, delta, dur, hourLabel, monthTitle, num, parseDate } from "@/lib/format";
 import { go } from "@/lib/route";
 import { useGroups } from "@/lib/groups";
 import { cn } from "@/lib/utils";
@@ -67,7 +67,7 @@ function MonthBody({ m }: { m: Month }) {
             <Why>The mean focus score of this month's workdays: days with at least {STATS.workdayMinMin / 60}h of activity. Other days are left out.</Why>
             <Sum rows={[["Workdays", String(c.workdays)], ["Last month", String(p.workdays)]]} />
           </>} />}
-        <Card hasPrev={hasPrev} k="Switches / hour" v={c.switchesPerHour.toFixed(1)} d={c.switchesPerHour - p.switchesPerHour} t={(c.switchesPerHour - p.switchesPerHour >= 0 ? "+" : "−") + Math.abs(c.switchesPerHour - p.switchesPerHour).toFixed(1)} lowerIsGood
+        <Card hasPrev={hasPrev} k="Switches / hour" v={num(c.switchesPerHour, 1)} d={c.switchesPerHour - p.switchesPerHour} t={(c.switchesPerHour - p.switchesPerHour >= 0 ? "+" : "−") + num(Math.abs(c.switchesPerHour - p.switchesPerHour), 1)} lowerIsGood
           help={<Why>Every switch on a workday divided by the workdays' active hours. A switch is a move to another kind of time that lasts at least {STATS.switchMinS}s.</Why>} />
       </div>
       <div className="grid items-start gap-5 lg:grid-cols-[1fr_1.3fr]">
