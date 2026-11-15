@@ -241,11 +241,10 @@ func InvoiceMoney(r store.Invoice, v int64) string {
 	return invoiceNums(r).Money(v, r.MinorUnits, r.Currency, r.CurrencyPosition == "before")
 }
 
-// InvoiceHours is seconds of r as decimal hours: "3.33" or "3,33".
-func InvoiceHours(r store.Invoice, s int64) string { return report.InvoiceHours(s, invoiceNums(r)) }
-
 // InvoicePercent is r's tax rate as its document writes it: "5.5".
-func InvoicePercent(r store.Invoice) string { return invoiceNums(r).Decimal(report.FormatPercent(r.TaxBP)) }
+func InvoicePercent(r store.Invoice) string {
+	return invoiceNums(r).Decimal(report.FormatPercent(r.TaxBP))
+}
 
 // InvoiceDate is t (in r's zone) as r's document writes dates:
 // "2026-11-03" unless r was issued with a date layout.
