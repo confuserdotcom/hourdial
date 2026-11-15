@@ -356,6 +356,9 @@ static NSColor *rgb(int hex) {
 @end
 
 @implementation CurtainBar
+- (BOOL)isAccessibilityElement {
+    return NO; // the clock above it says how long the break has run
+}
 - (void)drawRect:(NSRect)r {
     (void)r;
     NSRect b = self.bounds;
@@ -617,7 +620,9 @@ void bar_prompt(const char *spec) {
         NSView *v = [[NSView alloc] initWithFrame:NSMakeRect(0, 0, 300, 58)];
         NSTextField *goal = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 32, 300, 24)];
         goal.placeholderString = @"TD 3, exercises 4 to 7";
+        goal.accessibilityLabel = @"Goal";
         NSPopUpButton *len = [[NSPopUpButton alloc] initWithFrame:NSMakeRect(0, 0, 120, 26) pullsDown:NO];
+        len.accessibilityLabel = @"Length";
         for (NSString *m in mins) {
             [len addItemWithTitle:[m stringByAppendingString:@" min"]];
             len.lastItem.representedObject = m;
