@@ -14,7 +14,7 @@ const agentsUsage = "agents: usage: tock agents [--days N | --week]"
 func cmdAgents(env Env, args []string) error {
 	fs := newFlags("agents")
 	days := fs.Int("days", 1, "the last N days, today included")
-	week := fs.Bool("week", false, "this week, from Monday")
+	week := fs.Bool("week", false, "this week, from its first day (see week_start)")
 	if err := parseFlags(fs, args); err != nil {
 		return err
 	}
@@ -25,12 +25,12 @@ func cmdAgents(env Env, args []string) error {
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	to := today.AddDate(0, 0, 1)
 	from := to.AddDate(0, 0, -*days)
-	if *week {
-		from = today.AddDate(0, 0, -((int(today.Weekday()) + 6) % 7))
-	}
 	a, err := openApp(env)
 	if err != nil {
 		return err
+	}
+	if *week {
+		from = a.WeekOf(today)
 	}
 	defer a.Close()
 	ag, err := a.Agents(from, to)

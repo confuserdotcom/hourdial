@@ -57,7 +57,7 @@ func TestParseAndBounds(t *testing.T) {
 	if err != nil || q.Site == nil || q.Category != nil || q.Limit != 10 {
 		t.Fatalf("Parse = %+v, %v", q, err)
 	}
-	f, to := q.Bounds(today)
+	f, to := q.Bounds(today, time.Monday)
 	if f.Format("2006-01-02") != "2026-09-28" || to.Format("2006-01-02") != "2026-10-05" {
 		t.Fatalf("last week = %s %s", f, to)
 	}
@@ -73,7 +73,7 @@ func TestParseAndBounds(t *testing.T) {
 		if err != nil {
 			t.Fatalf("%s: %v", c.rng, err)
 		}
-		f, to := q.Bounds(today)
+		f, to := q.Bounds(today, time.Monday)
 		if f.Format("2006-01-02") != c.from || to.Format("2006-01-02") != c.to {
 			t.Errorf("%s = %s – %s", c.rng, f.Format("2006-01-02"), to.Format("2006-01-02"))
 		}
@@ -99,7 +99,7 @@ func TestRun(t *testing.T) {
 	}
 	ls := []classify.Label{{Category: "Code", Kind: "deep", Project: "tock"}, {Category: "Video", Kind: "distract"}, {Category: "Video", Kind: "distract"}, {}}
 	q, _ := Parse(json.RawMessage(`{"range":"today","group_by":"site","site":"youtube.com"}`), ruleset(t))
-	f, to := q.Bounds(today)
+	f, to := q.Bounds(today, time.Monday)
 	r := Run(q, f, to, vs, ls)
 	if r.MS != 2*3600_000 || r.TrackedMS != 4*3600_000 || len(r.Rows) != 2 || r.Rows[0].Name != "m.youtube.com" {
 		t.Fatalf("Run = %+v", r)

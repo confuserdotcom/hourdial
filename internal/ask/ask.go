@@ -152,10 +152,10 @@ func Parse(raw json.RawMessage, rs *classify.Ruleset) (Query, error) {
 }
 
 // Bounds is the query's range: from today's midnight (in today's zone),
-// [from, to). Weeks start on Monday.
-func (q Query) Bounds(today time.Time) (time.Time, time.Time) {
+// [from, to). Weeks start on weekStart.
+func (q Query) Bounds(today time.Time, weekStart time.Weekday) (time.Time, time.Time) {
 	day := time.Date(today.Year(), today.Month(), today.Day(), 0, 0, 0, 0, today.Location())
-	mon := report.MondayOf(day)
+	mon := report.WeekOf(day, weekStart)
 	first := time.Date(day.Year(), day.Month(), 1, 0, 0, 0, 0, day.Location())
 	switch q.Range {
 	case Today:

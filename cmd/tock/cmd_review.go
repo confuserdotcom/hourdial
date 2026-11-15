@@ -8,10 +8,11 @@ import (
 	"tock/internal/report"
 )
 
-// reviewWeek is the week tock review shows by default: this week on a
-// weekend, else last week.
-func reviewWeek(now time.Time) time.Time {
-	if wd := now.Weekday(); wd == time.Saturday || wd == time.Sunday {
+// reviewWeek is the week tock review shows by default for weeks starting
+// on first: this week on its last two days (the weekend, for Monday
+// weeks), else last week.
+func reviewWeek(now time.Time, first time.Weekday) time.Time {
+	if (int(now.Weekday())-int(first)+7)%7 >= 5 {
 		return now
 	}
 	return now.AddDate(0, 0, -7)
@@ -29,7 +30,12 @@ func cmdReview(env Env, args []string) error {
 		return usagef("review: unexpected argument %q", fs.Arg(0))
 	}
 	now := env.Now()
-	day := reviewWeek(now)
+	a, err := openApp(env)
+	if err != nil {
+		return err
+	}
+	defer a.Close()
+	day := reviewWeek(now, a.Config().Display.FirstDay())
 	if *week != "" {
 		d, err := time.ParseInLocation("2006-01-02", *week, now.Location())
 		if err != nil {
@@ -37,11 +43,6 @@ func cmdReview(env Env, args []string) error {
 		}
 		day = d
 	}
-	a, err := openApp(env)
-	if err != nil {
-		return err
-	}
-	defer a.Close()
 	w, err := a.Week(day)
 	if err != nil {
 		return err

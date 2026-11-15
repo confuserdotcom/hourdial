@@ -337,7 +337,7 @@ func (a *App) Day(day time.Time) (report.Day, error) {
 		return report.Day{}, err
 	}
 	if goals := a.rs.Goals; len(goals) > 0 {
-		mon := report.MondayOf(from)
+		mon := a.WeekOf(from)
 		wvs, wls, err := a.labelled(mon.UnixMilli(), to.UnixMilli(), now)
 		if err != nil {
 			return report.Day{}, err
@@ -354,9 +354,16 @@ func (a *App) Day(day time.Time) (report.Day, error) {
 	return d, nil
 }
 
-// Week reports the Monday-start week containing anyDay.
+// WeekOf is local midnight of the first day of t's week, by the
+// [display] week_start setting (Monday by default).
+func (a *App) WeekOf(t time.Time) time.Time {
+	return report.WeekOf(a.midnight(t), a.cfg.Display.FirstDay())
+}
+
+// Week reports the week containing anyDay, starting on the configured
+// first day.
 func (a *App) Week(anyDay time.Time) (report.Week, error) {
-	mon := report.MondayOf(a.midnight(anyDay))
+	mon := a.WeekOf(anyDay)
 	now := a.nowMS()
 	vs, labels, err := a.labelled(mon.UnixMilli(), mon.AddDate(0, 0, 7).UnixMilli(), now)
 	if err != nil {
@@ -379,7 +386,7 @@ func (a *App) Week(anyDay time.Time) (report.Week, error) {
 		return report.Week{}, err
 	}
 	if len(w.Goals) > 0 {
-		// Streaks as of today, or the week's Sunday for a past week.
+		// Streaks as of today, or the week's last day for a past week.
 		anchor := mon.AddDate(0, 0, 6)
 		if today.Before(anchor) {
 			anchor = today
@@ -400,9 +407,10 @@ func (a *App) Week(anyDay time.Time) (report.Week, error) {
 	return w, nil
 }
 
-// SetPlan saves the plan of the Monday-start week containing anyDay.
+// SetPlan saves the plan of the week containing anyDay, keyed by the
+// week's first day.
 func (a *App) SetPlan(anyDay time.Time, text string) error {
-	return a.st.SetPlan(dateKey(report.MondayOf(a.midnight(anyDay))), report.CleanPlan(text), a.nowMS())
+	return a.st.SetPlan(dateKey(a.WeekOf(anyDay)), report.CleanPlan(text), a.nowMS())
 }
 
 // Inbox returns the unlabelled keys of the last days days, largest first.

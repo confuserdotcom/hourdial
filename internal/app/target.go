@@ -196,7 +196,7 @@ func (a *App) goalStreaks(day time.Time, vs []classify.SpanView, ls []classify.L
 	}
 	out := make([][2]int, len(goals))
 	for i, g := range goals {
-		out[i][0], out[i][1] = report.Streak(i, g, past, today, closed)
+		out[i][0], out[i][1] = report.StreakFrom(i, g, past, today, closed, a.cfg.Display.FirstDay())
 	}
 	return out, nil
 }

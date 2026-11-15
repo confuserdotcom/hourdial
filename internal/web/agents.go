@@ -35,7 +35,7 @@ func (s *Server) agents(r *http.Request) (any, error) {
 	switch r.URL.Query().Get("range") {
 	case "", "day":
 	case "week":
-		from = day.AddDate(0, 0, -((int(day.Weekday()) + 6) % 7))
+		from = s.a.WeekOf(day)
 		to = from.AddDate(0, 0, 7)
 	default:
 		return nil, badRequest("range must be day or week")

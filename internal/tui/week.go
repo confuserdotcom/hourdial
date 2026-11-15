@@ -7,16 +7,18 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
+	"tock/internal/app"
 	"tock/internal/classify"
 	"tock/internal/report"
 )
 
-// weekTab shows one Monday-start week, or (m) one month's trends.
+// weekTab shows one week (Monday-start unless week_start says otherwise),
+// or (m) one month's trends.
 type weekTab struct {
 	date   time.Time // any day of the shown week; zero = this week
 	week   report.Week
 	loaded bool
-	cursor int // 0 = Monday
+	cursor int // 0 = the week's first day
 
 	month       bool      // month mode
 	monthDate   time.Time // any day of the shown month; zero = this month
@@ -64,10 +66,12 @@ func (m Model) weekKey(k string) (tea.Model, tea.Cmd) {
 		return m, m.reload()
 	case "l":
 		next := t.dateOr(now).AddDate(0, 0, 7)
-		if report.MondayOf(next).After(now) {
+		first := time.Monday
+		m.src.do(func(a *app.App) { first = a.Config().Display.FirstDay() })
+		if report.WeekOf(next, first).After(now) {
 			return m, nil
 		}
-		if sameDay(report.MondayOf(next), report.MondayOf(now)) {
+		if sameDay(report.WeekOf(next, first), report.WeekOf(now, first)) {
 			next = time.Time{}
 		}
 		t.date, t.loaded = next, false
@@ -208,7 +212,7 @@ func (t *weekTab) head() int {
 	return 3
 }
 
-// rowAt is the day (0 = Monday) shown on body line line, if any.
+// rowAt is the day (0 = the week's first) shown on body line line, if any.
 func (t *weekTab) rowAt(line int) (int, bool) {
 	i := line - t.head()
 	if !t.loaded || t.month || i < 0 || i >= len(t.week.Days) {

@@ -177,6 +177,9 @@ type statusJSON struct {
 	Billing bool `json:"billing"`
 	// Presets are the session lengths in minutes, the default first.
 	Presets []int `json:"presets"`
+	// WeekStart is the first day of the week: "monday", "sunday" or
+	// "saturday".
+	WeekStart string `json:"weekStart"`
 }
 
 type blockJSON struct {
@@ -203,7 +206,10 @@ type weekDayJSON struct {
 }
 
 type weekJSON struct {
+	// Monday is the week's Monday; Start its first day, which is the same
+	// day unless [display] week_start moves it.
 	Monday       string           `json:"monday"`
+	Start        string           `json:"start"`
 	Days         []weekDayJSON    `json:"days"`
 	TrackedMS    int64            `json:"trackedMS"`
 	ByKind       map[string]int64 `json:"byKind"`
@@ -382,7 +388,7 @@ func (s *Server) status(*http.Request) (any, error) {
 	}
 	cfg := s.a.Config()
 	out := statusJSON{Recording: h.TrackdUp && !h.Paused(), LastSeenMS: h.LastSeenMS, Focus: cfg.Focus.Enabled, Billing: cfg.Billing.Enabled,
-		Presets: append([]int{}, cfg.Focus.Presets...)}
+		Presets: append([]int{}, cfg.Focus.Presets...), WeekStart: cfg.Display.WeekStartName()}
 	if h.Paused() {
 		out.Paused = h.CapturePaused
 	}
@@ -402,6 +408,11 @@ func (s *Server) status(*http.Request) (any, error) {
 	return out, nil
 }
 
+// mondayIn is the Monday of the week that starts on start.
+func mondayIn(start time.Time) time.Time {
+	return start.AddDate(0, 0, (int(time.Monday)-int(start.Weekday())+7)%7)
+}
+
 func (s *Server) week(r *http.Request) (any, error) {
 	date, err := s.date(r)
 	if err != nil {
@@ -411,7 +422,7 @@ func (s *Server) week(r *http.Request) (any, error) {
 	if err != nil {
 		return nil, err
 	}
-	out := weekJSON{Monday: w.Monday.Format(dateLayout), TrackedMS: w.TrackedMS, ByKind: w.ByKind,
+	out := weekJSON{Monday: mondayIn(w.Monday).Format(dateLayout), Start: w.Monday.Format(dateLayout), TrackedMS: w.TrackedMS, ByKind: w.ByKind,
 		Categories: cats(w.Categories), Projects: names(w.Projects), Apps: names(w.Apps),
 		Distractions: names(w.Distractions), Plan: w.Plan, Goals: []goalJSON{}, Outages: outagesJSON(w.Outages)}
 	billed, err := s.a.Billed(w.Monday.UnixMilli(), w.Monday.AddDate(0, 0, 7).UnixMilli())
@@ -442,7 +453,7 @@ func (s *Server) top(r *http.Request) (any, error) {
 	case "today":
 		from = today
 	case "week":
-		from = today.AddDate(0, 0, -((int(today.Weekday()) + 6) % 7))
+		from = s.a.WeekOf(today)
 	case "month":
 		from = today.AddDate(0, 0, 1-today.Day())
 	case "":

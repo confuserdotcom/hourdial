@@ -17,7 +17,7 @@ func (a *App) AskAnswer(raw json.RawMessage) (ask.Query, ask.Result, error) {
 	if err != nil {
 		return q, ask.Result{}, err
 	}
-	from, to := q.Bounds(a.now())
+	from, to := q.Bounds(a.now(), a.cfg.Display.FirstDay())
 	now := a.nowMS()
 	vs, labels, err := a.labelled(from.UnixMilli(), min(to.UnixMilli(), now), now)
 	if err != nil {

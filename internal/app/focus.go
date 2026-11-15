@@ -405,12 +405,12 @@ func (a *App) live(s focus.Session, nowMS int64) (focus.Session, focus.Live, err
 	return s, focus.Level(vs, labels, s.StartMS, end, a.cfg.Focus), nil
 }
 
-// Focus reports the running session (live counters) and this Monday-start
-// week's closed sessions.
+// Focus reports the running session (live counters) and this week's closed
+// sessions.
 func (a *App) Focus(now time.Time) (report.Focus, error) {
 	nowMS := now.UnixMilli()
 	today := a.midnight(now)
-	ss, err := a.st.Sessions(report.MondayOf(today).UnixMilli(), nowMS+1)
+	ss, err := a.st.Sessions(a.WeekOf(today).UnixMilli(), nowMS+1)
 	if err != nil {
 		return report.Focus{}, err
 	}

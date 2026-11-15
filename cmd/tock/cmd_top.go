@@ -14,7 +14,7 @@ const topUsage = "top: usage: tock top [--days N | --week | --month] [--by categ
 func cmdTop(env Env, args []string) error {
 	fs := newFlags("top")
 	days := fs.Int("days", 7, "the last N days, today included")
-	week := fs.Bool("week", false, "this week, from Monday")
+	week := fs.Bool("week", false, "this week, from its first day (see week_start)")
 	month := fs.Bool("month", false, "this calendar month")
 	by := fs.String("by", "", "one section only: category, app, site or project")
 	limit := fs.Int("limit", 10, "rows per section (0 = all)")
@@ -35,15 +35,15 @@ func cmdTop(env Env, args []string) error {
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	to := today.AddDate(0, 0, 1)
 	from := to.AddDate(0, 0, -*days)
-	switch {
-	case *week:
-		from = today.AddDate(0, 0, -((int(today.Weekday()) + 6) % 7))
-	case *month:
-		from = today.AddDate(0, 0, 1-today.Day())
-	}
 	a, err := openApp(env)
 	if err != nil {
 		return err
+	}
+	switch {
+	case *week:
+		from = a.WeekOf(today)
+	case *month:
+		from = today.AddDate(0, 0, 1-today.Day())
 	}
 	defer a.Close()
 	t, err := a.Top(from, to)

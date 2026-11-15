@@ -23,7 +23,12 @@ func cmdReport(env Env, args []string) error {
 		return usagef("report: unexpected argument %q", fs.Arg(0))
 	}
 	now := env.Now()
-	day := reviewWeek(now)
+	a, err := openApp(env)
+	if err != nil {
+		return err
+	}
+	defer a.Close()
+	day := reviewWeek(now, a.Config().Display.FirstDay())
 	if *week != "" {
 		d, err := time.ParseInLocation("2006-01-02", *week, now.Location())
 		if err != nil {
@@ -31,11 +36,6 @@ func cmdReport(env Env, args []string) error {
 		}
 		day = d
 	}
-	a, err := openApp(env)
-	if err != nil {
-		return err
-	}
-	defer a.Close()
 	w, err := a.Week(day)
 	if err != nil {
 		return err
