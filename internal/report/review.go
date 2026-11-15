@@ -47,11 +47,11 @@ func ReviewLines(w Week) []string {
 	if s.Workdays > 0 {
 		head = append(head, fmt.Sprintf("score %d avg", int(math.Round(s.AvgScore))),
 			fmt.Sprintf("%d %s", s.Workdays, plural(s.Workdays, "workday", "workdays")),
-			fmt.Sprintf("%.1f switches/h", s.SwitchesPerHour))
+			w.Nums.Fixed(s.SwitchesPerHour, 1)+" switches/h")
 	} else {
 		head = append(head, "no workdays")
 	}
-	out := []string{"Week of " + w.Monday.Format("Mon 2 Jan"), strings.Join(head, " · ")}
+	out := []string{"Week of " + w.Dates.Day(w.Monday), strings.Join(head, " · ")}
 	if w.Plan != "" {
 		out = append(out, "plan: "+w.Plan)
 	}
@@ -80,7 +80,7 @@ func ReviewLines(w Week) []string {
 		}
 	}
 	if best >= 0 {
-		out = append(out, "", fmt.Sprintf("best day  %s · score %d", w.Days[best].Date.Format("Mon 2 Jan"), w.Days[best].Score.Value))
+		out = append(out, "", fmt.Sprintf("best day  %s · score %d", w.Dates.Day(w.Days[best].Date), w.Days[best].Score.Value))
 	}
 	return out
 }

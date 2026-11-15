@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"tock/internal/classify"
+	"tock/internal/datefmt"
 	"tock/internal/report"
 	"tock/internal/span"
 )
@@ -191,6 +192,7 @@ type Result struct {
 	MS        int64
 	TrackedMS int64
 	Rows      []Row
+	Dates     datefmt.Style // how Lines writes the dates ([display] date)
 }
 
 // host is a view's URL host without "www.", lowercase.
@@ -313,9 +315,9 @@ func (q Query) Describe() string {
 // Lines renders the answer.
 func Lines(q Query, r Result) []string {
 	last := r.To.AddDate(0, 0, -1)
-	span := r.From.Format("Mon 2 Jan")
+	span := r.Dates.Day(r.From)
 	if !last.Equal(r.From) {
-		span += " – " + last.Format("Mon 2 Jan")
+		span += " – " + r.Dates.Day(last)
 	}
 	out := []string{fmt.Sprintf("%s: %s", q.Describe(), report.Dur(r.MS))}
 	if r.TrackedMS > 0 && r.MS != r.TrackedMS {

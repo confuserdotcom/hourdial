@@ -68,8 +68,8 @@ func kindClass(kind string) string {
 // generated is when the page was made.
 func WriteWeekHTML(w io.Writer, wk Week, generated time.Time) error {
 	sun := wk.Monday.AddDate(0, 0, 6)
-	v := htmlWeek{Week: wk, Title: wk.Monday.Format("2 Jan 2006"),
-		Range:     wk.Monday.Format("Mon 2 Jan") + " – " + sun.Format("Sun 2 Jan 2006"),
+	v := htmlWeek{Week: wk, Title: wk.Dates.Date(wk.Monday),
+		Range:     wk.Dates.Day(wk.Monday) + " – " + wk.Dates.DayYear(sun),
 		Generated: wk.Clock.Stamp(generated, "2006-01-02 "), AvgScore: "—", Commits: CommitsLine(wk.Commits)}
 	var maxMS int64
 	for _, d := range wk.Days {

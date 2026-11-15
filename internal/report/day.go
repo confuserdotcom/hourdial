@@ -6,6 +6,8 @@ import (
 
 	"tock/internal/classify"
 	"tock/internal/clockfmt"
+	"tock/internal/datefmt"
+	"tock/internal/numfmt"
 	"tock/internal/span"
 	"tock/internal/stats"
 )
@@ -28,12 +30,16 @@ type DayInput struct {
 	Weights stats.Weights       // score weights
 	Hours   stats.Hours         // the work schedule; the score only sees its window
 	Clock   clockfmt.Clock      // how times of day are shown ([display] clock)
+	Dates   datefmt.Style       // how dates are written ([display] date)
+	Nums    numfmt.Style        // how decimals are written ([display] numbers)
 }
 
 // Day is everything the today views show.
 type Day struct {
 	Date      time.Time
 	Clock     clockfmt.Clock // how times of day are shown ([display] clock)
+	Dates     datefmt.Style  // how dates are written ([display] date)
+	Nums      numfmt.Style   // how decimals are written ([display] numbers)
 	TrackedMS int64
 	IdleMS    int64
 	// Cut is the recorded time that did not count, filled by the caller.
@@ -115,7 +121,7 @@ type Uncounted struct {
 // BuildDay computes the day report.
 func BuildDay(in DayInput) Day {
 	loc := in.Date.Location()
-	d := Day{Date: in.Date, Clock: in.Clock, ByKind: map[string]int64{}, Hours: Heatmap{MS: map[string][24]int64{}}}
+	d := Day{Date: in.Date, Clock: in.Clock, Dates: in.Dates, Nums: in.Nums, ByKind: map[string]int64{}, Hours: Heatmap{MS: map[string][24]int64{}}}
 	cats := map[string]*CatRow{}
 	projects := map[string]int64{}
 	for i, v := range in.Views {

@@ -23,5 +23,7 @@ func (a *App) AskAnswer(raw json.RawMessage) (ask.Query, ask.Result, error) {
 	if err != nil {
 		return q, ask.Result{}, err
 	}
-	return q, ask.Run(q, from, to, vs, labels), nil
+	r := ask.Run(q, from, to, vs, labels)
+	r.Dates = a.cfg.Display.DateStyle()
+	return q, r, nil
 }

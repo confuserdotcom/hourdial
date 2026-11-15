@@ -158,7 +158,7 @@ func (a *App) budgetNotices(now time.Time) []focus.Event {
 			ev.Title = fmt.Sprintf("%s: %d%% of its %s budget", name, r.Pct(), b)
 			ev.Body = fmt.Sprintf("%s spent, %s left.", report.Dur(r.SpentMS), report.Dur(r.BudgetMS-r.SpentMS))
 			if r.RunsOutMS > 0 {
-				ev.Body += " At this week's pace it runs out " + time.UnixMilli(r.RunsOutMS).In(now.Location()).Format("Mon 2 Jan") + "."
+				ev.Body += " At this week's pace it runs out " + a.cfg.Display.DateStyle().Day(time.UnixMilli(r.RunsOutMS).In(now.Location())) + "."
 			}
 		}
 		out = append(out, ev)

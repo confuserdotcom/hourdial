@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"tock/internal/classify"
+	"tock/internal/numfmt"
 	"tock/internal/span"
 	"tock/internal/stats"
 )
@@ -28,7 +29,8 @@ type MonthInput struct {
 	Labels               []classify.Label
 	PrevViews            []classify.SpanView
 	PrevLabels           []classify.Label
-	Days, PrevDays       []MonthDay // Days[i] is day i+1
+	Days, PrevDays       []MonthDay   // Days[i] is day i+1
+	Nums                 numfmt.Style // how decimals are written ([display] numbers)
 }
 
 // TrendRow is one category's time in both windows.
@@ -54,6 +56,7 @@ type Month struct {
 	Categories           []TrendRow // by MS desc, then PrevMS desc, then name; Unclassified last
 	Scores               []int      // one per day of the window: the score, or -1 for a day that is not a workday
 	Days                 []MonthPoint
+	Nums                 numfmt.Style // how decimals are written ([display] numbers)
 }
 
 // MonthPoint is one day of the month's window, for charts.
@@ -64,7 +67,7 @@ type MonthPoint struct {
 
 // BuildMonth computes the trends.
 func BuildMonth(in MonthInput) Month {
-	m := Month{First: in.First, Through: in.Through, PrevThrough: in.PrevThrough, Partial: in.Partial}
+	m := Month{First: in.First, Through: in.Through, PrevThrough: in.PrevThrough, Partial: in.Partial, Nums: in.Nums}
 	var scores []int
 	m.Cur, scores = side(in.Views, in.Days)
 	m.Prev, _ = side(in.PrevViews, in.PrevDays)
@@ -223,7 +226,7 @@ func MonthLines(m Month) []string {
 		if s.Workdays == 0 {
 			return "—"
 		}
-		return fmt.Sprintf("%.1f/h", s.SwitchesPerHour)
+		return m.Nums.Fixed(s.SwitchesPerHour, 1) + "/h"
 	}
 	score := "—"
 	if m.Cur.Workdays > 0 {

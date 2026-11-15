@@ -26,7 +26,7 @@ func (a *App) Month(any time.Time) (report.Month, error) {
 		return report.Month{}, ErrFutureMonth
 	}
 	prevLen := first.AddDate(0, 0, -1).Day()
-	in := report.MonthInput{First: first, Through: next.AddDate(0, 0, -1).Day(), PrevThrough: prevLen}
+	in := report.MonthInput{First: first, Through: next.AddDate(0, 0, -1).Day(), PrevThrough: prevLen, Nums: a.cfg.Display.NumberStyle()}
 	if next.After(today) {
 		in.Partial = true
 		in.Through = today.Day()

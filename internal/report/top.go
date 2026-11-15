@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"tock/internal/classify"
+	"tock/internal/datefmt"
 	"tock/internal/span"
 )
 
@@ -38,6 +39,7 @@ type Top struct {
 	From, To time.Time // To is exclusive
 	TotalMS  int64
 	Sections map[string][]TopRow
+	Dates    datefmt.Style // how TopLines writes the range ([display] date)
 }
 
 // BuildTop ranks the non-idle views; labels[i] labels views[i]. Projects
@@ -122,11 +124,11 @@ var topTitles = map[string]string{
 // the time and the share of the range's tracked time.
 func TopLines(t Top, sections []string, limit int) []string {
 	last := t.To.AddDate(0, 0, -1)
-	layout := "Mon 2 Jan"
+	day := t.Dates.Day
 	if t.From.Year() != last.Year() {
-		layout += " 2006"
+		day = t.Dates.DayYear
 	}
-	out := []string{fmt.Sprintf("Top  %s – %s · %s tracked", t.From.Format(layout), last.Format(layout), Dur(t.TotalMS))}
+	out := []string{fmt.Sprintf("Top  %s – %s · %s tracked", day(t.From), day(last), Dur(t.TotalMS))}
 	if t.TotalMS == 0 {
 		return append(out, "nothing tracked in this range")
 	}

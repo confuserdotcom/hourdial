@@ -6,6 +6,8 @@ import (
 
 	"tock/internal/classify"
 	"tock/internal/clockfmt"
+	"tock/internal/datefmt"
+	"tock/internal/numfmt"
 	"tock/internal/span"
 	"tock/internal/stats"
 )
@@ -25,12 +27,16 @@ type WeekInput struct {
 	Goals   []classify.Goal
 	Hours   stats.Hours // the work schedule; scores only see its window
 	Clock   clockfmt.Clock
+	Dates   datefmt.Style // how dates are written ([display] date)
+	Nums    numfmt.Style  // how decimals are written ([display] numbers)
 }
 
 // Week is what the week view shows.
 type Week struct {
 	Monday     time.Time
 	Clock      clockfmt.Clock // how times of day are shown ([display] clock)
+	Dates      datefmt.Style  // how dates are written ([display] date)
+	Nums       numfmt.Style   // how decimals are written ([display] numbers)
 	Days       [7]DayTotal
 	TrackedMS  int64
 	ByKind     map[string]int64
@@ -78,7 +84,7 @@ func WeekOf(t time.Time, first time.Weekday) time.Time {
 // BuildWeek computes the week report.
 func BuildWeek(in WeekInput) Week {
 	loc := in.Monday.Location()
-	w := Week{Monday: in.Monday, Clock: in.Clock, ByKind: map[string]int64{}}
+	w := Week{Monday: in.Monday, Clock: in.Clock, Dates: in.Dates, Nums: in.Nums, ByKind: map[string]int64{}}
 	now := time.UnixMilli(in.NowMS).In(loc)
 	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, loc)
 	for i := range w.Days {
