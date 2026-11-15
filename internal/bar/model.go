@@ -331,7 +331,7 @@ func (s Snapshot) header(nowMS int64) []Item {
 		if s.Live.Level >= 0 {
 			lv = report.LevelText(s.Live) + " · "
 		}
-		name := cmp.Or(ss.Goal, "Session")
+		name := report.Cut(cmp.Or(ss.Goal, "Session"), ProjectCells)
 		out = append(out, label("%s · %s left · %s%d %s", name, report.Countdown(ss.PlannedMS-nowMS), lv, ss.Interruptions, word))
 		if s.snoozed(nowMS) {
 			out = append(out, label("Notices snoozed until %s", s.Clock.Time(s.SnoozeUntil)))
