@@ -179,6 +179,55 @@ static BOOL faceEmpty(NSDictionary *f) {
     return ival(f, @"end_ms") == 0;
 }
 
+// spokenLeft is a countdown to endMS as VoiceOver says it, to the minute
+// (bar.spokenLeft on the Go side).
+static NSString *spokenLeft(long long endMS) {
+    long long ms = endMS - (long long)([[NSDate date] timeIntervalSince1970] * 1000);
+    if (ms <= 0) return @"time is up";
+    if (ms < 60000) return @"under a minute left";
+    long long m = (ms + 59999) / 60000;
+    return m == 1 ? @"1 minute left" : [NSString stringWithFormat:@"%lld minutes left", m];
+}
+
+// ---------- accessibility ----------
+// The notch draws most of what it shows itself: VoiceOver sees none of a
+// drawRect: view unless it says what is there. Go writes the words (the
+// "spoken" fields of bar.Island); these views hand them over as labels,
+// values and children.
+
+// AXPart is one drawn figure inside a view (a cell, a bar, a ring) as an
+// accessibility element, at rect in its host's coordinates.
+@interface AXPart : NSAccessibilityElement
+@property(weak) NSView *host;
+@property NSRect rect;
+@end
+@implementation AXPart
+- (NSRect)accessibilityFrame {
+    NSView *v = self.host;
+    return v ? NSAccessibilityFrameInView(v, self.rect) : NSZeroRect;
+}
+- (id)accessibilityParent {
+    return self.host;
+}
+- (BOOL)isAccessibilityFocused {
+    return NO;
+}
+@end
+
+static AXPart *axPart(NSView *host, NSRect r, NSString *words) {
+    AXPart *p = [AXPart new];
+    p.host = host;
+    p.rect = r;
+    p.accessibilityRole = NSAccessibilityStaticTextRole;
+    p.accessibilityValue = words ? words : @"";
+    return p;
+}
+
+// quiet hides v from VoiceOver: decoration, or text a parent already says.
+static void quiet(NSView *v) {
+    v.accessibilityElement = NO;
+}
+
 // ---------- small views ----------
 
 @interface FlipView : NSView
@@ -189,15 +238,76 @@ static BOOL faceEmpty(NSDictionary *f) {
 }
 @end
 
-// Dot is a kind colour as a small disc.
+// Group is a view VoiceOver reads as one group: a page, a labelling card.
+@interface Group : FlipView
+@property(copy) NSString *spoken;
+@end
+@implementation Group
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityGroupRole;
+}
+- (NSString *)accessibilityLabel {
+    return self.spoken;
+}
+@end
+
+// Track holds pages or labelling cards side by side; VoiceOver gets only
+// the one in view, not the ones clipped away beside it.
+@interface Track : FlipView
+@property NSInteger axAt;
+@end
+@implementation Track
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityGroupRole;
+}
+- (NSArray *)accessibilityChildren {
+    NSArray *s = self.subviews;
+    if (s.count == 0) {
+        return @[];
+    }
+    return @[ s[(NSUInteger)MIN(MAX(self.axAt, 0), (NSInteger)s.count - 1)] ];
+}
+@end
+
+// Dot is a kind colour as a small disc. The words beside it say the same.
 @interface Dot : NSView
 @property(strong) NSColor *color;
 @end
 @implementation Dot
+- (BOOL)isAccessibilityElement {
+    return NO;
+}
 - (void)drawRect:(NSRect)r {
     (void)r;
     [self.color setFill];
     [[NSBezierPath bezierPathWithOvalInRect:self.bounds] fill];
+}
+@end
+
+// Wings is the face either side of the notch, read as one line: its words
+// as the label and a running countdown as the value.
+@interface Wings : FlipView
+@property(copy) NSString *spoken;
+@property long long endMS;
+@end
+@implementation Wings
+- (BOOL)isAccessibilityElement {
+    return self.spoken.length > 0 || self.endMS > 0;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityStaticTextRole;
+}
+- (NSString *)accessibilityLabel {
+    return self.spoken;
+}
+- (id)accessibilityValue {
+    return self.endMS > 0 ? spokenLeft(self.endMS) : nil;
 }
 @end
 
@@ -211,11 +321,40 @@ static void pillDone(NSWindow *w);
 @property(copy) NSString *hint;  // "1", "S": shown as a key cap
 @property(copy) NSString *extra; // "86%": dimmed after the title
 @property(strong) NSColor *dot;
+@property(copy) NSString *spoken; // what it does, for VoiceOver; "" = the title
 @property BOOL primary, chip, hover, pressed;
 @end
 
 @implementation Pill
 - (BOOL)isFlipped {
+    return YES;
+}
+// VoiceOver: a button that says what it does, with its key as help, and
+// a press that does what a click does.
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityButtonRole;
+}
+- (NSString *)accessibilityLabel {
+    return self.spoken.length ? self.spoken : self.title;
+}
+- (NSString *)accessibilityHelp {
+    return self.hint.length ? [@"Key " stringByAppendingString:self.hint] : nil;
+}
+- (BOOL)isAccessibilityEnabled {
+    return self.ident.length > 0;
+}
+- (BOOL)isAccessibilitySelected {
+    return self.chip && self.primary; // the label picked
+}
+- (BOOL)accessibilityPerformPress {
+    if (self.ident.length == 0) {
+        return NO;
+    }
+    notchSend(self.ident);
+    pillDone(self.window);
     return YES;
 }
 // The panel never makes tockbar the active app: without this the first
@@ -324,7 +463,31 @@ static void pillDone(NSWindow *w);
 @interface Cells : FlipView
 @property(strong) NSArray<NSDictionary *> *cells;
 @end
+// cellWords is a figure as Go wrote it for VoiceOver, else its parts.
+static NSString *cellWords(NSDictionary *c) {
+    NSString *w = sval(c, @"spoken");
+    if (w.length) {
+        return w;
+    }
+    return [[@[ sval(c, @"k"), sval(c, @"v"), sval(c, @"c") ] filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"length > 0"]]
+        componentsJoinedByString:@" "];
+}
+
 @implementation Cells
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityGroupRole;
+}
+- (NSArray *)accessibilityChildren {
+    NSMutableArray *out = [NSMutableArray new];
+    CGFloat w = self.bounds.size.width / MAX(self.cells.count, 1u);
+    for (NSUInteger i = 0; i < self.cells.count; i++) {
+        [out addObject:axPart(self, NSMakeRect(i * w, 0, w, self.bounds.size.height), cellWords(self.cells[i]))];
+    }
+    return out;
+}
 - (void)drawRect:(NSRect)r {
     (void)r;
     NSRect b = NSInsetRect(self.bounds, 0.5, 0.5);
@@ -358,8 +521,18 @@ static void pillDone(NSWindow *w);
 @interface Strip : FlipView
 @property(strong) NSArray<NSString *> *kinds;
 @property(strong) NSArray<NSString *> *axis;
+@property(copy) NSString *spoken; // the strip in words
 @end
 @implementation Strip
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityImageRole;
+}
+- (NSString *)accessibilityLabel {
+    return self.spoken.length ? self.spoken : @"Time by kind";
+}
 - (void)drawRect:(NSRect)r {
     (void)r;
     CGFloat w = self.bounds.size.width;
@@ -387,8 +560,25 @@ static void pillDone(NSWindow *w);
 // Rows is a short table: name left, time right, hairlines between.
 @interface Rows : FlipView
 @property(strong) NSArray<NSArray *> *rows;
+@property(strong) NSArray<NSString *> *spoken; // each row in words
 @end
 @implementation Rows
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityGroupRole;
+}
+- (NSArray *)accessibilityChildren {
+    NSMutableArray *out = [NSMutableArray new];
+    for (NSUInteger i = 0; i < self.rows.count; i++) {
+        NSArray *row = self.rows[i];
+        NSString *w = i < self.spoken.count && [self.spoken[i] isKindOfClass:[NSString class]] ? self.spoken[i]
+                                                                                                : [row componentsJoinedByString:@", "];
+        [out addObject:axPart(self, NSMakeRect(0, i * scaled(21), self.bounds.size.width, scaled(21)), w)];
+    }
+    return out;
+}
 - (void)drawRect:(NSRect)r {
     (void)r;
     CGFloat w = self.bounds.size.width;
@@ -423,6 +613,22 @@ static void pillDone(NSWindow *w);
         sub = sub || sval(b, @"sub").length > 0;
     }
     return 48 + 3 + scaled(13) + (sub ? scaled(12) : 0);
+}
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityGroupRole;
+}
+- (NSArray *)accessibilityChildren {
+    NSMutableArray *out = [NSMutableArray new];
+    CGFloat slot = self.bounds.size.width / MAX(self.bars.count, 1u);
+    for (NSUInteger i = 0; i < self.bars.count; i++) {
+        NSDictionary *b = self.bars[i];
+        NSString *w = sval(b, @"spoken");
+        [out addObject:axPart(self, NSMakeRect(i * slot, 0, slot, self.bounds.size.height), w.length ? w : sval(b, @"label"))];
+    }
+    return out;
 }
 - (void)drawRect:(NSRect)r {
     (void)r;
@@ -496,6 +702,25 @@ static void pillDone(NSWindow *w);
     }
     return 46 + 6 + scaled(15) * 2 + (sub ? scaled(13) : 0);
 }
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityGroupRole;
+}
+- (NSArray *)accessibilityChildren {
+    NSMutableArray *out = [NSMutableArray new];
+    CGFloat slot = self.bounds.size.width / MAX(self.rings.count, 2u);
+    for (NSUInteger i = 0; i < self.rings.count; i++) {
+        NSDictionary *g = self.rings[i];
+        NSString *w = sval(g, @"spoken");
+        if (!w.length) {
+            w = [NSString stringWithFormat:@"%@: %@", sval(g, @"label"), sval(g, @"value")];
+        }
+        [out addObject:axPart(self, NSMakeRect(i * slot, 0, slot, self.bounds.size.height), w)];
+    }
+    return out;
+}
 - (void)drawRect:(NSRect)r {
     (void)r;
     NSUInteger n = self.rings.count;
@@ -555,6 +780,30 @@ static void pillDone(NSWindow *w);
 }
 + (CGFloat)heightFor:(NSArray *)cells {
     return MAX([Hero side], cells.count * scaled(30));
+}
+// VoiceOver: the ring or dial, then the figures beside it.
+- (BOOL)isAccessibilityElement {
+    return YES;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityGroupRole;
+}
+- (NSArray *)accessibilityChildren {
+    NSMutableArray *out = [NSMutableArray new];
+    CGFloat d = [Hero side], h = self.bounds.size.height;
+    NSDictionary *big = self.ring ? self.ring : self.dial;
+    if (big) {
+        NSString *w = sval(big, @"spoken");
+        if (!w.length) {
+            w = self.ring ? sval(big, @"value") : [NSString stringWithFormat:@"%@, %@", sval(big, @"center"), sval(big, @"sub")];
+        }
+        [out addObject:axPart(self, NSMakeRect(0, (h - d) / 2, d, d), w)];
+    }
+    CGFloat x = d + 22, row = scaled(30), y = round((h - self.cells.count * row) / 2);
+    for (NSUInteger i = 0; i < self.cells.count; i++) {
+        [out addObject:axPart(self, NSMakeRect(x, y + i * row, self.bounds.size.width - x, row), cellWords(self.cells[i]))];
+    }
+    return out;
 }
 // arcAt strokes share a..b of a circle round c, clockwise from 12 o'clock
 // (the view is flipped, so angles run clockwise).
@@ -674,8 +923,37 @@ static void centred(NSString *s, NSFont *f, NSColor *col, NSPoint c) {
 // PageDots shows which page of the open notch is in view.
 @interface PageDots : FlipView
 @property NSInteger count, at;
+@property(strong) NSArray<NSString *> *titles; // the pages' titles
+@property(copy) void (^go)(NSInteger delta);   // turns the page
 @end
 @implementation PageDots
+// VoiceOver: a stepper, "page 2 of 4, This week"; increment and decrement
+// turn the page, where a sighted user swipes or presses an arrow key.
+- (BOOL)isAccessibilityElement {
+    return self.count > 1;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityIncrementorRole;
+}
+- (NSString *)accessibilityLabel {
+    return @"Page";
+}
+- (id)accessibilityValue {
+    NSString *t = self.at < (NSInteger)self.titles.count ? self.titles[self.at] : @"";
+    return [NSString stringWithFormat:@"%ld of %ld%@%@", (long)self.at + 1, (long)self.count, t.length ? @", " : @"", t];
+}
+- (BOOL)accessibilityPerformIncrement {
+    if (self.go) {
+        self.go(1);
+    }
+    return YES;
+}
+- (BOOL)accessibilityPerformDecrement {
+    if (self.go) {
+        self.go(-1);
+    }
+    return YES;
+}
 - (void)drawRect:(NSRect)r {
     (void)r;
     if (self.count < 2) {
@@ -853,6 +1131,36 @@ static void haptic(NSHapticFeedbackPattern p) {
 
 - (BOOL)acceptsFirstMouse:(NSEvent *)e {
     (void)e;
+    return YES;
+}
+
+// VoiceOver: the notch is a group named tock; a press opens or puts away
+// the panel, as a click does, and cancel is Esc.
+- (BOOL)isAccessibilityElement {
+    return spec != nil;
+}
+- (NSAccessibilityRole)accessibilityRole {
+    return NSAccessibilityGroupRole;
+}
+- (NSString *)accessibilityLabel {
+    return @"tock notch";
+}
+- (NSString *)accessibilityHelp {
+    return self.panelShown ? @"Press to close" : @"Press to open";
+}
+- (BOOL)accessibilityPerformPress {
+    if (self.panelShown) {
+        [self dismiss];
+    } else {
+        [self openUser:NO params:kOpen];
+    }
+    return YES;
+}
+- (BOOL)accessibilityPerformCancel {
+    if (!self.panelShown) {
+        return NO;
+    }
+    [self dismiss];
     return YES;
 }
 
@@ -1608,7 +1916,9 @@ static void haptic(NSHapticFeedbackPattern p) {
 
 - (NSView *)wingsWidth:(CGFloat)w face:(NSDictionary *)f {
     CGFloat h = self.notchH;
-    FlipView *v = [[FlipView alloc] initWithFrame:NSMakeRect(0, 0, w, h)];
+    Wings *v = [[Wings alloc] initWithFrame:NSMakeRect(0, 0, w, h)];
+    v.spoken = sval(f, @"spoken");
+    v.endMS = ival(f, @"end_ms");
     CGFloat x = 14;
     NSString *dot = sval(f, @"dot");
     if (dot.length) {
@@ -1673,6 +1983,9 @@ static void haptic(NSHapticFeedbackPattern p) {
         [v addSubview:t];
         rx -= 5;
     }
+    for (NSView *s in v.subviews) { // the face reads as one line, not word by word
+        quiet(s);
+    }
     return v;
 }
 
@@ -1714,6 +2027,7 @@ static void haptic(NSHapticFeedbackPattern p) {
         Pill *p = [[Pill alloc] initWithFrame:NSZeroRect];
         p.ident = sval(b, @"id");
         p.title = sval(b, @"title");
+        p.spoken = sval(b, @"spoken");
         p.primary = bval(b, @"primary");
         CGFloat pw = MIN([p fitWidth], w - kPad * 2);
         if (x > kPad && x + pw > w - kPad) {
@@ -1728,7 +2042,8 @@ static void haptic(NSHapticFeedbackPattern p) {
 }
 
 - (NSView *)cardFor:(NSDictionary *)e index:(NSInteger)i width:(CGFloat)w height:(CGFloat *)outH {
-    FlipView *c = [[FlipView alloc] initWithFrame:NSMakeRect(0, 0, w, 10)];
+    Group *c = [[Group alloc] initWithFrame:NSMakeRect(0, 0, w, 10)];
+    c.spoken = sval(e, @"spoken"); // the entry; its chips are the buttons inside
     CGFloat y = 0;
     // app badge, title, sub, duration
     NSString *app = sval(e, @"app");
@@ -1750,6 +2065,11 @@ static void haptic(NSHapticFeedbackPattern p) {
     NSTextField *sub = text(sval(e, @"sub"), sys(11.5, NSFontWeightRegular), white(0.55));
     sub.frame = NSMakeRect(kPad + 38, y + 17, tw, sub.frame.size.height);
     [c addSubview:sub];
+    if (c.spoken.length) { // the group's label already says these
+        for (NSView *q in @[ bv, badge, dur, title, sub ]) {
+            quiet(q);
+        }
+    }
     y += 40;
     // the label chips, then Skip
     CGFloat x = kPad;
@@ -1762,6 +2082,7 @@ static void haptic(NSHapticFeedbackPattern p) {
         if (j < opts.count) {
             NSDictionary *o = opts[j];
             p.title = sval(o, @"label");
+            p.spoken = sval(o, @"spoken");
             p.dot = kindColor(sval(o, @"kind"));
             long long pct = ival(o, @"pct");
             p.extra = pct > 0 ? [NSString stringWithFormat:@"%lld%%", pct] : nil;
@@ -1843,6 +2164,7 @@ static void haptic(NSHapticFeedbackPattern p) {
         Strip *st = [[Strip alloc] initWithFrame:NSMakeRect(x, y + 2, w, 12 + scaled(14))];
         st.kinds = strip;
         st.axis = aval(d, @"axis");
+        st.spoken = sval(d, @"strip_spoken");
         [v addSubview:st];
         y += 16 + scaled(14) + 8;
     }
@@ -1850,6 +2172,7 @@ static void haptic(NSHapticFeedbackPattern p) {
     if (rows.count) {
         Rows *r = [[Rows alloc] initWithFrame:NSMakeRect(x, y, w, rows.count * scaled(21))];
         r.rows = rows;
+        r.spoken = aval(d, @"rows_spoken");
         [v addSubview:r];
         y += rows.count * scaled(21) + 6;
     }
@@ -1859,13 +2182,15 @@ static void haptic(NSHapticFeedbackPattern p) {
 // pageView lays out one page for size level lv: the page, its Mid from M
 // on, its Big in a second column at L.
 - (NSView *)pageView:(NSDictionary *)pg level:(NSInteger)lv width:(CGFloat)w height:(CGFloat *)outH {
-    FlipView *c = [[FlipView alloc] initWithFrame:NSMakeRect(0, 0, w, 10)];
+    Group *c = [[Group alloc] initWithFrame:NSMakeRect(0, 0, w, 10)];
+    c.spoken = sval(pg, @"title");
     CGFloat inner = w - kPad * 2;
     NSDictionary *big = lv >= 2 ? dval(pg, @"big") : nil;
     CGFloat colW = big ? floor(inner * 0.6) : inner;
     NSFont *lf = sys(10.5, NSFontWeightSemibold);
     NSTextField *t = text(sval(pg, @"title").uppercaseString, lf, white(0.45));
     t.frame = NSMakeRect(kPad, 0, colW, t.frame.size.height);
+    quiet(t); // the page group is named after it
     [c addSubview:t];
     CGFloat y = t.frame.size.height + 6, top = y;
     NSString *lead = sval(pg, @"lead"), *note = sval(pg, @"note");
@@ -1925,7 +2250,8 @@ static void haptic(NSHapticFeedbackPattern p) {
     FlipView *clip = [[FlipView alloc] initWithFrame:NSMakeRect(0, y, w, 10)];
     clip.wantsLayer = YES;
     clip.layer.masksToBounds = YES;
-    FlipView *track = [[FlipView alloc] initWithFrame:NSZeroRect];
+    Track *track = [[Track alloc] initWithFrame:NSZeroRect];
+    track.axAt = self.pageAt;
     CGFloat ch = 0;
     for (NSUInteger i = 0; i < pages.count; i++) {
         CGFloat h = 0;
@@ -1943,6 +2269,16 @@ static void haptic(NSHapticFeedbackPattern p) {
     PageDots *d = [[PageDots alloc] initWithFrame:NSMakeRect(0, y, w, 8)];
     d.count = (NSInteger)pages.count;
     d.at = self.pageAt;
+    NSMutableArray *titles = [NSMutableArray new];
+    for (NSDictionary *pg in pages) {
+        [titles addObject:sval(pg, @"title")];
+    }
+    d.titles = titles;
+    __weak Island *me = self;
+    d.go = ^(NSInteger delta) {
+        Island *s = me;
+        [s goPage:s.pageAt + delta velocity:0];
+    };
     [v addSubview:d];
     self.dots = d;
     y += 8 + 12;
@@ -1995,6 +2331,7 @@ static void haptic(NSHapticFeedbackPattern p) {
             Strip *s = [[Strip alloc] initWithFrame:NSMakeRect(kPad, y + 4, sw, 12 + scaled(14))];
             s.kinds = strip;
             s.axis = aval(p, @"axis");
+            s.spoken = sval(p, @"strip_spoken");
             [v addSubview:s];
             bh = 16 + scaled(14);
         }
@@ -2002,6 +2339,7 @@ static void haptic(NSHapticFeedbackPattern p) {
             CGFloat rx = strip.count ? kPad + sw + 18 : kPad;
             Rows *r = [[Rows alloc] initWithFrame:NSMakeRect(rx, y, inner - (rx - kPad), rows.count * scaled(21))];
             r.rows = rows;
+            r.spoken = aval(p, @"rows_spoken");
             [v addSubview:r];
             bh = MAX(bh, rows.count * scaled(21));
         }
@@ -2013,7 +2351,8 @@ static void haptic(NSHapticFeedbackPattern p) {
         FlipView *clip = [[FlipView alloc] initWithFrame:NSMakeRect(0, y, w, 10)];
         clip.wantsLayer = YES;
         clip.layer.masksToBounds = YES;
-        FlipView *track = [[FlipView alloc] initWithFrame:NSZeroRect];
+        Track *track = [[Track alloc] initWithFrame:NSZeroRect];
+        track.axAt = at;
         CGFloat ch = 0;
         for (NSUInteger i = 0; i < entries.count; i++) {
             CGFloat h = 0;
@@ -2248,6 +2587,14 @@ static void haptic(NSHapticFeedbackPattern p) {
     }
     if (self.track) {
         self.track.frameOrigin = NSMakePoint(round(-TX.x * self.contentSize.width), 0);
+        if ([self.track isKindOfClass:[Track class]]) {
+            Track *t = (Track *)self.track;
+            NSInteger at = lround(MAX(TX.x, 0));
+            if (at != t.axAt) {
+                t.axAt = at;
+                NSAccessibilityPostNotification(t, NSAccessibilityLayoutChangedNotification);
+            }
+        }
     }
     if (self.dots) {
         NSInteger at = lround(MIN(MAX(TX.x, 0), MAX(self.pageCount - 1, 0)));
@@ -2264,7 +2611,11 @@ static void haptic(NSHapticFeedbackPattern p) {
 // on the edges of the shape.
 - (NSView *)split:(NSView *)v width:(CGFloat)w {
     CGFloat h = v.frame.size.height, half = floor(w / 2);
-    FlipView *box = [[FlipView alloc] initWithFrame:v.frame];
+    Wings *box = [[Wings alloc] initWithFrame:v.frame];
+    if ([v isKindOfClass:[Wings class]]) {
+        box.spoken = ((Wings *)v).spoken;
+        box.endMS = ((Wings *)v).endMS;
+    }
     FlipView *l = [[FlipView alloc] initWithFrame:NSMakeRect(0, 0, half, h)];
     FlipView *r = [[FlipView alloc] initWithFrame:NSMakeRect(half, 0, w - half, h)];
     for (NSView *x in [v.subviews copy]) {
