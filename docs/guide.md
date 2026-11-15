@@ -1713,9 +1713,9 @@ $ tock doctor
 ok  ocr: on · permission granted · today 37 reads, avg 138 ms · skipped: away 12, private window 4
 ```
 
-One read costs about 1 s of CPU in the worker (Vision's accurate mode,
-which reads more than twice as many real words as its fast mode) and
-nothing in trackd's memory. At most one read a minute while an unclear
+One read of a browser window took about 0.8 s in the worker when measured
+(Vision's accurate mode; its fast mode took 0.1 s but got a fifth of the
+words right, against over half) and costs nothing in trackd's memory. At most one read a minute while an unclear
 window stays in front; raise `interval` to read less. Nothing runs while
 `enabled = false`.
 
