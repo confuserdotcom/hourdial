@@ -428,11 +428,14 @@ numbers = "1234.5"       # or "1,234.5", "1.234,5", "1 234,5", "1234,5": decimal
 name = "Your Name"
 address = ["1 Main Street", "City"]
 tax_id = ""              # your tax or VAT number
-currency = "EUR"         # printed after amounts; "" by default
+currency = "EUR"         # a code or a symbol, printed with amounts; "" by default
 note = "Payment within 30 days."
 round = "1s"             # round each day's time, e.g. "6m" or "15m"; "1s" = none
 round_mode = "nearest"   # or "up"; nearest rounds a half step up
 minor_units = 2          # decimals of amounts, 0 to 3
+currency_position = "after" # or "before": €1234.50 instead of 1234.50 EUR
+# date = "dmy"           # or "mdy", "iso" for new invoices; unset: [display] date, else iso
+# numbers = "1.234,5"    # as [display] numbers, for new invoices; unset: [display] numbers
 tax_label = ""           # e.g. "VAT"
 tax_rate = ""            # a percentage such as "20" or "5.5"; none = no tax line
 tax_note = ""            # e.g. "Reverse charge"
@@ -1043,7 +1046,8 @@ Dates are written day first, `Tue 3 Nov`. `date = "mdy"` under
 and the score breakdown, are written as `1234.5`; `numbers` takes how
 1234.5 should look: `"1,234.5"`, `"1.234,5"`, `"1 234,5"` or
 `"1234,5"`. Both apply in the commands, the TUI, the dashboard, reports,
-notices and the notch. Day and month names stay English, and durations
+notices and the notch, and to new invoices unless `[invoice]` sets its
+own (see Invoices). Day and month names stay English, and durations
 such as `7h39` do not change. Dates you type stay `2026-11-03`.
 Exports, `--json`, CSV, logs, file names and the summary sent to Claude
 keep their fixed forms.
@@ -1418,6 +1422,19 @@ invoice, on the subtotal. Your name, address, tax number, currency and note
 come from `[invoice]`, the client's address and tax number from
 `[[invoice.client]]`; all of it is copied into the invoice when it is
 issued.
+
+Amounts are written `1234.50 EUR` and dates `2026-11-03`, as on every
+invoice so far. Under `[invoice]`, `currency_position = "before"` puts the
+currency first: a symbol right before the number (`€1.234,50`), a code
+with a space (`MAD 1 234,50`). `date` (`"dmy"`, `"mdy"`, `"iso"`) and
+`numbers` (as under `[display]`) set how dates, amounts, hours and the tax
+rate are written; left out, they follow `[display] date` and `numbers`,
+and with those unset too the invoice looks as before. `minor_units = 0`
+suits currencies without cents, such as JPY, and `3` those with three,
+such as KWD; amounts are rounded in those units, never through floating
+point. The layout is stored with the invoice when it is issued: changing
+these settings later changes only new invoices, and `tock invoice show`,
+`list` and the dashboard print each invoice the way it was issued.
 
 If invoice files go missing, any `tock invoice` command and `tock doctor`
 write them again from the database. After restoring an older copy of the
