@@ -167,6 +167,7 @@ tock session start 50     # a 50-minute focus session
 - [Architecture](docs/architecture.md): how the pieces fit together.
 - [Privacy](docs/privacy.md): what is recorded and what can leave the machine.
 - [Stability](docs/stability.md): what stays the same between releases, and how well each platform is supported.
+- [Accessibility](docs/accessibility.md): what VoiceOver gets in the menu bar and the notch, and how far that is checked.
 - [CHANGELOG](CHANGELOG.md)
 
 The same pages are at [confuserdotcom.github.io/tock](https://confuserdotcom.github.io/tock/).
