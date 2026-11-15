@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BarChart3, CalendarDays, HelpCircle, Inbox as InboxIcon, Library as LibraryIcon, ListOrdered, Search, Settings as Gear, Sun } from "lucide-react";
+import { CalendarDays, ChartColumn, CircleQuestionMark, Inbox as InboxIcon, Library as LibraryIcon, ListOrdered, Search, Settings as Gear, Sun } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -26,7 +26,7 @@ import { FocusDock, focusField } from "@/components/FocusControl";
 const NATIVE = /tock-app/.test(navigator.userAgent);
 
 const TITLES: Record<View, string> = { today: "Today", week: "Week", trends: "Trends", top: "Top", inbox: "Inbox", library: "Library", settings: "Settings" };
-const ICONS: Record<View, typeof Sun> = { today: Sun, week: CalendarDays, trends: BarChart3, top: ListOrdered, inbox: InboxIcon, library: LibraryIcon, settings: Gear };
+const ICONS: Record<View, typeof Sun> = { today: Sun, week: CalendarDays, trends: ChartColumn, top: ListOrdered, inbox: InboxIcon, library: LibraryIcon, settings: Gear };
 
 /** useTick changes once a minute, so live views refresh. */
 function useTick(ms = 60_000) {
@@ -102,7 +102,7 @@ export default function App() {
             <div className="flex items-center gap-0.5 border-t px-1 pt-2">
               <NavItem v="settings" k="," active={route.view === "settings"} count={0} />
               <span className="ml-auto" />
-              <IconButton label="Keys and gestures (?)" onClick={openShortcuts}><HelpCircle /></IconButton>
+              <IconButton label="Keys and gestures (?)" onClick={openShortcuts}><CircleQuestionMark /></IconButton>
             </div>
           </div>
         </aside>
