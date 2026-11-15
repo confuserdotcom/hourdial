@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"tock/internal/numfmt"
 	"tock/internal/report"
 )
 
@@ -37,13 +38,13 @@ func cmdAgents(env Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	for _, l := range agentLines(ag) {
+	for _, l := range agentLines(ag, envDisplay(env).NumberStyle()) {
 		fmt.Fprintln(env.Stdout, l)
 	}
 	return nil
 }
 
-func agentLines(ag report.Agents) []string {
+func agentLines(ag report.Agents, nums numfmt.Style) []string {
 	if len(ag.Rows) == 0 {
 		return []string{"no agent sessions in this range (tock reads Claude Code's logs in ~/.claude/projects)"}
 	}
@@ -63,7 +64,7 @@ func agentLines(ag report.Agents) []string {
 	}
 	line += fmt.Sprintf(" · you %s in their windows", report.Dur(ag.YouMS))
 	if ag.YouMS > 0 && ag.AgentMS > 0 {
-		line += fmt.Sprintf(" · %.1f× leverage", float64(ag.AgentMS)/float64(ag.YouMS))
+		line += " · " + nums.Fixed(float64(ag.AgentMS)/float64(ag.YouMS), 1) + "× leverage"
 	}
 	return append(out, line)
 }

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -26,6 +28,41 @@ func TestReview(t *testing.T) {
 		"best day  Sat 10 Oct · score 74\n"
 	if code != 0 || out != want {
 		t.Fatalf("code %d\n%s\nwant\n%s", code, out, want)
+	}
+}
+
+// TestReviewLocale is tock review under each [display] date and numbers
+// style; setting the defaults by hand prints what TestReview does.
+func TestReviewLocale(t *testing.T) {
+	body := func(week, sph, best string) string {
+		return "Week of " + week + "\n" +
+			"tracked 2h54 · focus 2h14 · score 74 avg · 1 workday · " + sph + " switches/h\n" +
+			"\n" +
+			"goals\n" +
+			"  Code ≥2h/day                  met 1 of 1 day\n" +
+			"  project tock ≥10h/week        1h40/10h00 short 8h20\n" +
+			"  Entertainment ≤10m/day        over 1 of 1 day\n" +
+			"\n" +
+			"top distractions\n" +
+			"  youtube.com         12m\n" +
+			"\n" +
+			"best day  " + best + " · score 74\n"
+	}
+	for _, c := range []struct{ cfg, want string }{
+		{"date = \"dmy\"\nnumbers = \"1234.5\"\n", body("Mon 5 Oct", "0.7", "Sat 10 Oct")},
+		{"date = \"mdy\"\nnumbers = \"1,234.5\"\n", body("Mon Oct 5", "0.7", "Sat Oct 10")},
+		{"date = \"iso\"\nnumbers = \"1.234,5\"\n", body("Mon 2026-10-05", "0,7", "Sat 2026-10-10")},
+		{"numbers = \"1 234,5\"\n", body("Mon 5 Oct", "0,7", "Sat 10 Oct")},
+		{"date = \"mdy\"\nnumbers = \"1234,5\"\n", body("Mon Oct 5", "0,7", "Sat Oct 10")},
+	} {
+		te := newTestEnv(t, goalRules)
+		te.seed(t, daySpans()...)
+		if err := os.WriteFile(filepath.Join(te.ConfigDir, "config.toml"), []byte("[display]\n"+c.cfg), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		if code, out := te.run(t, "", "review"); code != 0 || out != c.want {
+			t.Errorf("%s: code %d\n%s\nwant\n%s", c.cfg, code, out, c.want)
+		}
 	}
 }
 

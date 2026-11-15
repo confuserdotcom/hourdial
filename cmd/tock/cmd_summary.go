@@ -121,7 +121,7 @@ func cmdBlocks(env Env, args []string) error {
 
 func printBlocks(env Env, d report.Day) {
 	loc := env.Now().Location()
-	fmt.Fprintf(env.Stdout, "Work blocks  %s\n", d.Date.Format("Mon 2 Jan"))
+	fmt.Fprintf(env.Stdout, "Work blocks  %s\n", d.Dates.Day(d.Date))
 	if d.Summary != "" {
 		fmt.Fprintln(env.Stdout)
 		for _, l := range wrap(report.Safe(d.Summary), 76) {

@@ -46,7 +46,7 @@ func cmdSync(env Env, args []string) error {
 	for _, m := range r.Machines {
 		last := "no activity"
 		if m.LastMS > 0 {
-			last = "last active " + envClock(env).Stamp(time.UnixMilli(m.LastMS).In(env.Now().Location()), "Mon 2 Jan ")
+			last = "last active " + envDay(env, time.UnixMilli(m.LastMS).In(env.Now().Location()))
 		}
 		fmt.Fprintf(env.Stdout, "%s: %s (%s)\n", m.Name, last, plural(m.Days, "day"))
 	}

@@ -68,6 +68,6 @@ func cmdReview(env Env, args []string) error {
 	if err := a.SetPlan(next, text); err != nil {
 		return err
 	}
-	fmt.Fprintf(env.Stdout, "saved plan for the week of %s\n", next.Format("Mon 2 Jan"))
+	fmt.Fprintf(env.Stdout, "saved plan for the week of %s\n", envDisplay(env).DateStyle().Day(next))
 	return nil
 }

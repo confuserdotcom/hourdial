@@ -254,7 +254,7 @@ func moduleNote(a *app.App, name string) string {
 		}
 		if a.Config().Billing.Enabled {
 			if p.Rate != nil {
-				r := "rate " + strconv.FormatFloat(*p.Rate, 'f', -1, 64) + "/h"
+				r := "rate " + a.Config().Display.NumberStyle().Decimal(strconv.FormatFloat(*p.Rate, 'f', -1, 64)) + "/h"
 				if p.Billable != nil && !*p.Billable {
 					r += ", not billed"
 				}

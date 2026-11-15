@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"tock/internal/classify"
+	"tock/internal/datefmt"
 	"tock/internal/report"
 )
 
@@ -26,13 +27,13 @@ func cmdBudget(env Env, args []string) error {
 	if err != nil {
 		return err
 	}
-	for _, l := range budgetLines(rows, env.Now()) {
+	for _, l := range budgetLines(rows, env.Now(), envDisplay(env).DateStyle()) {
 		fmt.Fprintln(env.Stdout, l)
 	}
 	return nil
 }
 
-func budgetLines(rows []report.BurnRow, now time.Time) []string {
+func budgetLines(rows []report.BurnRow, now time.Time, dates datefmt.Style) []string {
 	if len(rows) == 0 {
 		return []string{"no project has a budget: tock project set <name> --budget 40h"}
 	}
@@ -51,11 +52,11 @@ func budgetLines(rows []report.BurnRow, now time.Time) []string {
 			line += "  over by " + report.Dur(r.SpentMS-r.BudgetMS)
 		case r.RunsOutMS > 0:
 			end := time.UnixMilli(r.RunsOutMS).In(now.Location())
-			layout := "Mon 2 Jan"
+			day := dates.Day
 			if end.Year() != now.Year() {
-				layout += " 2006"
+				day = dates.DayYear
 			}
-			line += fmt.Sprintf("  %s/day · runs out %s", report.Dur(r.PerDayMS), end.Format(layout))
+			line += fmt.Sprintf("  %s/day · runs out %s", report.Dur(r.PerDayMS), day(end))
 		default:
 			line += "  no time this week"
 		}

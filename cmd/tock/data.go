@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"tock/internal/app"
 	"tock/internal/classify"
@@ -48,6 +49,22 @@ func envClock(env Env) clockfmt.Clock {
 		return clockfmt.H24
 	}
 	return c.Display.ClockFormat()
+}
+
+// envDisplay is the [display] section, for dates and numbers shown to
+// people; the defaults when config.toml cannot be read.
+func envDisplay(env Env) config.Display {
+	c, err := config.Load(env.configPath())
+	if err != nil {
+		return config.Display{}
+	}
+	return c.Display
+}
+
+// envDay is t as a weekday, date and time of day: "Tue 3 Nov 17:20".
+func envDay(env Env, t time.Time) string {
+	d := envDisplay(env)
+	return d.DateStyle().Day(t) + " " + d.ClockFormat().Time(t)
 }
 
 // openAppAsIs is openApp without writing starter rules.

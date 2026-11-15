@@ -461,7 +461,7 @@ func sessionWeights(env Env) error {
 	if err != nil {
 		return err
 	}
-	def := focus.DefaultQualityWeights()
+	def, nums := focus.DefaultQualityWeights(), envDisplay(env).NumberStyle()
 	fmt.Fprintln(env.Stdout, "component  default  current")
 	for _, c := range []struct {
 		name     string
@@ -470,7 +470,7 @@ func sessionWeights(env Env) error {
 		{"share", def.Share, cur.Share}, {"longest", def.Longest, cur.Longest},
 		{"calm", def.Calm, cur.Calm}, {"steady", def.Steady, cur.Steady},
 	} {
-		fmt.Fprintf(env.Stdout, "%-9s  %7.2f  %7.2f\n", c.name, c.def, c.cur)
+		fmt.Fprintf(env.Stdout, "%-9s  %7s  %7s\n", c.name, nums.Fixed(c.def, 2), nums.Fixed(c.cur, 2))
 	}
 	if fitted {
 		fmt.Fprintf(env.Stdout, "based on %d rated sessions\n", n)

@@ -50,6 +50,7 @@ func cmdTop(env Env, args []string) error {
 	if err != nil {
 		return err
 	}
+	t.Dates = a.Config().Display.DateStyle()
 	for _, l := range report.TopLines(t, sections, *limit) {
 		fmt.Fprintln(env.Stdout, l)
 	}

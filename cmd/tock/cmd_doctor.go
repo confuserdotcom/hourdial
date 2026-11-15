@@ -365,7 +365,7 @@ func doctorSync(env Env, s config.Sync, ok func(name, detail string), bad func(n
 			st.Close()
 			if name, ms, ok := strings.Cut(v, " "); ok {
 				if n, err := strconv.ParseInt(ms, 10, 64); err == nil {
-					detail = "on; last took " + name + "'s, changed " + envClock(env).Stamp(time.UnixMilli(n).In(env.Now().Location()), "Mon 2 Jan ")
+					detail = "on; last took " + name + "'s, changed " + envDay(env, time.UnixMilli(n).In(env.Now().Location()))
 				}
 			}
 		}
@@ -613,8 +613,7 @@ func doctorBrowser(env Env, ok func(name, detail string)) {
 // problem while recent, history after that.
 func doctorFailures(env Env, h app.Health, ok func(name, detail string), bad func(name, detail, fix string)) {
 	now := env.Now()
-	clk := envClock(env)
-	at := func(ms int64) string { return clk.Stamp(time.UnixMilli(ms).In(now.Location()), "Mon 2 Jan ") }
+	at := func(ms int64) string { return envDay(env, time.UnixMilli(ms).In(now.Location())) }
 	switch {
 	case h.WriteFailedSince(now.UnixMilli()):
 		bad("writes", fmt.Sprintf("write_failed at %s (%d in all): %s", at(h.LastErrorMS), h.WriteFails, h.LastError),

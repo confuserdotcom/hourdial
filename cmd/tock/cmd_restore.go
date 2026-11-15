@@ -146,7 +146,7 @@ func cmdRestore(env Env, args []string) error {
 			fmt.Fprintln(env.Stdout, "no snapshots yet; trackd takes one a day, and tock backup writes one now")
 			return nil
 		}
-		clk := envClock(env)
+		clk, dates := envClock(env), envDisplay(env).DateStyle()
 		for i, r := range all {
 			at := time.UnixMilli(r.atMS).In(env.Now().Location())
 			schema := "?"
@@ -154,7 +154,7 @@ func cmdRestore(env Env, args []string) error {
 				schema = "v" + strconv.Itoa(r.schema)
 			}
 			fmt.Fprintf(env.Stdout, "%d  %s  %-6s  %-4s  %s\n", i+1,
-				at.Format("Mon 2 Jan ")+clk.Col(at), r.kind, schema, sizeMB(r.size))
+				dates.Day(at)+" "+clk.Col(at), r.kind, schema, sizeMB(r.size))
 		}
 		return nil
 	}
@@ -187,7 +187,7 @@ func cmdRestore(env Env, args []string) error {
 	} else if v > store.LatestVersion() {
 		return fmt.Errorf("restore: the snapshot is from a newer tock (schema v%d, this one v%d); update tock first", v, store.LatestVersion())
 	}
-	when := envClock(env).Stamp(time.UnixMilli(pick.atMS).In(env.Now().Location()), "Mon 2 Jan ")
+	when := envDay(env, time.UnixMilli(pick.atMS).In(env.Now().Location()))
 	keep := env.dbPath() + ".before-restore-" + env.Now().Format("20060102-150405")
 	lost, err := invoicesLost(env.dbPath(), tmp)
 	if err != nil {
