@@ -13,9 +13,9 @@ import (
 // lists.
 const TopProjects = 5
 
-// WeekInput is one Monday-start week of labelled spans.
+// WeekInput is one week of labelled spans, starting on any weekday.
 type WeekInput struct {
-	Monday  time.Time // local midnight of the week's Monday
+	Monday  time.Time // local midnight of the week's first day (a Monday by default)
 	NowMS   int64
 	Views   []classify.SpanView // clipped to the week; the open span ends at NowMS
 	Labels  []classify.Label
@@ -62,9 +62,13 @@ type DayTotal struct {
 }
 
 // MondayOf returns local midnight of the Monday on or before t.
-func MondayOf(t time.Time) time.Time {
+func MondayOf(t time.Time) time.Time { return WeekOf(t, time.Monday) }
+
+// WeekOf returns local midnight of the first day of t's week, for weeks
+// that start on first: the last first-weekday on or before t.
+func WeekOf(t time.Time, first time.Weekday) time.Time {
 	d := time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
-	back := (int(d.Weekday()) + 6) % 7 // Monday = 0
+	back := (int(d.Weekday()) - int(first) + 7) % 7
 	return d.AddDate(0, 0, -back)
 }
 

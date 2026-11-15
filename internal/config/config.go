@@ -44,6 +44,7 @@ type Config struct {
 	Notch     Notch
 	Backup    Backup
 	Billing   Billing
+	Display   Display
 	// File is the config as config.toml sets it, before the groups turn
 	// their members off; see Raw.
 	File *Config
@@ -282,6 +283,7 @@ type fileTOML struct {
 	Notch     notchTOML     `toml:"notch"`
 	Backup    backupTOML    `toml:"backup"`
 	Billing   billingTOML   `toml:"billing"`
+	Display   displayTOML   `toml:"display"`
 }
 
 // Load reads path. A missing file is Default() and no error. Any other
@@ -384,6 +386,9 @@ func Parse(name string, b []byte) (Config, error) {
 		return Default(), fmt.Errorf("%s: %w", name, err)
 	}
 	decodeNotch(f.Notch, &c.Notch)
+	if err := decodeDisplay(f.Display, &c.Display); err != nil {
+		return Default(), fmt.Errorf("%s: %w", name, err)
+	}
 	if err := decodeOCR(f.OCR, &c.OCR); err != nil {
 		return Default(), fmt.Errorf("%s: %w", name, err)
 	}

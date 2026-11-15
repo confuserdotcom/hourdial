@@ -30,9 +30,14 @@ func (d GoalDay) skip() bool { return !d.Active || d.Off }
 // goal held; a limit already over breaks the streak; otherwise today is
 // left out until it is decided.
 func Streak(gi int, g classify.Goal, past []GoalDay, today GoalDay, closed bool) (cur, best int) {
+	return StreakFrom(gi, g, past, today, closed, time.Monday)
+}
+
+// StreakFrom is Streak with weeks starting on first.
+func StreakFrom(gi int, g classify.Goal, past []GoalDay, today GoalDay, closed bool, first time.Weekday) (cur, best int) {
 	var seq []bool // oldest first
 	if g.Week {
-		seq = weekStreakSeq(gi, g, past, today)
+		seq = weekStreakSeq(gi, g, past, today, first)
 	} else {
 		for i := len(past) - 1; i >= 0; i-- {
 			if d := past[i]; !d.skip() {
@@ -73,17 +78,18 @@ func decided(g classify.Goal, state string, closed bool) (held, ok bool) {
 	return false, false
 }
 
-// weekStreakSeq is the held state of each Monday-start week, oldest first.
-// The oldest week is dropped when the lookback starts after its Monday.
-func weekStreakSeq(gi int, g classify.Goal, past []GoalDay, today GoalDay) []bool {
+// weekStreakSeq is the held state of each week starting on first, oldest
+// first. The oldest week is dropped when the lookback starts after its
+// first day.
+func weekStreakSeq(gi int, g classify.Goal, past []GoalDay, today GoalDay, first time.Weekday) []bool {
 	type week struct {
 		ms     int64
 		active bool
 	}
-	thisMon := MondayOf(today.Date)
+	thisMon := WeekOf(today.Date, first)
 	var weeks []week // most recent first, index 0 is this week
 	add := func(d GoalDay) {
-		i := int(thisMon.Sub(MondayOf(d.Date)).Hours()+12) / (7 * 24)
+		i := int(thisMon.Sub(WeekOf(d.Date, first)).Hours()+12) / (7 * 24)
 		for len(weeks) <= i {
 			weeks = append(weeks, week{})
 		}
@@ -94,7 +100,7 @@ func weekStreakSeq(gi int, g classify.Goal, past []GoalDay, today GoalDay) []boo
 	for _, d := range past {
 		add(d)
 	}
-	if n := len(past); n > 0 && len(weeks) > 1 && !past[n-1].Date.Equal(MondayOf(past[n-1].Date)) {
+	if n := len(past); n > 0 && len(weeks) > 1 && !past[n-1].Date.Equal(WeekOf(past[n-1].Date, first)) {
 		weeks = weeks[:len(weeks)-1]
 	}
 	var seq []bool
