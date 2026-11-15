@@ -98,6 +98,12 @@ TOCK_DEMO_PORT=7788 go test -tags demo -run TestDemo -timeout 0 ./internal/web
   "set to zero" differ; defaults come from a `Default<Thing>()` function,
   and an unknown key is an error, not ignored.
 - The store has one file per group of tables in `internal/store`.
+- The schema is frozen and changes are batched. A change goes in a new
+  numbered file in `internal/store/migrations`, at most one per release;
+  a migration that has shipped is never edited (fix forward with a new
+  one), and the compat level is never raised within 1.x.
+  `internal/store/schema_freeze_test.go` pins every migration by name and
+  hash, so a new one means adding its line there in the same commit.
 - cgo lives in `internal/collect` and `cmd/tockbar` only.
 - trackd has a budget: under 1 % CPU when idle and about 40 MB of memory.
   `scripts/trackd-usage.sh` measures it.
