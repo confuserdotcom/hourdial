@@ -343,7 +343,7 @@ func (s *Server) day(r *http.Request) (any, error) {
 	out.BilledMS = billed.MS(from, to)
 	for i, row := range d.Timeline {
 		out.Timeline[i] = rowJSON{IDs: row.IDs, Start: row.Start, End: row.End, Key: report.Safe(row.Key),
-			App: report.Safe(row.App), Text: row.Text, Category: row.Label.Category, Kind: row.Label.Kind,
+			App: report.Safe(classify.DisplayApp(row.App)), Text: row.Text, Category: row.Label.Category, Kind: row.Label.Kind,
 			Project: row.Label.Project, Source: string(row.Label.CategorySource), Idle: row.Idle, Open: row.Open}
 		for _, id := range row.IDs {
 			if n := billed.Number(id); n != "" {
@@ -536,7 +536,7 @@ func (s *Server) inbox(r *http.Request) (any, error) {
 	}
 	for i, it := range items {
 		out.TotalMS += it.TotalMS
-		j := itemJSON{Key: report.Safe(it.Key), App: report.Safe(it.App), MS: it.TotalMS, Spans: it.Spans,
+		j := itemJSON{Key: report.Safe(it.Key), App: report.Safe(classify.DisplayApp(it.App)), MS: it.TotalMS, Spans: it.Spans,
 			Example: report.Safe(it.Example), Private: it.Private}
 		if w, ok := sugg[it.Key]; ok {
 			j.Suggestion = &suggestionJSON{Label: wantText(w)}

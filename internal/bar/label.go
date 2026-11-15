@@ -52,7 +52,7 @@ func LoadLabels(a *app.App, now time.Time) ([]Entry, error) {
 		if len(out) == labelEntries {
 			break
 		}
-		e := Entry{Key: it.Key, App: report.Safe(it.App), Title: report.Safe(it.Example), Dur: report.Dur(it.TotalMS), MS: it.TotalMS, Picked: -1}
+		e := Entry{Key: it.Key, App: report.Safe(classify.DisplayApp(it.App)), Title: report.Safe(it.Example), Dur: report.Dur(it.TotalMS), MS: it.TotalMS, Picked: -1}
 		if it.Private || e.Title == "" {
 			e.Title = report.Safe(it.Key)
 		}
