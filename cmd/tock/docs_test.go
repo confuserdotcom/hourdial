@@ -180,7 +180,7 @@ func docCommands(t *testing.T, page string) []docCommand {
 	var out []docCommand
 	in := false
 	last := -1
-	for i, line := range strings.Split(string(b), "\n") {
+	for i, line := range strings.Split(strings.ReplaceAll(string(b), "\r\n", "\n"), "\n") {
 		if fence.MatchString(line) {
 			in = !in
 			last = -1
@@ -271,7 +271,7 @@ func TestGuideCommandList(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, sec, ok := strings.Cut(string(b), "\n## Commands\n")
+	_, sec, ok := strings.Cut(strings.ReplaceAll(string(b), "\r\n", "\n"), "\n## Commands\n")
 	if !ok {
 		t.Fatal("guide.md has no ## Commands section")
 	}

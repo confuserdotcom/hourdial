@@ -52,7 +52,7 @@ func tomlBlocks(t *testing.T) (all []tomlBlock, ref tomlBlock) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	lines := strings.Split(string(b), "\n")
+	lines := strings.Split(strings.ReplaceAll(string(b), "\r\n", "\n"), "\n")
 	afterRef := false
 	for i := 0; i < len(lines); i++ {
 		if strings.Contains(lines[i], "`config.toml` sections") {
