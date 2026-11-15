@@ -11,6 +11,9 @@ import (
 	"time"
 
 	"tock/internal/classify"
+	"tock/internal/config"
+	"tock/internal/datefmt"
+	"tock/internal/numfmt"
 	"tock/internal/report"
 	"tock/internal/store"
 )
@@ -92,6 +95,7 @@ func (a *App) DraftInvoice(s InvoiceSpec) (InvoiceDraft, error) {
 		Project: name, PeriodFromMS: s.From.UnixMilli(), PeriodToMS: end.UnixMilli(), TZ: tzName(loc),
 		Currency: cfg.Currency, MinorUnits: cfg.MinorUnits, RateMinor: rateMinor, RoundStepS: cfg.RoundStepS, RoundMode: string(mode),
 		TaxLabel: cfg.TaxLabel, TaxBP: cfg.TaxBP, TaxNote: cfg.TaxNote, Note: cfg.Note, Generator: s.Generator}
+	r.DateStyle, r.NumberStyle, r.CurrencyPosition = layoutRecord(a.Config().InvoiceLayout())
 	r.ClientName = strings.TrimSpace(s.Client)
 	if r.ClientName == "" {
 		r.ClientName = a.rs.Client(name)
@@ -202,7 +206,54 @@ func invoiceDoc(r store.Invoice, loc *time.Location) report.Invoice {
 		Currency: r.Currency, Note: r.Note, Issued: time.UnixMilli(r.IssuedMS).In(loc),
 		PeriodFrom: time.UnixMilli(r.PeriodFromMS).In(loc), PeriodTo: time.UnixMilli(r.PeriodToMS).In(loc).AddDate(0, 0, -1),
 		MinorUnits: r.MinorUnits, RateMinor: r.RateMinor, Lines: lines, SecondsBilled: r.SecondsBilled, SubtotalMinor: r.SubtotalMinor,
-		TaxLabel: r.TaxLabel, TaxNote: r.TaxNote, TaxBP: r.TaxBP, TaxMinor: r.TaxMinor, TotalMinor: r.TotalMinor, Supersedes: r.Supersedes}
+		TaxLabel: r.TaxLabel, TaxNote: r.TaxNote, TaxBP: r.TaxBP, TaxMinor: r.TaxMinor, TotalMinor: r.TotalMinor, Supersedes: r.Supersedes,
+		Nums: invoiceNums(r), CurrencyBefore: r.CurrencyPosition == "before", Dates: invoiceDates(r), DatesSet: r.DateStyle != ""}
+}
+
+// layoutRecord is a layout as an invoice stores it: "" for each part
+// that is the layout invoices had before it could be chosen.
+func layoutRecord(l config.InvoiceLayout) (date, nums, pos string) {
+	if l.DatesSet {
+		date = l.Dates.String()
+	}
+	if l.Nums != numfmt.Plain {
+		nums = l.Nums.String()
+	}
+	if l.CurrencyBefore {
+		pos = "before"
+	}
+	return date, nums, pos
+}
+
+func invoiceNums(r store.Invoice) numfmt.Style {
+	s, _ := numfmt.Parse(r.NumberStyle)
+	return s
+}
+
+func invoiceDates(r store.Invoice) datefmt.Style {
+	s, _ := datefmt.Parse(r.DateStyle)
+	return s
+}
+
+// InvoiceMoney is v minor units of r as its document writes them:
+// "1234.50 EUR", or "€1.234,50" in another layout.
+func InvoiceMoney(r store.Invoice, v int64) string {
+	return invoiceNums(r).Money(v, r.MinorUnits, r.Currency, r.CurrencyPosition == "before")
+}
+
+// InvoiceHours is seconds of r as decimal hours: "3.33" or "3,33".
+func InvoiceHours(r store.Invoice, s int64) string { return report.InvoiceHours(s, invoiceNums(r)) }
+
+// InvoicePercent is r's tax rate as its document writes it: "5.5".
+func InvoicePercent(r store.Invoice) string { return invoiceNums(r).Decimal(report.FormatPercent(r.TaxBP)) }
+
+// InvoiceDate is t (in r's zone) as r's document writes dates:
+// "2026-11-03" unless r was issued with a date layout.
+func InvoiceDate(r store.Invoice, t time.Time) string {
+	if r.DateStyle == "" {
+		return datefmt.ISO.Date(t)
+	}
+	return invoiceDates(r).Date(t)
 }
 
 // DraftPDF is the PDF of a draft, marked DRAFT.

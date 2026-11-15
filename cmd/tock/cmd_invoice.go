@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"tock/internal/app"
+	"tock/internal/numfmt"
 	"tock/internal/report"
 	"tock/internal/store"
 )
@@ -135,10 +136,10 @@ func (f invoiceFlags) spec(env Env) (app.InvoiceSpec, error) {
 // printDraft prints a draft's totals and what to look at before issuing.
 func printDraft(env Env, d app.InvoiceDraft) {
 	r := d.Record
-	fmt.Fprintf(env.Stdout, "%s, %s to %s: %d days, %s h", r.Project, d.Doc.PeriodFrom.Format("2006-01-02"),
-		d.Doc.PeriodTo.Format("2006-01-02"), len(r.Lines), hoursText(r.SecondsBilled))
+	fmt.Fprintf(env.Stdout, "%s, %s to %s: %d days, %s h", r.Project, app.InvoiceDate(r, d.Doc.PeriodFrom),
+		app.InvoiceDate(r, d.Doc.PeriodTo), len(r.Lines), invHours(r, r.SecondsBilled))
 	if r.TaxBP > 0 {
-		fmt.Fprintf(env.Stdout, ", %s + %s %s%%", money(r.SubtotalMinor, r), strings.TrimSpace(r.TaxLabel), report.FormatPercent(r.TaxBP))
+		fmt.Fprintf(env.Stdout, ", %s + %s %s%%", money(r.SubtotalMinor, r), strings.TrimSpace(r.TaxLabel), app.InvoicePercent(r))
 	}
 	fmt.Fprintf(env.Stdout, ", total %s\n", money(r.TotalMinor, r))
 	if r.ClientName != "" {
@@ -187,12 +188,22 @@ func issuedNowText(issued, now int64) string {
 	return "issued " + withUnit(a) + " / now " + withUnit(b)
 }
 
-func money(v int64, r store.Invoice) string {
-	s := report.FormatMinor(v, r.MinorUnits)
-	if r.Currency != "" {
-		s += " " + r.Currency
+// money is v minor units of r in r's layout: "1234.50 EUR", "€1.234,50".
+func money(v int64, r store.Invoice) string { return app.InvoiceMoney(r, v) }
+
+// invHours is hoursText in r's layout: "3.33", "3,33".
+func invHours(r store.Invoice, s int64) string {
+	n, _ := numfmt.Parse(r.NumberStyle)
+	return n.Decimal(hoursText(s))
+}
+
+// lineDay is a line's local day (2006-01-02) in r's layout.
+func lineDay(r store.Invoice, day string) string {
+	t, err := time.Parse("2006-01-02", day)
+	if err != nil {
+		return day
 	}
-	return s
+	return app.InvoiceDate(r, t)
 }
 
 func invoicePreview(env Env, a *app.App, args []string) error {
@@ -335,7 +346,7 @@ func invoiceList(env Env, a *app.App, args []string) error {
 			loc = app.InvoiceLocation(i, here)
 			zones[i.TZ] = loc
 		}
-		return time.UnixMilli(ms).In(loc).Format("2006-01-02")
+		return app.InvoiceDate(i, time.UnixMilli(ms).In(loc))
 	}
 	replacedBy := map[string]string{}
 	for _, i := range list {
@@ -418,18 +429,18 @@ func printInvoice(env Env, inv store.Invoice) {
 	w := env.Stdout
 	// Dates in the zone the invoice was issued in, as its PDF prints them.
 	loc := app.InvoiceLocation(inv, env.Now().Location())
-	issued := time.UnixMilli(inv.IssuedMS).In(loc).Format("2006-01-02")
+	date := func(ms int64) string { return app.InvoiceDate(inv, time.UnixMilli(ms).In(loc)) }
+	issued := date(inv.IssuedMS)
 	fmt.Fprintf(w, "%s  %s %s", inv.Number, inv.Status, issued)
 	if inv.Status == store.InvoiceVoid {
-		fmt.Fprintf(w, ", void %s: %s", time.UnixMilli(inv.VoidMS).In(loc).Format("2006-01-02"), report.Safe(inv.VoidReason))
+		fmt.Fprintf(w, ", void %s: %s", date(inv.VoidMS), report.Safe(inv.VoidReason))
 	}
 	if inv.Supersedes != "" {
 		fmt.Fprintf(w, ", replaces %s", inv.Supersedes)
 	}
 	fmt.Fprintln(w)
 	from, to := inv.PeriodFromMS, inv.PeriodToMS-1
-	fmt.Fprintf(w, "%s, %s to %s\n", report.Safe(inv.Project), time.UnixMilli(from).In(loc).Format("2006-01-02"),
-		time.UnixMilli(to).In(loc).Format("2006-01-02"))
+	fmt.Fprintf(w, "%s, %s to %s\n", report.Safe(inv.Project), date(from), date(to))
 	var parties []string
 	if inv.IssuerName != "" {
 		parties = append(parties, "from "+report.Safe(inv.IssuerName))
@@ -441,12 +452,12 @@ func printInvoice(env Env, inv store.Invoice) {
 		fmt.Fprintln(w, strings.Join(parties, " "))
 	}
 	for _, l := range inv.Lines {
-		fmt.Fprintf(w, "  %s  %s h  %s\n", l.Day, hoursText(l.SecondsBilled), money(l.AmountMinor, inv))
+		fmt.Fprintf(w, "  %s  %s h  %s\n", lineDay(inv, l.Day), invHours(inv, l.SecondsBilled), money(l.AmountMinor, inv))
 	}
-	fmt.Fprintf(w, "%s h at rate %s/h", hoursText(inv.SecondsBilled), money(inv.RateMinor, inv))
+	fmt.Fprintf(w, "%s h at rate %s/h", invHours(inv, inv.SecondsBilled), money(inv.RateMinor, inv))
 	if inv.TaxBP > 0 {
 		fmt.Fprintf(w, ", subtotal %s, %s %s%% %s", money(inv.SubtotalMinor, inv), report.Safe(strings.TrimSpace(inv.TaxLabel)),
-			report.FormatPercent(inv.TaxBP), money(inv.TaxMinor, inv))
+			app.InvoicePercent(inv), money(inv.TaxMinor, inv))
 	}
 	fmt.Fprintf(w, ", total %s\n", money(inv.TotalMinor, inv))
 	fmt.Fprintf(w, "pdf sha256 %s (tock invoice show %s --pdf -o FILE)\n", inv.PDFSHA256, inv.Number)
