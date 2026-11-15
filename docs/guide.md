@@ -1158,7 +1158,10 @@ serves it with hot reload at `http://localhost:5173/#` followed by 64
 zeros; `make web` tests it and rebuilds `internal/web/static`, which is committed so
 Go builds need no Node. `TOCK_DEMO_PORT=7788 go test -tags demo -run
 TestDemo -timeout 0 ./internal/web` serves synthetic data at
-`http://127.0.0.1:7788/#` followed by 64 zeros.
+`http://127.0.0.1:7788/#` followed by 64 zeros. `cd web && npm run e2e`
+(after `npx playwright install chromium` once) builds the showcase server,
+serves a month of made-up data from a temp folder, and runs axe-core on
+every view plus a few flows in headless Chromium, as CI does.
 
 ## Duplicate names
 
