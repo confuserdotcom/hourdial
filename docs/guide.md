@@ -170,11 +170,11 @@ tock rules check | tock rules stats [--days N]
 tock rules dupes | tock rules merge [--project] <from> <into>
                                        look-alike names | fold one name into another everywhere
 tock category [add <name> <kind> [--afk D] |
-                set <name> [--kind K] [--afk D] [--interrupt on|off] |
-                rename <name> <new> | rm <name>]
+              set <name> [--kind K] [--afk D] [--interrupt on|off] |
+              rename <name> <new> | rm <name>]
                                        list or change your categories (rules.toml)
-tock project [add <name> [--category C] [--alias a,b] | set <name> ... |
-               rename <name> <new> | rm <name> | scan <dir> --category C]
+tock project [add <name> [--category C] [--alias a,b] [--rate N] | set <name> ... |
+             rename <name> <new> | rm <name> | scan <dir> --category C]
                                        projects; filed under a category they are modules
 
 Looking back:
@@ -199,22 +199,29 @@ Setup and data:
 tock init                              write starter ~/.config/tock/rules.toml
 tock doctor [--wait] [--open] [--deep] [--json]
                                        check trackd, permissions, rules, config and snapshots;
-                                       --deep: a full check of the database; --json: for scripts
+                                       --deep: a full check of the database
 tock bug-report [-o FILE] [--include-rules]
                                        a file to attach to an issue, without titles or URLs
 tock update [trust <fingerprint>]      Linux: the key trusted for the Mac's builds; trust one
 tock version                           the version of this build
-tock choice [<feature> on|off]         turn groups and features on and off (focus, billing, screen text…),
+tock choice [<feature> on|off]         turn features on and off (screen text, wake screen, Slack…),
                                        open the dashboard; piped: each feature and whether it is on
 tock backup [--out FILE]               archive tock.db and the rule, config and shell files
                                        (default ~/.local/share/tock/backups/)
 tock restore [<n|path> [--yes]]        list snapshots of the database, or put one back
                                        (stops and starts trackd)
+tock stop | tock start                 stop recording until tock start or your next login
 tock prune [--days N] [--dry-run]      delete window titles (and URL paths) older than N days
                                        (default [privacy] keep_titles); labels stay
 tock import activitywatch <export.json>
                                        ActivityWatch history (Export all buckets, or
                                        curl localhost:5600/api/0/export); again replaces it
+tock setup [--check] [--no-doctor]    after brew install: make the signing certificate, install
+                                       and start trackd and the menu bar app (safe to run again)
+tock setup --template NAME[,NAME] [--past] [--yes]
+                                       NAME: developer, designer, writer, client, own;
+                                       add the categories and rules a template has and you lack;
+                                       they label from now on unless --past (tock undo takes back)
 tock uninstall [--purge]              stop trackd and the menu bar, remove the apps and tock;
                                        --purge also deletes your data, rules and config
 tock shell-init zsh                    shell hook for terminal projects; in ~/.zshrc:
@@ -228,10 +235,9 @@ tock ask [--dry-run] "<question>"      ask about your time in plain words; answe
 tock recommend [accept | dismiss]      the pending suggestion: show it, take it, or not now
 tock ocr test [--now] | grant          read the front window's text once (in 3 s) | ask for Screen Recording
 tock invoice --project P [--from D] [--to D] [--client NAME] [-o FILE]
-                                       preview an invoice (DRAFT PDF, nothing stored; default last month)
-tock invoice issue --project P […]     issue it: numbered, stored, never changed (see Billing)
-tock invoice void | list | show | check | verify | recover
-                                       keep issued invoices (see Billing)
+                                       preview an invoice from the project's rate (DRAFT PDF; default last month)
+tock invoice issue|void|list|show|check|verify|recover …
+                                       issue and keep invoices (tock invoice help)
 tock sync [--days N]                   write this machine's last N days (default 2) to the
                                        [sync] folder now and read the other machines'
 tock slack [login | logout | status]   Slack status and do-not-disturb during focus sessions
