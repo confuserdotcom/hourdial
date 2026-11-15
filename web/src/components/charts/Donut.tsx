@@ -11,8 +11,8 @@ export type Slice = { name: string; ms: number; color: string; hint?: string; ki
 export function Donut({ data, center, sub, onSelect, active }: { data: Slice[]; center: string; sub: string; onSelect?: (name: string) => void; active?: string | null }) {
   const total = data.reduce((s, d) => s + d.ms, 0);
   return (
-    <div className="flex items-center gap-5">
-      <div className="relative h-[168px] w-[168px] shrink-0">
+    <div className="flex flex-wrap items-center gap-5">
+      <div className="relative aspect-square w-[168px] max-w-full shrink-0">
         <ChartContainer config={{}} className="aspect-square h-full w-full" aria-hidden>
           <PieChart>
             <ChartTooltip
@@ -40,7 +40,7 @@ export function Donut({ data, center, sub, onSelect, active }: { data: Slice[]; 
           <span className="text-[11px] text-muted-foreground">{sub}</span>
         </div>
       </div>
-      <ul className="min-w-0 flex-1 space-y-1.5">
+      <ul className="min-w-0 flex-[1_1_12rem] space-y-1.5">
         {data.map((d) => {
           const inner = (
             <>
@@ -51,7 +51,7 @@ export function Donut({ data, center, sub, onSelect, active }: { data: Slice[]; 
             </>
           );
           return (
-            <li key={d.name} className={active && active !== d.name ? "opacity-50" : undefined} title={d.hint}>
+            <li key={d.name} className={active && active !== d.name ? "opacity-50" : undefined} title={d.hint ?? d.name}>
               {onSelect ? (
                 <button type="button" onClick={() => onSelect(d.name)} aria-pressed={active === d.name}
                   className={`-mx-1.5 flex w-[calc(100%+0.75rem)] items-center gap-2 rounded-md px-1.5 py-0.5 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${active === d.name ? "bg-accent" : ""}`}>

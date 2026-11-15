@@ -42,6 +42,8 @@ Versions follow [semantic versioning](docs/stability.md) from v1.0.0 on.
   lands in the wrong category.
 
 ### Fixed
+- The Week dashboard gives project names more room in the chart legend.
+  A name that still needs truncation can be read in its tooltip.
 - The Linux updater's signed manifest now names its arch, so a signed
   arm64 build copied into the amd64 folder of the sync folder is refused
   instead of installed.
