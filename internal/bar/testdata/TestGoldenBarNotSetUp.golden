@@ -1,0 +1,14 @@
+== title
+◷ tock
+
+== menu
+Set up tock [setup]
+--
+Quit tock menu bar [quit]
+
+== notch
+{
+  "state": "quiet",
+  "open": false,
+  "face": {}
+}

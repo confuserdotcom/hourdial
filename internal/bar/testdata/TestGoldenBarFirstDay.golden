@@ -1,0 +1,186 @@
+== title
+◷ 1h20
+
+== menu
+1h20 today · 35m focus · score 52
+[strip none,deep,deep,shallow]
+--
+Start 25 min focus [start:25]
+--
+Inbox · 12m [dash:inbox]
+Open dashboard [dash]
+--
+Settings ▸
+  Privacy ▸
+    Nothing to hide yet
+  Notifications… [notify-settings]
+  Accessibility… [ax]
+  --
+  Quit tock menu bar [quit]
+
+== notch
+{
+  "state": "quiet",
+  "open": false,
+  "face": {},
+  "hover": {
+    "face": {
+      "left": "1h20",
+      "left_dim": "today",
+      "right": "52",
+      "right_dim": "12m to label"
+    },
+    "sub": "12m of today has no label yet.",
+    "buttons": [
+      {
+        "id": "start:25",
+        "title": "Focus 25m",
+        "primary": true
+      },
+      {
+        "id": "dash",
+        "title": "Open Today"
+      },
+      {
+        "id": "notch:label",
+        "title": "Label 12m"
+      }
+    ],
+    "pages": [
+      {
+        "id": "today",
+        "title": "Today",
+        "cells": [
+          {
+            "k": "Score",
+            "v": "52"
+          },
+          {
+            "k": "Deep focus",
+            "v": "35m"
+          },
+          {
+            "k": "Tracked",
+            "v": "1h20"
+          }
+        ],
+        "dial": {
+          "arcs": [
+            {
+              "from": 0.6666666666666666,
+              "to": 0.7222222222222222,
+              "kind": "deep"
+            }
+          ],
+          "now": 0.7222222222222222,
+          "center": "17:20",
+          "sub": "1h20 tracked"
+        },
+        "mid": {
+          "id": "",
+          "title": "",
+          "bars": [
+            {
+              "label": "16",
+              "parts": [
+                {
+                  "kind": "deep",
+                  "ms": 2100000
+                }
+              ]
+            },
+            {
+              "label": "17"
+            }
+          ]
+        },
+        "big": {
+          "id": "",
+          "title": "Projects",
+          "rows": [
+            [
+              "tock",
+              "50m"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "week",
+        "title": "This week",
+        "bars": [
+          {
+            "label": "Mon"
+          },
+          {
+            "label": "Tue"
+          },
+          {
+            "label": "Wed"
+          },
+          {
+            "label": "Thu",
+            "sub": "52",
+            "hi": true,
+            "parts": [
+              {
+                "kind": "deep",
+                "ms": 2100000
+              },
+              {
+                "kind": "none",
+                "ms": 2700000
+              }
+            ]
+          },
+          {
+            "label": "Fri"
+          },
+          {
+            "label": "Sat"
+          },
+          {
+            "label": "Sun"
+          }
+        ],
+        "mid": {
+          "id": "",
+          "title": "",
+          "cells": [
+            {
+              "k": "Tracked",
+              "v": "1h20"
+            },
+            {
+              "k": "Deep focus",
+              "v": "35m"
+            },
+            {
+              "k": "Avg score",
+              "v": "52"
+            }
+          ]
+        },
+        "big": {
+          "id": "",
+          "title": "By kind",
+          "rows": [
+            [
+              "Deep",
+              "35m"
+            ],
+            [
+              "No label",
+              "45m"
+            ]
+          ]
+        }
+      },
+      {
+        "id": "goals",
+        "title": "Goals",
+        "note": "No goals yet · tock goal add"
+      }
+    ]
+  }
+}

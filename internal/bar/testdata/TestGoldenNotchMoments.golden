@@ -1,0 +1,585 @@
+== budget 85%
+{
+  "state": "budget",
+  "open": true,
+  "notice": 7,
+  "auto_close": 90,
+  "face": {
+    "dot": "break",
+    "left": "tock",
+    "right": "85%"
+  },
+  "panel": {
+    "face": {
+      "dot": "break",
+      "left": "tock",
+      "right": "85%"
+    },
+    "lead": "tock: 85% of its 40h budget",
+    "cells": [
+      {
+        "k": "Spent",
+        "v": "34h00"
+      },
+      {
+        "k": "Budget",
+        "v": "40h"
+      },
+      {
+        "k": "Left",
+        "v": "6h00"
+      },
+      {
+        "k": "Runs out",
+        "v": "Fri 20 Nov"
+      }
+    ],
+    "strip": [
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "axis": [
+      "0",
+      "40h"
+    ],
+    "buttons": [
+      {
+        "id": "dash",
+        "title": "Open Today",
+        "primary": true
+      },
+      {
+        "id": "notch:close",
+        "title": "Close"
+      }
+    ]
+  }
+}
+
+== budget over
+{
+  "state": "budget",
+  "open": true,
+  "notice": 8,
+  "auto_close": 90,
+  "face": {
+    "dot": "distract",
+    "left": "tock",
+    "right": "110%"
+  },
+  "panel": {
+    "face": {
+      "dot": "distract",
+      "left": "tock",
+      "right": "110%"
+    },
+    "lead": "tock is over its 40h budget",
+    "cells": [
+      {
+        "k": "Spent",
+        "v": "44h00"
+      },
+      {
+        "k": "Budget",
+        "v": "40h"
+      },
+      {
+        "k": "Over",
+        "v": "4h00",
+        "tone": "bad"
+      }
+    ],
+    "strip": [
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "break",
+      "distract",
+      "distract"
+    ],
+    "axis": [
+      "0",
+      "44h"
+    ],
+    "buttons": [
+      {
+        "id": "dash",
+        "title": "Open Today",
+        "primary": true
+      },
+      {
+        "id": "notch:close",
+        "title": "Close"
+      }
+    ]
+  }
+}
+
+== budget from an older trackd
+{
+  "state": "budget",
+  "open": true,
+  "notice": 9,
+  "auto_close": 90,
+  "face": {
+    "dot": "break",
+    "left": "tock: 80% of its budg…"
+  },
+  "panel": {
+    "face": {
+      "dot": "break",
+      "left": "tock: 80% of its budg…"
+    },
+    "lead": "tock: 80% of its budget",
+    "sub": "32h spent.",
+    "buttons": [
+      {
+        "id": "dash",
+        "title": "Open Today",
+        "primary": true
+      },
+      {
+        "id": "notch:close",
+        "title": "Close"
+      }
+    ]
+  }
+}
+
+== session done
+{
+  "state": "done",
+  "open": true,
+  "notice": 10,
+  "haptic": "level",
+  "auto_close": 30,
+  "face": {
+    "dot": "good",
+    "left": "Session done",
+    "right": "50m"
+  },
+  "panel": {
+    "face": {
+      "dot": "good",
+      "left": "Session done",
+      "right": "50m"
+    },
+    "lead": "TD 3, exercises 4 to 7",
+    "sub": "15:00 to 15:50 · ended on time",
+    "cells": [
+      {
+        "k": "Deep focus",
+        "v": "0%"
+      },
+      {
+        "k": "Longest block",
+        "v": "32m"
+      },
+      {
+        "k": "Switches",
+        "v": "4"
+      },
+      {
+        "k": "Distracting",
+        "v": "3m"
+      }
+    ],
+    "buttons": [
+      {
+        "id": "notch:act:10:refile:",
+        "title": "Refile → Licence",
+        "primary": true
+      },
+      {
+        "id": "notch:act:10:again",
+        "title": "Start again (50 min)"
+      },
+      {
+        "id": "notch:label",
+        "title": "Label 48m"
+      },
+      {
+        "id": "notch:close",
+        "title": "Close"
+      }
+    ]
+  }
+}
+
+== drift
+{
+  "state": "drift",
+  "open": true,
+  "notice": 11,
+  "auto_close": 12,
+  "face": {
+    "dot": "distract",
+    "left": "Video",
+    "right_dim": "off task"
+  },
+  "panel": {
+    "face": {
+      "dot": "distract",
+      "left": "Video",
+      "right_dim": "off task"
+    },
+    "lead": "Back to tock notch?",
+    "sub": "YouTube for 2 min",
+    "buttons": [
+      {
+        "id": "notch:act:11:snooze:distract",
+        "title": "Snooze 15 min",
+        "primary": true
+      },
+      {
+        "id": "notch:act:11:quiet:cat:42",
+        "title": "Don't interrupt for Video"
+      },
+      {
+        "id": "notch:act:11:stop",
+        "title": "Stop session"
+      }
+    ]
+  }
+}
+
+== meeting
+{
+  "state": "meet",
+  "open": true,
+  "notice": 12,
+  "auto_close": 90,
+  "face": {
+    "dot": "shallow",
+    "left": "Standup",
+    "right": "now"
+  },
+  "panel": {
+    "face": {
+      "dot": "shallow",
+      "left": "Standup",
+      "right": "now"
+    },
+    "lead": "Standup",
+    "sub": "17:24 to 17:54 · Work",
+    "buttons": [
+      {
+        "id": "notch:act:12:join",
+        "title": "Join",
+        "primary": true
+      },
+      {
+        "id": "notch:close",
+        "title": "Close"
+      }
+    ]
+  }
+}
+
+== recap
+{
+  "state": "recap",
+  "open": true,
+  "notice": 13,
+  "auto_close": 60,
+  "face": {
+    "left": "Thursday",
+    "right": "5h00",
+    "right_dim": "tracked"
+  },
+  "panel": {
+    "face": {
+      "left": "Thursday",
+      "right": "5h00",
+      "right_dim": "tracked"
+    },
+    "cells": [
+      {
+        "k": "Score",
+        "v": "81",
+        "c": "+6 vs usual Thu",
+        "tone": "good"
+      },
+      {
+        "k": "Deep focus",
+        "v": "3h12",
+        "c": "+24m",
+        "tone": "good"
+      },
+      {
+        "k": "Longest block",
+        "v": "1h10",
+        "c": "+15m",
+        "tone": "good"
+      },
+      {
+        "k": "Distracting",
+        "v": "25m",
+        "c": "−5m",
+        "tone": "good"
+      }
+    ],
+    "strip": [
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "deep",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "shallow",
+      "distract",
+      "distract",
+      "distract",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none",
+      "none"
+    ],
+    "axis": [
+      "09",
+      "11",
+      "13",
+      "15",
+      "17"
+    ],
+    "rows": [
+      [
+        "tock",
+        "3h00"
+      ],
+      [
+        "No project",
+        "1h00"
+      ],
+      [
+        "Licence",
+        "30m"
+      ]
+    ],
+    "buttons": [
+      {
+        "id": "dash",
+        "title": "Open Today",
+        "primary": true
+      },
+      {
+        "id": "notch:label",
+        "title": "Label 48m"
+      },
+      {
+        "id": "notch:close",
+        "title": "Done for today"
+      }
+    ]
+  }
+}
+
+== labelling
+{
+  "state": "label",
+  "open": true,
+  "face": {
+    "left": "To label",
+    "right": "36m",
+    "right_dim": "left"
+  },
+  "panel": {
+    "face": {
+      "left": "To label",
+      "right": "36m",
+      "right_dim": "left"
+    },
+    "entries": [
+      {
+        "app": "Google Chrome",
+        "title": "Pull requests · tock",
+        "sub": "github.com",
+        "dur": "24m",
+        "opts": [
+          {
+            "label": "Code / tock",
+            "kind": "deep",
+            "pct": 86
+          },
+          {
+            "label": "Admin",
+            "kind": "shallow"
+          }
+        ],
+        "picked": -1
+      },
+      {
+        "app": "Preview",
+        "title": "chapter4.pdf",
+        "dur": "12m",
+        "opts": [
+          {
+            "label": "Study",
+            "kind": "deep"
+          }
+        ],
+        "picked": -1
+      }
+    ]
+  }
+}
+
+== inbox clear
+{
+  "state": "label",
+  "open": true,
+  "haptic": "alignment",
+  "face": {
+    "dot": "good",
+    "left": "Inbox",
+    "right": "clear"
+  },
+  "panel": {
+    "face": {
+      "dot": "good",
+      "left": "Inbox",
+      "right": "clear"
+    },
+    "lead": "Nothing left to label",
+    "sub": "New rules apply to past days too.",
+    "buttons": [
+      {
+        "id": "notch:close",
+        "title": "Close",
+        "primary": true
+      }
+    ],
+    "entries": [
+      {
+        "app": "Google Chrome",
+        "title": "Pull requests · tock",
+        "sub": "github.com",
+        "dur": "24m",
+        "opts": [
+          {
+            "label": "Code / tock",
+            "kind": "deep",
+            "pct": 86
+          },
+          {
+            "label": "Admin",
+            "kind": "shallow"
+          }
+        ],
+        "picked": -1
+      },
+      {
+        "app": "Preview",
+        "title": "chapter4.pdf",
+        "dur": "12m",
+        "opts": [
+          {
+            "label": "Study",
+            "kind": "deep"
+          }
+        ],
+        "picked": -1
+      }
+    ],
+    "at": 2
+  }
+}
+
+== missed done in the quiet notch
+{
+  "state": "quiet",
+  "open": false,
+  "face": {
+    "dot": "good"
+  },
+  "hover": {
+    "face": {
+      "dot": "good",
+      "left": "Session done"
+    },
+    "lead": "Session done",
+    "buttons": [
+      {
+        "id": "notch:close",
+        "title": "Close",
+        "primary": true
+      }
+    ]
+  },
+  "pending": true
+}
+

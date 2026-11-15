@@ -1,0 +1,14 @@
+== title
+◷ tock
+
+== menu
+Waiting for trackd to start
+--
+Quit tock menu bar [quit]
+
+== notch
+{
+  "state": "quiet",
+  "open": false,
+  "face": {}
+}

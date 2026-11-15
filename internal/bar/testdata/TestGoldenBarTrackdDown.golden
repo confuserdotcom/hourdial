@@ -1,0 +1,50 @@
+== title
+◷ 2h54 !
+
+== menu
+2h54 today
+trackd is not running
+Allow Accessibility for trackd… [ax]
+Notifications are off… [notify-settings]
+--
+Start 25 min focus [start:25]
+More lengths ▸
+  Start 50 min focus [start:50]
+--
+Open dashboard [dash]
+--
+Settings ▸
+  Privacy ▸
+    Nothing to hide yet
+  Notifications… [notify-settings]
+  Accessibility… [ax]
+  --
+  Quit tock menu bar [quit]
+
+== notch
+{
+  "state": "quiet",
+  "open": false,
+  "face": {},
+  "hover": {
+    "face": {
+      "left": "2h54",
+      "left_dim": "today"
+    },
+    "buttons": [
+      {
+        "id": "start:25",
+        "title": "Focus 25m",
+        "primary": true
+      },
+      {
+        "id": "start:50",
+        "title": "50m"
+      },
+      {
+        "id": "dash",
+        "title": "Open Today"
+      }
+    ]
+  }
+}

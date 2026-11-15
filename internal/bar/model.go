@@ -197,13 +197,7 @@ func Load(a *app.App, now time.Time, access string) (Snapshot, error) {
 		}
 	}
 	cfg := a.Config()
-	for _, f := range config.Features {
-		fs := FeatureState{ID: f.ID, Group: f.Group, Name: f.Name, On: f.Set(cfg), Live: f.On(cfg)}
-		if f.Waits(cfg) {
-			fs.Waits = config.FeatureByID(f.Needs).Name
-		}
-		s.Features = append(s.Features, fs)
-	}
+	s.Features = featureStates(cfg)
 	s.Privacy, s.PrivacyErr = loadPrivacy(a, cfg.Privacy)
 	s.Last, s.LastErr = loadLast(a, now)
 	s.Loc, s.Clock = now.Location(), cfg.Display.ClockFormat()
@@ -219,6 +213,20 @@ func Load(a *app.App, now time.Time, access string) (Snapshot, error) {
 		s.BreakUntil = time.UnixMilli(until).In(now.Location())
 	}
 	return s, nil
+}
+
+// featureStates are the Settings toggles as cfg has them, in config.Features
+// order.
+func featureStates(cfg config.Config) []FeatureState {
+	var out []FeatureState
+	for _, f := range config.Features {
+		fs := FeatureState{ID: f.ID, Group: f.Group, Name: f.Name, On: f.Set(cfg), Live: f.On(cfg)}
+		if f.Waits(cfg) {
+			fs.Waits = config.FeatureByID(f.Needs).Name
+		}
+		out = append(out, fs)
+	}
+	return out
 }
 
 // loadLast reads the last-session row. A session deleted meanwhile is no
