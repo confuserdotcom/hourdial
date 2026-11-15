@@ -299,7 +299,7 @@ func (p *picker) view(w, h int) []string {
 	}
 	subject := p.what
 	if subject == "" {
-		subject = report.Safe(p.key)
+		subject = report.Safe(classify.DisplayKey(p.key))
 	}
 	const cw = 44
 	lines := []string{sDim.Render(subject), sBrand.Render("› ") + sBright.Render(p.query) + sBrand.Render("▏"), ""}

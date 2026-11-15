@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/x/ansi"
 
+	"tock/internal/classify"
 	"tock/internal/clockfmt"
 	"tock/internal/report"
 	"tock/internal/span"
@@ -487,7 +488,7 @@ func (t todayTab) timelineRow(i int, r report.Row, w int, sel bool, loc *time.Lo
 		durStyle = durStyle.Underline(true) // as the dashboard underlines billed time
 	}
 	line := mark + times + "  " + durStyle.Render(fitRight(report.Dur(r.End-r.Start), 5)) + "  " + label + "  " +
-		sText.Render(fit(r.App, 10)) + "  " + text
+		sText.Render(fit(classify.DisplayApp(r.App), 10)) + "  " + text
 	if tail != "" {
 		line += " " + tail
 	}

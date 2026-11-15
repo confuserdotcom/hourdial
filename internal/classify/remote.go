@@ -19,6 +19,10 @@ func DisplayApp(app string) string {
 	return strings.TrimPrefix(app, ImportMachine+" · ")
 }
 
+// DisplayKey is an inbox key as a person reads it: a key starts with its
+// app, shown as DisplayApp shows it. Commands and stored lists keep the key.
+func DisplayKey(key string) string { return DisplayApp(key) }
+
 // RemoteIDBase keeps remote view ids apart from away and meeting view ids:
 // a remote view has ID -(RemoteIDBase + remote row id).
 const RemoteIDBase = int64(1) << 41

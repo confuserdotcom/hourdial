@@ -74,6 +74,7 @@ func (t *todayTab) rows() []report.Row {
 	q := strings.ToLower(t.filter)
 	var out []report.Row
 	for _, r := range rs {
+		// The stored app holds the shown one, so either name finds the row.
 		hay := strings.ToLower(rowLabel(r) + " " + r.App + " " + r.Text)
 		if strings.Contains(hay, q) {
 			out = append(out, r)

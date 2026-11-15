@@ -110,7 +110,7 @@ func (m Model) inboxKey(k string) (tea.Model, tea.Cmd) {
 		if it := t.selected(); it != nil {
 			key := it.Key
 			return m, m.act(func(a *app.App) (string, error) {
-				return "ignored: " + report.Safe(key) + " (u undo)", a.Ignore(key, true)
+				return "ignored: " + report.Safe(classify.DisplayKey(key)) + " (u undo)", a.Ignore(key, true)
 			})
 		}
 	}
@@ -190,7 +190,7 @@ func (t inboxTab) view(w, h int) []string {
 			}
 		}
 		line := sBright.Render(fitRight(report.Dur(it.TotalMS), 5)) + sDim.Render(fitRight(plural(it.Spans, "span"), 10)) + "  " +
-			sText.Render(fit(report.Safe(it.Key), keyW)) + "  " + tail
+			sText.Render(fit(report.Safe(classify.DisplayKey(it.Key)), keyW)) + "  " + tail
 		if i == t.cursor {
 			out = append(out, selRow(sBrand.Bold(true).Render("▸")+line, w))
 		} else {

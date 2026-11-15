@@ -52,7 +52,7 @@ func cmdTag(env Env, args []string) error {
 		}
 		var ok bool
 		if want, ok = sugg[key]; !ok {
-			return fmt.Errorf("no suggestion for %s: give a label, tock tag %s <Category>[/<Project>]", report.Safe(key), fs.Arg(0))
+			return fmt.Errorf("no suggestion for %s: give a label, tock tag %s <Category>[/<Project>]", report.Safe(classify.DisplayKey(key)), fs.Arg(0))
 		}
 	} else if want, err = parseWant(a.Rules(), fs.Arg(1)); err != nil {
 		return err

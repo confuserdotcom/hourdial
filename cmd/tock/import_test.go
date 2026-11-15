@@ -66,6 +66,34 @@ func TestImportedTimeReachesInbox(t *testing.T) {
 	}
 }
 
+// Imported Xcode reads as Xcode in the terminal and adds up with this
+// Mac's Xcode; the export keeps the stored name.
+func TestImportedAppNames(t *testing.T) {
+	te := newTestEnv(t, testRules)
+	te.seed(t, seedSpan{id: 1, start: "12:00", end: "12:30", bundle: "com.apple.dt.Xcode", app: "Xcode", title: "Run"})
+	file := filepath.Join(t.TempDir(), "aw.json")
+	export := `{"buckets": {"aw-watcher-window_x": {"type": "currentwindow", "events": [
+  {"timestamp": "2026-10-10T07:00:00Z", "duration": 600, "data": {"app": "Xcode", "title": "Build"}}]}}}`
+	if err := os.WriteFile(file, []byte(export), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if code, _ := te.run(t, "", "import", "activitywatch", file); code != 0 {
+		t.Fatalf("import: code %d err %q", code, te.errb)
+	}
+	for _, args := range [][]string{{"inbox"}, {"top", "--days", "1", "--by", "app"}, {"today", "--keys"}} {
+		code, out := te.run(t, "", args...)
+		if code != 0 || !strings.Contains(out, "Xcode") || strings.Contains(out, "activitywatch") {
+			t.Fatalf("%v: code %d\n%s", args, code, out)
+		}
+	}
+	if _, out := te.run(t, "", "top", "--days", "1", "--by", "app"); strings.Count(out, "Xcode") != 1 || !strings.Contains(out, "40m") {
+		t.Fatalf("top lists Xcode apart from its import:\n%s", out)
+	}
+	if _, out := te.run(t, "", "export", "--format", "csv", "--from", "2026-10-10", "--to", "2026-10-10"); !strings.Contains(out, "activitywatch · Xcode") {
+		t.Fatalf("export lost the stored app name:\n%s", out)
+	}
+}
+
 func TestImportActivityWatchHidden(t *testing.T) {
 	te := newTestEnv(t, testRules)
 	if err := os.WriteFile(filepath.Join(te.ConfigDir, "config.toml"), []byte("[privacy]\nhide_sites = [\"youtube.com\"]\n"), 0o600); err != nil {

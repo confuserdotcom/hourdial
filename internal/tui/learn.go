@@ -109,7 +109,7 @@ func (d *learnDlg) hint() string {
 
 func (d *learnDlg) view(w int) []string {
 	label := report.LabelText(d.want.Category, d.want.Project)
-	lines := []string{sHead.Render("Learn a rule") + sDim.Render("  "+report.Safe(d.key)), ""}
+	lines := []string{sHead.Render("Learn a rule") + sDim.Render("  "+report.Safe(classify.DisplayKey(d.key))), ""}
 	if len(d.cands) == 0 {
 		lines = append(lines,
 			"no safe rule: every candidate would relabel spans other rules already label.",

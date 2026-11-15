@@ -89,6 +89,9 @@ func TestDisplayApp(t *testing.T) {
 			t.Errorf("DisplayApp(%q) = %q, want %q", c.in, got, c.want)
 		}
 	}
+	if got := DisplayKey("activitywatch · Xcode · Build"); got != "Xcode · Build" {
+		t.Errorf("DisplayKey = %q", got)
+	}
 }
 
 // Imported views show the app alone, but their inbox key keeps the import
