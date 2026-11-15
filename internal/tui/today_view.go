@@ -125,7 +125,7 @@ func (t *todayTab) hero(w int, now time.Time) []string {
 
 	title := "Today"
 	if !t.isToday(now) {
-		title = d.Date.Format("Mon 2 Jan")
+		title = d.Dates.Day(d.Date)
 	}
 	var facts []string
 	if n := len(st.Blocks); n > 0 {
@@ -438,7 +438,7 @@ func (t todayTab) empty(w int, now time.Time) []string {
 			}
 		}
 		lines = append(lines, "", keycap("l", "next day")+"   "+keycap(".", "back to today"))
-		return emptyState(w, t.day.Date.Format("Mon 2 Jan"), lines...)
+		return emptyState(w, t.day.Dates.Day(t.day.Date), lines...)
 	}
 	if t.trackdUp {
 		return emptyState(w, "Today",

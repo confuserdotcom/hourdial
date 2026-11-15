@@ -227,7 +227,7 @@ func (t weekTab) view(w, h int) []string {
 	}
 	wk := t.week
 	parts := []string{sBright.Render(report.Dur(wk.TrackedMS)) + sDim.Render(" tracked"), weekScore(wk)}
-	out := []string{spread(" "+sHead.Render("Week of "+wk.Monday.Format("Mon 2 Jan"))+navArrows(),
+	out := []string{spread(" "+sHead.Render("Week of "+wk.Dates.Day(wk.Monday))+navArrows(),
 		strings.Join(parts, sDim.Render(" · "))+" ", w)}
 	if wk.Plan != "" {
 		out = append(out, fit(" "+sBrand.Render("◆ plan  ")+sText.Render(wk.Plan), w))

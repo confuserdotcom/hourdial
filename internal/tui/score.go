@@ -20,12 +20,12 @@ func (t todayTab) scoreView(w, h int, loc *time.Location) []string {
 	}
 	d := t.day
 	st, sc := d.Stats, d.Score
-	date := d.Date.Format("Mon 2 Jan")
+	date := d.Dates.Day(d.Date)
 	if st.ActiveMS <= 0 {
 		return []string{" " + sHead.Render("Score · "+date), "", "  no activity on this day"}
 	}
 	term := func(name string, v, weight float64, why string) string {
-		return fmt.Sprintf("  %-12s %4.2f × %.1f = %4.1f   %s", name, v, weight, 100*v*weight, why)
+		return fmt.Sprintf("  %-12s %4s × %s = %4s   %s", name, d.Nums.Fixed(v, 2), d.Nums.Fixed(weight, 1), d.Nums.Fixed(100*v*weight, 1), why)
 	}
 	sum := int(math.Round(sc.Sum()))
 	out := []string{
@@ -36,8 +36,8 @@ func (t todayTab) scoreView(w, h int, loc *time.Location) []string {
 		term("long blocks", sc.Blocks, sc.Weights.Blocks,
 			fmt.Sprintf("%s in blocks of %s or more", report.Dur(st.LongMS), report.Dur(stats.LongBlockMS))),
 		term("few switches", sc.Calm, sc.Weights.Calm,
-			fmt.Sprintf("%s in %s active = %.1f an hour (%d = 0)", switches(st.Switches),
-				report.Dur(st.ActiveMS), sc.SwitchesPerHour, stats.CalmZeroPerHour)),
+			fmt.Sprintf("%s in %s active = %s an hour (%d = 0)", switches(st.Switches),
+				report.Dur(st.ActiveMS), d.Nums.Fixed(sc.SwitchesPerHour, 1), stats.CalmZeroPerHour)),
 		term("longest run", sc.Stretch, sc.Weights.Stretch,
 			fmt.Sprintf("longest %s without a switch (%s = 1)", report.Dur(st.LongestRunMS), report.Dur(stats.StretchFullMS))),
 		fmt.Sprintf("  %-12s            − %4d   %s distraction, 1 point per %dm, at most %d", "distraction",

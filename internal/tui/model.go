@@ -15,6 +15,7 @@ import (
 	"tock/internal/classify"
 	"tock/internal/clockfmt"
 	"tock/internal/config"
+	"tock/internal/datefmt"
 	"tock/internal/plan"
 	"tock/internal/report"
 	"tock/internal/suggest"
@@ -58,6 +59,7 @@ type Model struct {
 	tab           int
 	noFocus       bool           // the Focus group is off: no focus tab
 	clk           clockfmt.Clock // [display] clock, read on each load
+	dates         datefmt.Style  // [display] date, read on each load
 	health        app.Health
 	healthErr     error
 	inbox         inboxTab
@@ -96,11 +98,13 @@ type Model struct {
 // and status messages; it should be the app's clock.
 func New(a *app.App, now func() time.Time) Model {
 	var clk clockfmt.Clock
+	var dates datefmt.Style
 	if a != nil {
-		clk = a.Config().Display.ClockFormat()
+		clk, dates = a.Config().Display.ClockFormat(), a.Config().Display.DateStyle()
 	}
 	return Model{
 		clk:       clk,
+		dates:     dates,
 		focus:     focusTab{clk: clk},
 		src:       &source{a: a},
 		now:       now,
@@ -125,6 +129,7 @@ type tickMsg struct{}
 type loadedMsg struct {
 	noFocus   bool // the Focus group is off
 	clk       clockfmt.Clock
+	dates     datefmt.Style
 	health    app.Health
 	healthErr error
 	items     []classify.Item
@@ -173,7 +178,7 @@ func (m *Model) load() tea.Cmd {
 			a.Reload() // a failure is kept in RulesErr and shown in the banner
 			msg.planCfg = a.Config().Plan
 			msg.noFocus = !a.Config().Focus.Enabled
-			msg.clk = a.Config().Display.ClockFormat()
+			msg.clk, msg.dates = a.Config().Display.ClockFormat(), a.Config().Display.DateStyle()
 			msg.health, msg.healthErr = a.Health()
 			f, err := a.Focus(now)
 			if err != nil {
@@ -276,7 +281,7 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case loadedMsg:
 		m.loading = false
 		m.noFocus, m.today.noFocus = msg.noFocus, msg.noFocus
-		m.clk, m.focus.clk = msg.clk, msg.clk
+		m.clk, m.focus.clk, m.dates = msg.clk, msg.clk, msg.dates
 		if m.noFocus && m.tab == tabFocus {
 			m.tab = tabToday
 		}

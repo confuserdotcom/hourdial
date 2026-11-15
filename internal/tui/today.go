@@ -322,7 +322,7 @@ func (m Model) todayKey(k string) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		mid := (r.Start + (r.End-r.Start)/2) / 60_000 * 60_000
-		m.edit = newRangeDlg(classify.EditLabel, "Split: label part of it", mid, r.End, t.day.Date, t.day.Clock)
+		m.edit = newRangeDlg(classify.EditLabel, "Split: label part of it", mid, r.End, t.day.Date, t.day.Clock, t.day.Dates)
 		return m, nil
 	case "+":
 		from, to := m.now().UnixMilli()-30*60_000, m.now().UnixMilli()
@@ -332,7 +332,7 @@ func (m Model) todayKey(k string) (tea.Model, tea.Cmd) {
 			from = t.day.Date.Add(9 * time.Hour).UnixMilli()
 			to = from + 60*60_000
 		}
-		m.edit = newRangeDlg(classify.EditAdd, "Add time", from, to, t.day.Date, t.day.Clock)
+		m.edit = newRangeDlg(classify.EditAdd, "Add time", from, to, t.day.Date, t.day.Clock, t.day.Dates)
 		return m, nil
 	case "a", "A", "y":
 		n := len(t.day.Away)

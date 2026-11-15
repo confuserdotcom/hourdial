@@ -11,6 +11,7 @@ import (
 	"tock/internal/app"
 	"tock/internal/classify"
 	"tock/internal/clockfmt"
+	"tock/internal/datefmt"
 	"tock/internal/report"
 )
 
@@ -19,6 +20,7 @@ import (
 // timeline (a split).
 type rangeDlg struct {
 	clk   clockfmt.Clock
+	dates datefmt.Style
 	kind  string // classify.EditAdd or classify.EditLabel
 	title string
 	text  string // "HH:MM-HH:MM", or 12-hour "9:05am-10:40am"
@@ -30,9 +32,9 @@ func clockText(ms int64, loc *time.Location, clk clockfmt.Clock) string {
 }
 
 // newRangeDlg starts with [from, to) filled in.
-func newRangeDlg(kind, title string, from, to int64, day time.Time, clk clockfmt.Clock) *rangeDlg {
+func newRangeDlg(kind, title string, from, to int64, day time.Time, clk clockfmt.Clock, dates datefmt.Style) *rangeDlg {
 	loc := day.Location()
-	return &rangeDlg{kind: kind, title: title, text: clockText(from, loc, clk) + "-" + clockText(to, loc, clk), day: day, clk: clk}
+	return &rangeDlg{kind: kind, title: title, text: clockText(from, loc, clk) + "-" + clockText(to, loc, clk), day: day, clk: clk, dates: dates}
 }
 
 // parse reads the text as a range on the dialog's day.
@@ -99,7 +101,7 @@ func (m Model) rangeKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 func (d *rangeDlg) view(w int) []string {
 	cell := min(w-8, 34)
 	return center2(card(d.title, []string{
-		sDim.Render("from-to, on " + d.day.Format("Mon 2 Jan")),
+		sDim.Render("from-to, on " + d.dates.Day(d.day)),
 		sBrand.Render("› ") + sBright.Render(d.text) + sBrand.Render("▏"),
 	}, cell+4), w)
 }
