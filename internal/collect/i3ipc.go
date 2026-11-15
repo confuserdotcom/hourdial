@@ -21,13 +21,17 @@ import (
 // i3 IPC, which Sway speaks too: "i3-ipc", the payload's length and the
 // message type (both uint32, native order: little-endian everywhere tock
 // runs), then the payload.
+// i3MaxPayload bounds one reply. A real get_tree reply for a large
+// desktop (measured: ~2000 windows serialise to ~0.25 MiB) is far below
+// this; a server claiming more is not believed, and trackd refuses it
+// before allocating.
 const (
 	i3Magic        = "i3-ipc"
 	i3RunCommand   = 0
 	i3Subscribe    = 2
 	i3GetTree      = 4
 	i3EventWindow  = 0x80000003
-	i3MaxPayload   = 64 << 20
+	i3MaxPayload   = 1 << 20
 	i3HeaderLength = len(i3Magic) + 8
 )
 
