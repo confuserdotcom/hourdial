@@ -404,6 +404,9 @@ show_in_recordings = false # true lets screen sharing and recordings see it
 all_displays = true      # a notch on every display; false: only the built-in one
 open_on_hover = false    # true: resting the pointer opens it, no click needed
 
+[model]                  # the local model; see The model
+enabled = true           # false: no model labels, only rules and tags
+
 [privacy]
 keep_titles = 30         # off unless set: days window titles are kept
 hide_apps = []           # bundle ids recorded as private time only: no title, no URL
@@ -474,6 +477,8 @@ depth = 0.5                   # "deep time": focus against your target
 blocks = 0.3                  # "long blocks": time in blocks of 25m or more
 calm = 0.2                    # "few switches": app switches an hour, none at 20
 stretch = 0.0                 # "longest run": longest run without a switch, full at 1h30
+
+# [plan] and [sync] are under Plan and Sync between machines.
 ```
 
 ## Plan
