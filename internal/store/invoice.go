@@ -71,6 +71,13 @@ type Invoice struct {
 	Note      string
 	Generator string // the tock version that issued it
 
+	// DateStyle, NumberStyle and CurrencyPosition are the layout it was
+	// issued in ([invoice] date, numbers, currency_position). "" is the
+	// layout of invoices issued before these settings, and is not written
+	// to the canonical JSON, so such invoices hash as they always did. The
+	// layout lives in the canonical JSON only, not in its own columns.
+	DateStyle, NumberStyle, CurrencyPosition string
+
 	Lines []InvoiceLine
 	Items []InvoiceItem
 
@@ -257,7 +264,9 @@ const summaryCols = `i.id, i.number, i.year, i.seq, i.status, i.issued_ms, i.sup
 	i.void_ms, i.void_reason, i.issuer_name, i.issuer_address, i.issuer_tax_id,
 	i.client_name, i.client_address, i.client_tax_id, i.project, i.period_from_ms, i.period_to_ms, i.tz,
 	i.currency, i.minor_units, i.rate_minor, i.round_step_s, i.round_mode, i.tax_label, i.tax_bp, i.tax_note,
-	i.seconds_billed, i.subtotal_minor, i.tax_minor, i.total_minor, i.note, i.generator, i.json_sha256, i.pdf_sha256`
+	i.seconds_billed, i.subtotal_minor, i.tax_minor, i.total_minor, i.note, i.generator, i.json_sha256, i.pdf_sha256,
+	COALESCE(json_extract(i.canonical_json, '$.layout.date'), ''), COALESCE(json_extract(i.canonical_json, '$.layout.numbers'), ''),
+	COALESCE(json_extract(i.canonical_json, '$.layout.currency_position'), '')`
 
 const invoiceFrom = ` FROM invoices i LEFT JOIN invoices p ON p.id = i.supersedes_id`
 
@@ -272,7 +281,8 @@ func scanInvoice(r scanner, extra ...any) (Invoice, error) {
 		&voidMS, &voidReason, &inv.IssuerName, &issuerAddr, &inv.IssuerTaxID,
 		&inv.ClientName, &clientAddr, &inv.ClientTaxID, &inv.Project, &inv.PeriodFromMS, &inv.PeriodToMS, &inv.TZ,
 		&inv.Currency, &inv.MinorUnits, &inv.RateMinor, &inv.RoundStepS, &inv.RoundMode, &inv.TaxLabel, &inv.TaxBP, &inv.TaxNote,
-		&inv.SecondsBilled, &inv.SubtotalMinor, &inv.TaxMinor, &inv.TotalMinor, &inv.Note, &inv.Generator, &inv.JSONSHA256, &inv.PDFSHA256}
+		&inv.SecondsBilled, &inv.SubtotalMinor, &inv.TaxMinor, &inv.TotalMinor, &inv.Note, &inv.Generator, &inv.JSONSHA256, &inv.PDFSHA256,
+		&inv.DateStyle, &inv.NumberStyle, &inv.CurrencyPosition}
 	if err := r.Scan(append(dst, extra...)...); err != nil {
 		return Invoice{}, err
 	}
@@ -520,6 +530,7 @@ type invoiceDoc struct {
 	Note          string        `json:"note"`
 	Generator     string        `json:"generator"`
 	PDFSHA256     string        `json:"pdf_sha256"`
+	Layout        *layoutDoc    `json:"layout,omitempty"`
 	Lines         []InvoiceLine `json:"lines"`
 	Items         []InvoiceItem `json:"items"`
 }
@@ -528,6 +539,14 @@ type partyDoc struct {
 	Name    string   `json:"name"`
 	Address []string `json:"address"`
 	TaxID   string   `json:"tax_id"`
+}
+
+// layoutDoc is how an invoice writes dates, numbers and its currency;
+// absent for the layout invoices had before it could be chosen.
+type layoutDoc struct {
+	Date             string `json:"date"`
+	Numbers          string `json:"numbers"`
+	CurrencyPosition string `json:"currency_position"`
 }
 
 type taxDoc struct {
@@ -551,19 +570,30 @@ func docOf(inv Invoice) invoiceDoc {
 		Currency: inv.Currency, MinorUnits: inv.MinorUnits, RateMinor: inv.RateMinor, RoundStepS: inv.RoundStepS, RoundMode: inv.RoundMode,
 		Tax:           taxDoc{inv.TaxLabel, inv.TaxBP, inv.TaxNote},
 		SecondsBilled: inv.SecondsBilled, SubtotalMinor: inv.SubtotalMinor, TaxMinor: inv.TaxMinor, TotalMinor: inv.TotalMinor,
-		Note: inv.Note, Generator: inv.Generator, PDFSHA256: inv.PDFSHA256, Lines: lines, Items: items}
+		Note: inv.Note, Generator: inv.Generator, PDFSHA256: inv.PDFSHA256, Layout: layoutOf(inv), Lines: lines, Items: items}
+}
+
+func layoutOf(inv Invoice) *layoutDoc {
+	if inv.DateStyle == "" && inv.NumberStyle == "" && inv.CurrencyPosition == "" {
+		return nil
+	}
+	return &layoutDoc{inv.DateStyle, inv.NumberStyle, inv.CurrencyPosition}
 }
 
 // invoiceOfDoc is the invoice a canonical JSON describes, as issued.
 func invoiceOfDoc(d invoiceDoc) Invoice {
-	return normalizeInvoice(Invoice{Number: d.Number, Year: d.Year, Seq: d.Seq, Status: InvoiceIssued, IssuedMS: d.IssuedMS,
+	inv := Invoice{Number: d.Number, Year: d.Year, Seq: d.Seq, Status: InvoiceIssued, IssuedMS: d.IssuedMS,
 		IssuerName: d.Issuer.Name, IssuerAddress: d.Issuer.Address, IssuerTaxID: d.Issuer.TaxID,
 		ClientName: d.Client.Name, ClientAddress: d.Client.Address, ClientTaxID: d.Client.TaxID,
 		Project: d.Project, PeriodFromMS: d.PeriodFromMS, PeriodToMS: d.PeriodToMS, TZ: d.TZ,
 		Currency: d.Currency, MinorUnits: d.MinorUnits, RateMinor: d.RateMinor, RoundStepS: d.RoundStepS, RoundMode: d.RoundMode,
 		TaxLabel: d.Tax.Label, TaxBP: d.Tax.BP, TaxNote: d.Tax.Note,
 		SecondsBilled: d.SecondsBilled, SubtotalMinor: d.SubtotalMinor, TaxMinor: d.TaxMinor, TotalMinor: d.TotalMinor,
-		Note: d.Note, Generator: d.Generator, PDFSHA256: d.PDFSHA256, Lines: d.Lines, Items: d.Items})
+		Note: d.Note, Generator: d.Generator, PDFSHA256: d.PDFSHA256, Lines: d.Lines, Items: d.Items}
+	if d.Layout != nil {
+		inv.DateStyle, inv.NumberStyle, inv.CurrencyPosition = d.Layout.Date, d.Layout.Numbers, d.Layout.CurrencyPosition
+	}
+	return normalizeInvoice(inv)
 }
 
 func encodeCanonical(v any) ([]byte, error) {
