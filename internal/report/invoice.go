@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"tock/internal/classify"
+	"tock/internal/datefmt"
+	"tock/internal/numfmt"
 	"tock/internal/pdf"
 )
 
@@ -38,6 +40,22 @@ type Invoice struct {
 	Supersedes           string // the number of the invoice this one replaces
 	// Draft marks a preview: DRAFT on the page, and no number.
 	Draft bool
+	// Nums and CurrencyBefore are how amounts, hours and the tax rate
+	// are written; Dates, when DatesSet, how dates are. The zero values
+	// are the layout every invoice had before these settings: 1234.50
+	// EUR and ISO dates.
+	Nums           numfmt.Style
+	CurrencyBefore bool
+	Dates          datefmt.Style
+	DatesSet       bool
+}
+
+// dates is the date style the invoice prints: ISO unless one was chosen.
+func (inv Invoice) dates() datefmt.Style {
+	if !inv.DatesSet {
+		return datefmt.ISO
+	}
+	return inv.Dates
 }
 
 // ItemOrigin tells what a view id from App.Export is: a span of this
@@ -70,12 +88,11 @@ func FormatPercent(bp int64) string {
 // hours is seconds as decimal hours: "2.50".
 func hours(s int64) string { return strconv.FormatFloat(math.Round(float64(s)/36)/100, 'f', 2, 64) }
 
+// InvoiceHours is seconds as decimal hours in nums: "2.50", "2,50".
+func InvoiceHours(s int64, nums numfmt.Style) string { return nums.Decimal(hours(s)) }
+
 func (inv Invoice) money(v int64) string {
-	s := FormatMinor(v, inv.MinorUnits)
-	if inv.Currency != "" {
-		s += " " + inv.Currency
-	}
-	return s
+	return inv.Nums.Money(v, inv.MinorUnits, inv.Currency, inv.CurrencyBefore)
 }
 
 // Invoice page layout, in points.
@@ -115,8 +132,8 @@ func WriteInvoicePDF(w io.Writer, inv Invoice) error {
 	ry := invMargin + 34.0
 	for _, kv := range [][2]string{
 		{"Number", number},
-		{"Date", inv.Issued.Format("2006-01-02")},
-		{"Period", inv.PeriodFrom.Format("2006-01-02") + " – " + inv.PeriodTo.Format("2006-01-02")},
+		{"Date", inv.dates().Date(inv.Issued)},
+		{"Period", inv.dates().Date(inv.PeriodFrom) + " – " + inv.dates().Date(inv.PeriodTo)},
 	} {
 		p.TextRight(invRight-150, ry, 9, false, kv[0])
 		p.TextRight(invRight, ry, 10, true, kv[1])
@@ -142,7 +159,7 @@ func WriteInvoicePDF(w io.Writer, inv Invoice) error {
 		p.Text(invMargin, y, 9, false, "Replaces invoice "+inv.Supersedes)
 		y += 18
 	}
-	rate := FormatMinor(inv.RateMinor, inv.MinorUnits)
+	rate := inv.Nums.Minor(inv.RateMinor, inv.MinorUnits)
 	p.Text(invMargin, y, 11, false, "Project ")
 	p.Text(invMargin+pdf.Width("Project ", 11, false), y, 11, true, inv.Project)
 	p.TextRight(invRight, y, 11, false, inv.money(inv.RateMinor)+" / hour")
@@ -164,10 +181,10 @@ func WriteInvoicePDF(w io.Writer, inv Invoice) error {
 		}
 		day := l.Day
 		if t, err := time.Parse("2006-01-02", l.Day); err == nil {
-			day = t.Format("Mon 2006-01-02")
+			day = inv.dates().DayYear(t)
 		}
 		p.Text(invMargin+8, y, 10, false, day)
-		p.TextRight(invRight-220, y, 10, false, hours(l.SecondsBilled))
+		p.TextRight(invRight-220, y, 10, false, InvoiceHours(l.SecondsBilled, inv.Nums))
 		p.TextRight(invRight-110, y, 10, false, rate)
 		p.TextRight(invRight-8, y, 10, false, inv.money(l.AmountMinor))
 		p.Line(invMargin, y+6, invRight, y+6, 0.4, 0.85)
@@ -179,13 +196,13 @@ func WriteInvoicePDF(w io.Writer, inv Invoice) error {
 	}
 	y += 8
 	p.TextRight(invRight-110, y, 10, false, "Total hours")
-	p.TextRight(invRight-8, y, 10, false, hours(inv.SecondsBilled))
+	p.TextRight(invRight-8, y, 10, false, InvoiceHours(inv.SecondsBilled, inv.Nums))
 	if inv.TaxBP > 0 {
 		y += 16
 		p.TextRight(invRight-110, y, 10, false, "Subtotal")
 		p.TextRight(invRight-8, y, 10, false, inv.money(inv.SubtotalMinor))
 		y += 16
-		label := strings.TrimSpace(inv.TaxLabel + " " + FormatPercent(inv.TaxBP) + "%")
+		label := strings.TrimSpace(inv.TaxLabel + " " + inv.Nums.Decimal(FormatPercent(inv.TaxBP)) + "%")
 		p.TextRight(invRight-110, y, 10, false, label)
 		p.TextRight(invRight-8, y, 10, false, inv.money(inv.TaxMinor))
 	}
