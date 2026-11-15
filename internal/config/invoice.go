@@ -5,6 +5,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"tock/internal/datefmt"
+	"tock/internal/numfmt"
 )
 
 // Invoice is the [invoice] section: who the invoices tock invoice writes
@@ -29,6 +32,14 @@ type Invoice struct {
 	TaxLabel string
 	TaxBP    int64
 	TaxNote  string
+
+	// Date and Numbers are how invoices write dates and numbers, as under
+	// [display]; "" falls back to [display], then to the layout invoices
+	// always had (ISO dates, 1234.50). CurrencyPosition is "after"
+	// (1234.50 EUR) or "before" (€1234.50); "" is after.
+	Date             string
+	Numbers          string
+	CurrencyPosition string
 
 	// Clients are [[invoice.client]] details, found by a project's client
 	// name.
@@ -58,6 +69,36 @@ func (inv Invoice) Client(name string) (InvoiceClient, bool) {
 	return InvoiceClient{}, false
 }
 
+// InvoiceLayout is how a new invoice writes dates, numbers and the
+// currency, from [invoice], else [display]. With neither set it is the
+// layout every earlier invoice has: ISO dates (DatesSet false), 1234.50
+// and the currency after the amount.
+type InvoiceLayout struct {
+	Dates          datefmt.Style
+	DatesSet       bool
+	Nums           numfmt.Style
+	CurrencyBefore bool
+}
+
+// InvoiceLayout resolves the layout of a new invoice.
+func (c Config) InvoiceLayout() InvoiceLayout {
+	var l InvoiceLayout
+	date := c.Invoice.Date
+	if date == "" {
+		date = c.Display.Date
+	}
+	if s, ok := datefmt.Parse(date); ok {
+		l.Dates, l.DatesSet = s, true
+	}
+	nums := c.Invoice.Numbers
+	if nums == "" {
+		nums = c.Display.Numbers
+	}
+	l.Nums, _ = numfmt.Parse(nums)
+	l.CurrencyBefore = c.Invoice.CurrencyPosition == "before"
+	return l
+}
+
 // MaxRoundStepS is the longest [invoice] round.
 const MaxRoundStepS = 24 * 3600
 
@@ -73,6 +114,9 @@ type invoiceTOML struct {
 	TaxLabel   *string             `toml:"tax_label"`
 	TaxRate    *string             `toml:"tax_rate"`
 	TaxNote    *string             `toml:"tax_note"`
+	Date       *string             `toml:"date"`
+	Numbers    *string             `toml:"numbers"`
+	CurrencyAt *string             `toml:"currency_position"`
 	Client     []invoiceClientTOML `toml:"client"`
 }
 
@@ -127,6 +171,28 @@ func decodeInvoice(f invoiceTOML, c *Invoice) error {
 			return fmt.Errorf("[invoice] minor_units = %d, want 0 to 3", u)
 		}
 		c.MinorUnits = *f.MinorUnits
+	}
+	if f.Date != nil {
+		s, ok := datefmt.Parse(*f.Date)
+		if !ok {
+			return fmt.Errorf(`[invoice] date = %q, want "dmy" (3 Nov 2026), "mdy" (Nov 3, 2026) or "iso" (2026-11-03)`, *f.Date)
+		}
+		c.Date = s.String()
+	}
+	if f.Numbers != nil {
+		s, ok := numfmt.Parse(*f.Numbers)
+		if !ok {
+			return fmt.Errorf(`[invoice] numbers = %q, want %s`, *f.Numbers, numbersWant())
+		}
+		c.Numbers = s.String()
+	}
+	if f.CurrencyAt != nil {
+		switch p := strings.ToLower(strings.TrimSpace(*f.CurrencyAt)); p {
+		case "after", "before":
+			c.CurrencyPosition = p
+		default:
+			return fmt.Errorf(`[invoice] currency_position = %q, want "after" (1234.50 EUR) or "before" (€1234.50)`, *f.CurrencyAt)
+		}
 	}
 	if f.TaxRate != nil {
 		bp, err := ParseTaxRate(*f.TaxRate)
