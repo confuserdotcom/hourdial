@@ -421,6 +421,8 @@ enabled = true           # the Billing group; false hides rates and stops tock i
 [display]
 week_start = "monday"    # or "sunday", "saturday": the first day of every week
 clock = "24h"            # or "12h": times of day as 5:20pm instead of 17:20
+date = "dmy"             # or "mdy" (Tue Nov 3), "iso" (Tue 2026-11-03); dmy is Tue 3 Nov
+numbers = "1234.5"       # or "1,234.5", "1.234,5", "1 234,5", "1234,5": decimals and grouping
 
 [invoice]                # for tock invoice; all optional
 name = "Your Name"
@@ -1034,6 +1036,17 @@ dashboard, reports, notices, the menu bar and the notch. Times you type,
 such as the range for `tock edit` or `tock away`, can be in either form.
 Exports, `--json`, logs, file names and the summary sent to Claude stay
 24-hour.
+
+Dates are written day first, `Tue 3 Nov`. `date = "mdy"` under
+`[display]` writes them month first (`Tue Nov 3`, `Nov 3, 2026`), and
+`date = "iso"` as `Tue 2026-11-03`. Decimals, such as switches per hour
+and the score breakdown, are written as `1234.5`; `numbers` takes how
+1234.5 should look: `"1,234.5"`, `"1.234,5"`, `"1 234,5"` or
+`"1234,5"`. Both apply in the commands, the TUI, the dashboard, reports,
+notices and the notch. Day and month names stay English, and durations
+such as `7h39` do not change. Dates you type stay `2026-11-03`.
+Exports, `--json`, CSV, logs, file names and the summary sent to Claude
+keep their fixed forms.
 
 `tock top` ranks the last 7 days (or `--week`, `--month`, `--days N`):
 categories with their kind, apps and sites (URL hosts) with the category
