@@ -150,6 +150,8 @@ tock rules check          # after editing rules.toml
 tock session start 50     # a 50-minute focus session
 ```
 
+<img src="docs/readme/inbox.webp" width="100%" alt="The inbox in the dashboard: two groups of unlabelled time; labelling one as Research writes a rule, and the group leaves the inbox.">
+
 <img src="docs/readme/tui.webp" width="100%" alt="The tock terminal UI: the today tab, labelling a block, the score breakdown, a focus session, the command palette and the inbox.">
 
 ## Docs
