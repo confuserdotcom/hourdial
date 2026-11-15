@@ -6,7 +6,47 @@ import (
 	"time"
 
 	"tock/internal/clockfmt"
+	"tock/internal/datefmt"
+	"tock/internal/numfmt"
 )
+
+func TestLoadDisplayDateNumbers(t *testing.T) {
+	c, err := Load(write(t, ""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.Display.DateStyle() != datefmt.DMY || c.Display.NumberStyle() != numfmt.Plain || c.Display.Date != "" || c.Display.Numbers != "" {
+		t.Fatalf("defaults moved: %+v", c.Display)
+	}
+	for in, want := range map[string]datefmt.Style{"dmy": datefmt.DMY, "MDY": datefmt.MDY, " iso ": datefmt.ISO} {
+		c, err := Load(write(t, "[display]\ndate = \""+in+"\"\n"))
+		if err != nil {
+			t.Fatalf("%q: %v", in, err)
+		}
+		if c.Display.DateStyle() != want || c.Display.Date != want.String() {
+			t.Fatalf("%q: date = %v (%q)", in, c.Display.DateStyle(), c.Display.Date)
+		}
+	}
+	for in, want := range map[string]numfmt.Style{"1234.5": numfmt.Plain, "1,234.5": numfmt.Comma, "1.234,5": numfmt.Dot, "1 234,5": numfmt.Space, "1234,5": numfmt.PlainComma} {
+		c, err := Load(write(t, "[display]\nnumbers = \""+in+"\"\n"))
+		if err != nil {
+			t.Fatalf("%q: %v", in, err)
+		}
+		if c.Display.NumberStyle() != want || c.Display.Numbers != want.String() {
+			t.Fatalf("%q: numbers = %v (%q)", in, c.Display.NumberStyle(), c.Display.Numbers)
+		}
+	}
+	for _, bad := range []string{"", "ymd", "us"} {
+		if _, err := Load(write(t, "[display]\ndate = \""+bad+"\"\n")); err == nil || !strings.Contains(err.Error(), "date") {
+			t.Fatalf("date %q: err = %v", bad, err)
+		}
+	}
+	for _, bad := range []string{"", ",", "1'234.5", "de"} {
+		if _, err := Load(write(t, "[display]\nnumbers = \""+bad+"\"\n")); err == nil || !strings.Contains(err.Error(), "numbers") {
+			t.Fatalf("numbers %q: err = %v", bad, err)
+		}
+	}
+}
 
 func TestLoadDisplay(t *testing.T) {
 	c, err := Load(write(t, ""))
