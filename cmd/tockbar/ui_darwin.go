@@ -76,7 +76,9 @@ func cstr(s string, f func(*C.char)) {
 	f(c)
 }
 
-func (cocoa) SetTitle(t string)      { cstr(t, func(c *C.char) { C.bar_set_title(c) }) }
+func (cocoa) SetTitle(t, w string) {
+	cstr(t, func(c *C.char) { cstr(w, func(s *C.char) { C.bar_set_title(c, s) }) })
+}
 func (cocoa) SetMenu(s string)       { cstr(s, func(c *C.char) { C.bar_set_menu(c) }) }
 func (cocoa) OpenURL(u string)       { cstr(u, func(c *C.char) { C.bar_open_url(c) }) }
 func (cocoa) OpenDashboard(u string) { cstr(u, func(c *C.char) { C.bar_open_dashboard(c) }) }

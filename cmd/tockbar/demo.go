@@ -150,7 +150,7 @@ func runDemo(u ui, events <-chan event) {
 			ready = true
 		}
 	}
-	u.SetTitle("◷ demo")
+	u.SetTitle("◷ demo", "tock demo")
 	u.SetMenu("quit\tQuit the demo")
 	u.NotchOptions(true, true, false) // the demo exists to be recorded
 	step, at := 0, 0

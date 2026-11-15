@@ -99,6 +99,7 @@ static NSImage *menuGlyph(void) {
         g = [[NSBundle mainBundle] imageForResource:@"MenuGlyph"];
         g.template = YES; // macOS tints it for light, dark and highlighted
         g.size = NSMakeSize(16, 16);
+        g.accessibilityDescription = @"tock";
     });
     return g;
 }
@@ -120,10 +121,15 @@ static void applyTitle(NSString *t) {
     b.title = t;
 }
 
-void bar_set_title(const char *title) {
-    NSString *t = str(title);
+// spoken is what VoiceOver says for the item: the state in words, where
+// the title is a glyph and a short figure.
+void bar_set_title(const char *title, const char *spoken) {
+    NSString *t = str(title), *w = str(spoken);
     dispatch_async(dispatch_get_main_queue(), ^{
         applyTitle(t);
+        NSStatusBarButton *b = bar.item.button;
+        b.accessibilityLabel = w.length > 0 ? w : @"tock";
+        b.toolTip = w.length > 0 ? w : nil;
     });
 }
 
@@ -215,11 +221,19 @@ void bar_set_menu(const char *spec) {
             if (f.count < 2) {
                 continue;
             }
+            NSString *spoken = nil; // what VoiceOver says instead of the title
+            for (NSUInteger k = 2; k < f.count; k++) {
+                if ([f[k] hasPrefix:@"a:"]) {
+                    spoken = [f[k] substringFromIndex:2];
+                }
+            }
             if (f.count >= 4 && [f[3] hasPrefix:@"s:"]) {
                 // Enabled with no action: a disabled item would grey the colours.
                 NSMenuItem *it = [[NSMenuItem alloc] initWithTitle:@"" action:nil keyEquivalent:@""];
                 it.attributedTitle = stripTitle([f[3] substringFromIndex:2]);
                 it.enabled = YES;
+                // the blocks alone would be read out one glyph at a time
+                it.accessibilityLabel = spoken.length ? spoken : @"Today by kind";
                 [top addItem:it];
                 continue;
             }
@@ -234,6 +248,9 @@ void bar_set_menu(const char *spec) {
             }
             if (f.count >= 3 && [f[2] isEqualToString:@"c"]) {
                 it.state = NSControlStateValueOn;
+            }
+            if (spoken.length) {
+                it.accessibilityLabel = spoken;
             }
             [top addItem:it];
         }

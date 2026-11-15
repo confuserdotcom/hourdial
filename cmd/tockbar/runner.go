@@ -39,7 +39,8 @@ const defaultAction = "com.apple.UNNotificationDefaultActionIdentifier"
 
 // ui is the Cocoa side, faked in tests.
 type ui interface {
-	SetTitle(title string)
+	// SetTitle shows the menu bar title; spoken is what VoiceOver says for it.
+	SetTitle(title, spoken string)
 	SetMenu(spec string)
 	Post(id int64, title, body, category, categories string)
 	// Curtain shows the break screen of notice id over every screen until a
@@ -99,7 +100,7 @@ type runner struct {
 	access   string
 	beatAt   time.Time
 	asked    bool
-	title    string
+	title    string // the title and its spoken form last shown
 	menu     string
 	cats     []string // registered category lines, newest last
 	lastErr  string
@@ -339,9 +340,9 @@ func (r *runner) toNotch(n store.Notice, d app.NoticeData) bool {
 
 func (r *runner) render(now time.Time) {
 	nowMS := now.UnixMilli()
-	if t := r.snap.Title(nowMS); t != r.title {
-		r.title = t
-		r.ui.SetTitle(t)
+	if t, w := r.snap.Title(nowMS), r.snap.Spoken(nowMS); t+"\n"+w != r.title {
+		r.title = t + "\n" + w
+		r.ui.SetTitle(t, w)
 	}
 	if m := strings.Join(specLines(r.snap.Items(nowMS), 0, nil), "\n"); m != r.menu {
 		r.menu = m
@@ -479,7 +480,8 @@ func (r *runner) labelStep(id string) {
 
 // specLines flattens items into menu spec lines: one ">" per depth, then "-"
 // for a separator, else "id\ttitle" with a third field "c" for a check mark;
-// a strip row is "\t\t\ts:k1,k2,…" (an unlabelled cell is "none").
+// a strip row is "\t\t\ts:k1,k2,…" (an unlabelled cell is "none"). A last
+// field "a:words" is what VoiceOver says for a row whose title reads badly.
 // A submenu parent is written first, with no id, then its rows one deeper.
 func specLines(items []bar.Item, depth int, lines []string) []string {
 	prefix := strings.Repeat(">", depth)
@@ -493,12 +495,18 @@ func specLines(items []bar.Item, depth int, lines []string) []string {
 			for i, k := range it.Strip {
 				ks[i] = cmp.Or(clean(k), "none")
 			}
-			lines = append(lines, prefix+"\t\t\ts:"+strings.Join(ks, ","))
+			lines = append(lines, prefix+"\t\t\ts:"+strings.Join(ks, ",")+"\ta:"+clean(it.Spoken()))
 			continue
 		}
 		line := prefix + it.ID + "\t" + clean(it.Title)
 		if it.Checked {
 			line += "\tc"
+		}
+		if w := it.Spoken(); w != "" {
+			if !it.Checked {
+				line += "\t"
+			}
+			line += "\ta:" + clean(w)
 		}
 		lines = append(lines, line)
 		if len(it.Sub) > 0 {

@@ -21,6 +21,7 @@ import (
 
 type fakeUI struct {
 	titles, menus []string
+	spoken        []string // what VoiceOver says for each title
 	posts         []string
 	auth          []bool
 	urls          []string
@@ -33,8 +34,11 @@ type fakeUI struct {
 	quit          bool
 }
 
-func (f *fakeUI) SetTitle(t string) { f.titles = append(f.titles, t) }
-func (f *fakeUI) SetMenu(s string)  { f.menus = append(f.menus, s) }
+func (f *fakeUI) SetTitle(t, w string) {
+	f.titles = append(f.titles, t)
+	f.spoken = append(f.spoken, w)
+}
+func (f *fakeUI) SetMenu(s string) { f.menus = append(f.menus, s) }
 func (f *fakeUI) Post(id int64, title, body, cat, cats string) {
 	f.posts = append(f.posts, title+"|"+body+"|"+cat+"|"+cats)
 }
@@ -89,6 +93,9 @@ func TestRunnerDrawsAndBeats(t *testing.T) {
 	r.handle(event{kind: evReady})
 	if last(u.titles) != "◷ 2h54" || !strings.Contains(last(u.menus), "start:25\tStart 25 min focus") {
 		t.Fatalf("title %q menu %q", u.titles, last(u.menus))
+	}
+	if last(u.spoken) != "tock, 2 hours 54 minutes tracked today" {
+		t.Fatalf("spoken title = %q", last(u.spoken))
 	}
 	if len(u.auth) != 1 || !u.auth[0] {
 		t.Fatalf("first check must prompt: %v", u.auth)
@@ -192,7 +199,7 @@ func TestRunnerDrawsSubmenu(t *testing.T) {
 	var at int
 	for _, want := range []string{
 		"\n\tLast session · 25m · Q", "\n>\t15:00–15:25 · ", "\n>\ton task ", "\n>-\n",
-		"\n>rate:5:" + id + "\tRate ★5\n", "\n>rate:4:" + id + "\tRate ★4\tc\n", "\n>rate:1:" + id + "\tRate ★1",
+		"\n>rate:5:" + id + "\tRate ★5\t\ta:Rate 5 stars\n", "\n>rate:4:" + id + "\tRate ★4\tc\ta:Rate 4 stars\n", "\n>rate:1:" + id + "\tRate ★1",
 	} {
 		i := strings.Index(menu[at:], want)
 		if i < 0 {
@@ -660,7 +667,17 @@ func TestRunnerShowsWakeScreen(t *testing.T) {
 
 func TestSpecLinesStrip(t *testing.T) {
 	got := specLines([]bar.Item{{Title: "x"}, {Strip: []string{"deep", "", "distract"}}}, 0, nil)
-	want := []string{"\tx", "\t\t\ts:deep,none,distract"}
+	want := []string{"\tx", "\t\t\ts:deep,none,distract\ta:Today: deep 33%, distracting 33%, no label 33%"}
+	if strings.Join(got, "\n") != strings.Join(want, "\n") {
+		t.Fatalf("lines = %q, want %q", got, want)
+	}
+}
+
+// A row whose title reads badly aloud carries what VoiceOver says instead,
+// after the check mark field.
+func TestSpecLinesSpoken(t *testing.T) {
+	got := specLines([]bar.Item{{Title: "Rate ★4", ID: "rate:4:7", Checked: true}, {Title: "Inbox · 48m", ID: "dash:inbox"}}, 0, nil)
+	want := []string{"rate:4:7\tRate ★4\tc\ta:Rate 4 stars", "dash:inbox\tInbox · 48m\t\ta:Inbox, 48 minutes"}
 	if strings.Join(got, "\n") != strings.Join(want, "\n") {
 		t.Fatalf("lines = %q, want %q", got, want)
 	}
