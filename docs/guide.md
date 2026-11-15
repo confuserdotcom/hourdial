@@ -2206,8 +2206,10 @@ tock import activitywatch aw.json
 
 - Window events become time on that app, with the browser tab's address and
   title when the web watcher saw one. Time ActivityWatch marked afk is left out.
-- Your rules label it, like time from another machine, and it shows in the
-  timeline as `activitywatch · <app>`. Relabel it with a rule.
+- Your rules label it, like time from another machine. It shows under the
+  app's own name and counts with this machine's time in that app; `tock
+  export` keeps the stored name, `activitywatch · <app>`. Relabel it with a
+  rule.
 - URLs are stored like trackd stores them (host and path, no query), and
   `[privacy]` hide lists apply.
 - Importing again replaces the days in the file, so a newer export never
