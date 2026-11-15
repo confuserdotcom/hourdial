@@ -1,8 +1,8 @@
 == title
-◷ 3h00
+◷ 3h00 «tock, 3 hours tracked today»
 
 == menu
-3h00 today · 0s focus · score 70
+3h00 today · 0s focus · score 70 «3 hours today, 0 seconds focus, score 70»
 --
 Next: 17:24 Standup (in 4 min)
 Join Standup [join:1793899440000]
@@ -27,14 +27,16 @@ Settings ▸
     "dot": "shallow",
     "left": "Standup",
     "right": "4m",
-    "right_dim": "in"
+    "right_dim": "in",
+    "spoken": "Standup, in 4 minutes"
   },
   "hover": {
     "face": {
       "dot": "shallow",
       "left": "Standup",
       "right": "4m",
-      "right_dim": "in"
+      "right_dim": "in",
+      "spoken": "Standup, in 4 minutes"
     },
     "lead": "Standup",
     "sub": "17:24 to 17:54 · Work",
@@ -42,7 +44,8 @@ Settings ▸
       {
         "id": "join:1793899440000",
         "title": "Join",
-        "primary": true
+        "primary": true,
+        "spoken": "Join"
       }
     ]
   }

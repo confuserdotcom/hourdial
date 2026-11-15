@@ -1,8 +1,8 @@
 == title
-◷ 2h54 !
+◷ 2h54 ! «tock, 2 hours 54 minutes tracked today, trackd is not running»
 
 == menu
-2h54 today
+2h54 today «2 hours 54 minutes today»
 trackd is not running
 Allow Accessibility for trackd… [ax]
 Notifications are off… [notify-settings]
@@ -29,21 +29,25 @@ Settings ▸
   "hover": {
     "face": {
       "left": "2h54",
-      "left_dim": "today"
+      "left_dim": "today",
+      "spoken": "2 hours 54 minutes today"
     },
     "buttons": [
       {
         "id": "start:25",
         "title": "Focus 25m",
-        "primary": true
+        "primary": true,
+        "spoken": "Start a 25 minute focus session"
       },
       {
         "id": "start:50",
-        "title": "50m"
+        "title": "50m",
+        "spoken": "Start a 50 minute focus session"
       },
       {
         "id": "dash",
-        "title": "Open Today"
+        "title": "Open Today",
+        "spoken": "Open Today"
       }
     ]
   }

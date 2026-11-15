@@ -1,8 +1,8 @@
 == title
-◷ 0s
+◷ 0s «tock, 0 seconds tracked today»
 
 == menu
-0s today
+0s today «0 seconds today»
 --
 Start 25 min focus [start:25]
 More lengths ▸
@@ -27,21 +27,25 @@ Settings ▸
   "hover": {
     "face": {
       "left": "0s",
-      "left_dim": "today"
+      "left_dim": "today",
+      "spoken": "0 seconds today"
     },
     "buttons": [
       {
         "id": "start:25",
         "title": "Focus 25m",
-        "primary": true
+        "primary": true,
+        "spoken": "Start a 25 minute focus session"
       },
       {
         "id": "start:50",
-        "title": "50m"
+        "title": "50m",
+        "spoken": "Start a 50 minute focus session"
       },
       {
         "id": "dash",
-        "title": "Open Today"
+        "title": "Open Today",
+        "spoken": "Open Today"
       }
     ],
     "pages": [
@@ -55,26 +59,33 @@ Settings ▸
         "title": "This week",
         "bars": [
           {
-            "label": "Mon"
+            "label": "Mon",
+            "spoken": "Mon: nothing"
           },
           {
-            "label": "Tue"
+            "label": "Tue",
+            "spoken": "Tue: nothing"
           },
           {
-            "label": "Wed"
+            "label": "Wed",
+            "spoken": "Wed: nothing"
           },
           {
             "label": "Thu",
-            "hi": true
+            "hi": true,
+            "spoken": "Thu, today: nothing"
           },
           {
-            "label": "Fri"
+            "label": "Fri",
+            "spoken": "Fri: nothing"
           },
           {
-            "label": "Sat"
+            "label": "Sat",
+            "spoken": "Sat: nothing"
           },
           {
-            "label": "Sun"
+            "label": "Sun",
+            "spoken": "Sun: nothing"
           }
         ],
         "mid": {
@@ -83,11 +94,13 @@ Settings ▸
           "cells": [
             {
               "k": "Tracked",
-              "v": "0s"
+              "v": "0s",
+              "spoken": "Tracked 0 seconds"
             },
             {
               "k": "Deep focus",
-              "v": "0s"
+              "v": "0s",
+              "spoken": "Deep focus 0 seconds"
             }
           ]
         }

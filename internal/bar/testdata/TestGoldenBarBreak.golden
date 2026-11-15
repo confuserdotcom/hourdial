@@ -1,10 +1,10 @@
 == title
-◷ 3h00
+◷ 3h00 «tock, 3 hours tracked today»
 
 == menu
-3h00 today · 0s focus · score 70
+3h00 today · 0s focus · score 70 «3 hours today, 0 seconds focus, score 70»
 --
-Break · until 17:28
+Break · until 17:28 «Break, until 17:28»
 --
 Start 25 min focus [start:25]
 --
@@ -27,7 +27,8 @@ Settings ▸
     "left": "Break",
     "right": "8:00",
     "right_dim": "left",
-    "end_ms": 1793899680000
+    "end_ms": 1793899680000,
+    "spoken": "Break"
   },
   "hover": {
     "face": {
@@ -35,7 +36,8 @@ Settings ▸
       "left": "Break",
       "right": "8:00",
       "right_dim": "left",
-      "end_ms": 1793899680000
+      "end_ms": 1793899680000,
+      "spoken": "Break"
     },
     "lead": "Break",
     "sub": "until 17:28"

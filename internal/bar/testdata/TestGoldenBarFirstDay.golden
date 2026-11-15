@@ -1,13 +1,13 @@
 == title
-◷ 1h20
+◷ 1h20 «tock, 1 hour 20 minutes tracked today»
 
 == menu
-1h20 today · 35m focus · score 52
-[strip none,deep,deep,shallow]
+1h20 today · 35m focus · score 52 «1 hour 20 minutes today, 35 minutes focus, score 52»
+[strip none,deep,deep,shallow] «Today: deep 50%, shallow 25%, no label 25%»
 --
 Start 25 min focus [start:25]
 --
-Inbox · 12m [dash:inbox]
+Inbox · 12m [dash:inbox] «Inbox, 12 minutes»
 Open dashboard [dash]
 --
 Settings ▸
@@ -28,22 +28,26 @@ Settings ▸
       "left": "1h20",
       "left_dim": "today",
       "right": "52",
-      "right_dim": "12m to label"
+      "right_dim": "12m to label",
+      "spoken": "1 hour 20 minutes today, score 52, 12 minutes to label"
     },
     "sub": "12m of today has no label yet.",
     "buttons": [
       {
         "id": "start:25",
         "title": "Focus 25m",
-        "primary": true
+        "primary": true,
+        "spoken": "Start a 25 minute focus session"
       },
       {
         "id": "dash",
-        "title": "Open Today"
+        "title": "Open Today",
+        "spoken": "Open Today"
       },
       {
         "id": "notch:label",
-        "title": "Label 12m"
+        "title": "Label 12m",
+        "spoken": "Label 12 minutes"
       }
     ],
     "pages": [
@@ -53,15 +57,18 @@ Settings ▸
         "cells": [
           {
             "k": "Score",
-            "v": "52"
+            "v": "52",
+            "spoken": "Score 52"
           },
           {
             "k": "Deep focus",
-            "v": "35m"
+            "v": "35m",
+            "spoken": "Deep focus 35 minutes"
           },
           {
             "k": "Tracked",
-            "v": "1h20"
+            "v": "1h20",
+            "spoken": "Tracked 1 hour 20 minutes"
           }
         ],
         "dial": {
@@ -74,7 +81,8 @@ Settings ▸
           ],
           "now": 0.7222222222222222,
           "center": "17:20",
-          "sub": "1h20 tracked"
+          "sub": "1h20 tracked",
+          "spoken": "The day as a dial: deep 16:00 to 17:20; now 17:20; 1 hour 20 minutes tracked"
         },
         "mid": {
           "id": "",
@@ -87,10 +95,12 @@ Settings ▸
                   "kind": "deep",
                   "ms": 2100000
                 }
-              ]
+              ],
+              "spoken": "16: deep 35 minutes"
             },
             {
-              "label": "17"
+              "label": "17",
+              "spoken": "17: nothing"
             }
           ]
         },
@@ -102,6 +112,9 @@ Settings ▸
               "tock",
               "50m"
             ]
+          ],
+          "rows_spoken": [
+            "tock, 50 minutes"
           ]
         }
       },
@@ -110,13 +123,16 @@ Settings ▸
         "title": "This week",
         "bars": [
           {
-            "label": "Mon"
+            "label": "Mon",
+            "spoken": "Mon: nothing"
           },
           {
-            "label": "Tue"
+            "label": "Tue",
+            "spoken": "Tue: nothing"
           },
           {
-            "label": "Wed"
+            "label": "Wed",
+            "spoken": "Wed: nothing"
           },
           {
             "label": "Thu",
@@ -131,16 +147,20 @@ Settings ▸
                 "kind": "none",
                 "ms": 2700000
               }
-            ]
+            ],
+            "spoken": "Thu, today: 1 hour 20 minutes; deep 35 minutes, no label 45 minutes; score 52"
           },
           {
-            "label": "Fri"
+            "label": "Fri",
+            "spoken": "Fri: nothing"
           },
           {
-            "label": "Sat"
+            "label": "Sat",
+            "spoken": "Sat: nothing"
           },
           {
-            "label": "Sun"
+            "label": "Sun",
+            "spoken": "Sun: nothing"
           }
         ],
         "mid": {
@@ -149,15 +169,18 @@ Settings ▸
           "cells": [
             {
               "k": "Tracked",
-              "v": "1h20"
+              "v": "1h20",
+              "spoken": "Tracked 1 hour 20 minutes"
             },
             {
               "k": "Deep focus",
-              "v": "35m"
+              "v": "35m",
+              "spoken": "Deep focus 35 minutes"
             },
             {
               "k": "Avg score",
-              "v": "52"
+              "v": "52",
+              "spoken": "Avg score 52"
             }
           ]
         },
@@ -173,6 +196,10 @@ Settings ▸
               "No label",
               "45m"
             ]
+          ],
+          "rows_spoken": [
+            "Deep, 35 minutes",
+            "No label, 45 minutes"
           ]
         }
       },

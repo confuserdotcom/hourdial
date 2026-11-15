@@ -1,28 +1,28 @@
 == title
-◉ 19:00
+◉ 19:00 «tock, tock notch, 19 minutes left»
 
 == menu
-5h00 today · 3h12 focus · score 81
-[strip deep,deep,deep,deep,none,none,shallow,shallow,shallow,distract,none,none]
-tock notch · 19:00 left · focus 64% · 2 interruptions
+5h00 today · 3h12 focus · score 81 «5 hours today, 3 hours 12 minutes focus, score 81»
+[strip deep,deep,deep,deep,none,none,shallow,shallow,shallow,distract,none,none] «Today: deep 33%, shallow 25%, distracting 8%, no label 33%»
+tock notch · 19:00 left · focus 64% · 2 interruptions «tock notch, 19 minutes left, focus 64%, 2 interruptions»
 --
 Next: 18:00 Read chapter 4 (in 40 min)
 Snooze distraction notices (15 min) [snooze:distract]
-Last session · 50m · Q78 ▸
-  15:00–15:50 · 0% deep · 1 interruption
-  on task 0 · longest 0 · few interruptions 0 · few switches 0
+Last session · 50m · Q78 ▸ «Last session, 50 minutes, quality 78»
+  15:00–15:50 · 0% deep · 1 interruption «15:00 to 15:50, 0% deep, 1 interruption»
+  on task 0 · longest 0 · few interruptions 0 · few switches 0 «on task 0, longest 0, few interruptions 0, few switches 0»
   --
-  Rate ★5 [rate:5:41]
-  Rate ★4 [rate:4:41]
-  Rate ★3 [rate:3:41]
-  Rate ★2 [rate:2:41]
-  Rate ★1 [rate:1:41]
+  Rate ★5 [rate:5:41] «Rate 5 stars»
+  Rate ★4 [rate:4:41] «Rate 4 stars»
+  Rate ★3 [rate:3:41] «Rate 3 stars»
+  Rate ★2 [rate:2:41] «Rate 2 stars»
+  Rate ★1 [rate:1:41] «Rate 1 star»
   --
   Refile to Licence [refile:41]
 --
 Stop session [stop]
 --
-Inbox · 48m [dash:inbox]
+Inbox · 48m [dash:inbox] «Inbox, 48 minutes»
 Open dashboard [dash]
 --
 Settings ▸
@@ -78,21 +78,24 @@ Settings ▸
     "dot": "distract",
     "left": "Off task",
     "right_dim": "left",
-    "end_ms": 1793900340000
+    "end_ms": 1793900340000,
+    "spoken": "Off task"
   },
   "hover": {
     "face": {
       "dot": "distract",
       "left": "Off task",
       "right_dim": "left",
-      "end_ms": 1793900340000
+      "end_ms": 1793900340000,
+      "spoken": "Off task"
     },
     "lead": "tock notch",
     "sub": "17:14 to 17:39 · focus 64%",
     "buttons": [
       {
         "id": "stop",
-        "title": "Stop session"
+        "title": "Stop session",
+        "spoken": "Stop session"
       }
     ]
   }

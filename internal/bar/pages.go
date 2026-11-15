@@ -5,6 +5,7 @@ import (
 	"math"
 	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"tock/internal/app"
@@ -28,6 +29,9 @@ type Page struct {
 	Dial  *Dial       `json:"dial,omitempty"`
 	Mid   *Page       `json:"mid,omitempty"`
 	Big   *Page       `json:"big,omitempty"`
+	// StripSpoken and RowsSpoken are Strip and Rows in words for VoiceOver.
+	StripSpoken string   `json:"strip_spoken,omitempty"`
+	RowsSpoken  []string `json:"rows_spoken,omitempty"`
 }
 
 // BarCol is one column of a stacked bar chart, bottom part first.
@@ -36,6 +40,8 @@ type BarCol struct {
 	Sub   string `json:"sub,omitempty"` // under the label, e.g. the day's score
 	Hi    bool   `json:"hi,omitempty"`  // today or now
 	Parts []Part `json:"parts,omitempty"`
+	// Spoken is the column in words for VoiceOver.
+	Spoken string `json:"spoken,omitempty"`
 }
 
 // Part is one kind's time in a bar.
@@ -53,6 +59,8 @@ type Ring struct {
 	Kind  string  `json:"kind"`
 	// Big draws the ring large with the value inside: the session's clock.
 	Big bool `json:"big,omitempty"`
+	// Spoken is the ring in words for VoiceOver.
+	Spoken string `json:"spoken,omitempty"`
 }
 
 // Dial is a day as a 24-hour ring, midnight at the top: what was done in
@@ -63,6 +71,8 @@ type Dial struct {
 	Work   *[2]float64 `json:"work,omitempty"` // the work hours as shares of the day
 	Center string      `json:"center"`         // the time now, or the weekday
 	Sub    string      `json:"sub"`
+	// Spoken is the dial in words for VoiceOver: its runs as clock times.
+	Spoken string `json:"spoken,omitempty"`
 }
 
 // Arc is a run of one kind as shares of the day, 0..1 from midnight; kind
@@ -135,6 +145,22 @@ func dayDial(d report.Day, loc *time.Location, nowMS int64) *Dial {
 	if w := d.Work; w.Set && !w.Off(d.Date) {
 		out.Work = &[2]float64{float64(w.StartMin) * 60_000 / span, float64(w.EndMin) * 60_000 / span}
 	}
+	clock := func(share float64) string { return d.Clock.MS(day0+int64(math.Round(share*span)), loc) }
+	var runs []string
+	for _, a := range out.Arcs {
+		runs = append(runs, kindName(a.Kind, "no label")+" "+clock(a.From)+" to "+clock(a.To))
+	}
+	words := "The day as a dial"
+	if len(runs) > 0 {
+		words += ": " + strings.Join(runs, ", ")
+	}
+	if out.Now >= 0 {
+		words += "; now " + out.Center
+	}
+	if out.Work != nil {
+		words += "; work hours " + clock(out.Work[0]) + " to " + clock(out.Work[1])
+	}
+	out.Spoken = words + "; " + Say(out.Sub)
 	return out
 }
 

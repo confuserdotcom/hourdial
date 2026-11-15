@@ -1,23 +1,23 @@
 == title
-◷ 5h00
+◷ 5h00 «tock, 5 hours tracked today»
 
 == menu
-5h00 today · 3h12 focus · score 81
-[strip deep,deep,deep,deep,none,none,shallow,shallow,shallow,distract,none,none]
+5h00 today · 3h12 focus · score 81 «5 hours today, 3 hours 12 minutes focus, score 81»
+[strip deep,deep,deep,deep,none,none,shallow,shallow,shallow,distract,none,none] «Today: deep 33%, shallow 25%, distracting 8%, no label 33%»
 --
 Next: 18:00 Read chapter 4 (in 40 min)
 Suggested: focus now (50 min)
 Start focus (50 min) [rec:accept:3:1793898900000]
 Not now [rec:dismiss:3:1793898900000]
-Last session · 50m · Q78 ▸
-  15:00–15:50 · 0% deep · 1 interruption
-  on task 0 · longest 0 · few interruptions 0 · few switches 0
+Last session · 50m · Q78 ▸ «Last session, 50 minutes, quality 78»
+  15:00–15:50 · 0% deep · 1 interruption «15:00 to 15:50, 0% deep, 1 interruption»
+  on task 0 · longest 0 · few interruptions 0 · few switches 0 «on task 0, longest 0, few interruptions 0, few switches 0»
   --
-  Rate ★5 [rate:5:41]
-  Rate ★4 [rate:4:41]
-  Rate ★3 [rate:3:41]
-  Rate ★2 [rate:2:41]
-  Rate ★1 [rate:1:41]
+  Rate ★5 [rate:5:41] «Rate 5 stars»
+  Rate ★4 [rate:4:41] «Rate 4 stars»
+  Rate ★3 [rate:3:41] «Rate 3 stars»
+  Rate ★2 [rate:2:41] «Rate 2 stars»
+  Rate ★1 [rate:1:41] «Rate 1 star»
   --
   Refile to Licence [refile:41]
 --
@@ -26,7 +26,7 @@ More lengths ▸
   Start 50 min focus [start:50]
   Start 90 min focus [start:90]
 --
-Inbox · 48m [dash:inbox]
+Inbox · 48m [dash:inbox] «Inbox, 48 minutes»
 Open dashboard [dash]
 --
 Settings ▸
@@ -84,26 +84,31 @@ Settings ▸
       "left": "5h00",
       "left_dim": "today",
       "right": "81",
-      "right_dim": "48m to label"
+      "right_dim": "48m to label",
+      "spoken": "5 hours today, score 81, 48 minutes to label"
     },
     "sub": "48m of today has no label yet.",
     "buttons": [
       {
         "id": "start:25",
         "title": "Focus 25m",
-        "primary": true
+        "primary": true,
+        "spoken": "Start a 25 minute focus session"
       },
       {
         "id": "start:50",
-        "title": "50m"
+        "title": "50m",
+        "spoken": "Start a 50 minute focus session"
       },
       {
         "id": "dash",
-        "title": "Open Today"
+        "title": "Open Today",
+        "spoken": "Open Today"
       },
       {
         "id": "notch:label",
-        "title": "Label 48m"
+        "title": "Label 48m",
+        "spoken": "Label 48 minutes"
       }
     ],
     "pages": [
@@ -115,17 +120,20 @@ Settings ▸
             "k": "Score",
             "v": "81",
             "c": "+6",
-            "tone": "good"
+            "tone": "good",
+            "spoken": "Score 81, plus 6"
           },
           {
             "k": "Deep focus",
             "v": "3h12",
             "c": "+24m",
-            "tone": "good"
+            "tone": "good",
+            "spoken": "Deep focus 3 hours 12 minutes, plus 24 minutes"
           },
           {
             "k": "Tracked",
-            "v": "5h00"
+            "v": "5h00",
+            "spoken": "Tracked 5 hours"
           }
         ],
         "dial": {
@@ -158,7 +166,8 @@ Settings ▸
           ],
           "now": 0.7222222222222222,
           "center": "17:20",
-          "sub": "5h00 tracked"
+          "sub": "5h00 tracked",
+          "spoken": "The day as a dial: deep 09:00 to 11:00, away 11:00 to 12:00, shallow 14:00 to 15:30, distracting 15:30 to 16:00, no label 16:00 to 17:00; now 17:20; 5 hours tracked"
         },
         "mid": {
           "id": "",
@@ -171,7 +180,8 @@ Settings ▸
                   "kind": "deep",
                   "ms": 3000000
                 }
-              ]
+              ],
+              "spoken": "09: deep 50 minutes"
             },
             {
               "label": "10",
@@ -180,16 +190,20 @@ Settings ▸
                   "kind": "deep",
                   "ms": 2400000
                 }
-              ]
+              ],
+              "spoken": "10: deep 40 minutes"
             },
             {
-              "label": "11"
+              "label": "11",
+              "spoken": "11: nothing"
             },
             {
-              "label": "12"
+              "label": "12",
+              "spoken": "12: nothing"
             },
             {
-              "label": "13"
+              "label": "13",
+              "spoken": "13: nothing"
             },
             {
               "label": "14",
@@ -198,7 +212,8 @@ Settings ▸
                   "kind": "shallow",
                   "ms": 1800000
                 }
-              ]
+              ],
+              "spoken": "14: shallow 30 minutes"
             },
             {
               "label": "15",
@@ -207,7 +222,8 @@ Settings ▸
                   "kind": "shallow",
                   "ms": 1200000
                 }
-              ]
+              ],
+              "spoken": "15: shallow 20 minutes"
             }
           ]
         },
@@ -227,6 +243,11 @@ Settings ▸
               "Licence",
               "30m"
             ]
+          ],
+          "rows_spoken": [
+            "tock, 3 hours",
+            "No project, 1 hour",
+            "Licence, 30 minutes"
           ]
         }
       },
@@ -254,7 +275,8 @@ Settings ▸
                 "kind": "none",
                 "ms": 4500000
               }
-            ]
+            ],
+            "spoken": "Mon: 5 hours; deep 3 hours, shallow 30 minutes, distracting 15 minutes, no label 1 hour 15 minutes; score 70"
           },
           {
             "label": "Tue",
@@ -276,7 +298,8 @@ Settings ▸
                 "kind": "none",
                 "ms": 4500000
               }
-            ]
+            ],
+            "spoken": "Tue: 5 hours; deep 3 hours, shallow 30 minutes, distracting 15 minutes, no label 1 hour 15 minutes; score 73"
           },
           {
             "label": "Wed",
@@ -298,7 +321,8 @@ Settings ▸
                 "kind": "none",
                 "ms": 4500000
               }
-            ]
+            ],
+            "spoken": "Wed: 5 hours; deep 3 hours, shallow 30 minutes, distracting 15 minutes, no label 1 hour 15 minutes; score 76"
           },
           {
             "label": "Thu",
@@ -321,16 +345,20 @@ Settings ▸
                 "kind": "none",
                 "ms": 4500000
               }
-            ]
+            ],
+            "spoken": "Thu, today: 5 hours; deep 3 hours, shallow 30 minutes, distracting 15 minutes, no label 1 hour 15 minutes; score 79"
           },
           {
-            "label": "Fri"
+            "label": "Fri",
+            "spoken": "Fri: nothing"
           },
           {
-            "label": "Sat"
+            "label": "Sat",
+            "spoken": "Sat: nothing"
           },
           {
-            "label": "Sun"
+            "label": "Sun",
+            "spoken": "Sun: nothing"
           }
         ],
         "mid": {
@@ -339,15 +367,18 @@ Settings ▸
           "cells": [
             {
               "k": "Tracked",
-              "v": "20h00"
+              "v": "20h00",
+              "spoken": "Tracked 20 hours"
             },
             {
               "k": "Deep focus",
-              "v": "12h00"
+              "v": "12h00",
+              "spoken": "Deep focus 12 hours"
             },
             {
               "k": "Avg score",
-              "v": "75"
+              "v": "75",
+              "spoken": "Avg score 75"
             }
           ]
         },
@@ -371,6 +402,12 @@ Settings ▸
               "No label",
               "5h00"
             ]
+          ],
+          "rows_spoken": [
+            "Deep, 12 hours",
+            "Shallow, 2 hours",
+            "Distracting, 1 hour",
+            "No label, 5 hours"
           ]
         }
       },
@@ -383,13 +420,15 @@ Settings ▸
             "value": "1h00 / 2h00",
             "sub": "3 day streak",
             "frac": 0.5,
-            "kind": "shallow"
+            "kind": "shallow",
+            "spoken": "Study: 1 hour of 2 hours, short, 3 day streak"
           },
           {
             "label": "Fun",
             "value": "50m / 45m",
             "frac": 1,
-            "kind": "distract"
+            "kind": "distract",
+            "spoken": "Fun: 50 minutes of 45 minutes, over"
           }
         ]
       }

@@ -168,7 +168,7 @@ func TestRecapIsland(t *testing.T) {
 	if i.Face.Left != "Thursday" || i.Face.Right != "6h48" {
 		t.Fatalf("face = %+v", i.Face)
 	}
-	want := []Cell{{"Score", "81", "+6 vs usual Thu", "good"}, {"Deep focus", "3h12", "+24m", "good"}, {"Longest block", "1h34", "", ""}, {"Distracting", "14m", "−9m", "good"}}
+	want := []Cell{{"Score", "81", "+6 vs usual Thu", "good", ""}, {"Deep focus", "3h12", "+24m", "good", ""}, {"Longest block", "1h34", "", "", ""}, {"Distracting", "14m", "−9m", "good", ""}}
 	for k := range want {
 		if p.Cells[k] != want[k] {
 			t.Errorf("cell %d = %+v, want %+v", k, p.Cells[k], want[k])

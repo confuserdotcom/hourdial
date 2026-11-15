@@ -21,6 +21,7 @@ import (
 )
 
 // The menu bar title, the menu and the notch as the Cocoa side gets them,
+// with what VoiceOver says for each,
 // for a fixed set of days at a fixed now (Thursday 5 Nov 2026, 17:20 UTC).
 // The notch is the JSON tockbar hands to notch_darwin.m, with the quiet or
 // running panel's pages filled in as the runner does.
@@ -36,13 +37,15 @@ func goldenAt(hh, mm int) int64 {
 }
 
 // menuText renders a menu: "--" separators, "[strip k,k,…]" strip rows,
-// "Title ▸" submenu parents with their rows indented, "✓ " checked rows and
-// " [id]" after clickable ones.
+// "Title ▸" submenu parents with their rows indented, "✓ " checked rows,
+// " [id]" after clickable ones and « what VoiceOver says » when that is not
+// the title.
 func menuText(items []Item) string {
 	var b []string
 	var walk func([]Item, string)
 	walk = func(items []Item, ind string) {
 		for _, it := range items {
+			n := len(b)
 			switch {
 			case it.Separator:
 				b = append(b, ind+"--")
@@ -66,6 +69,9 @@ func menuText(items []Item) string {
 					c = "✓ "
 				}
 				b = append(b, ind+c+it.Title+" ["+it.ID+"]")
+			}
+			if w := it.Spoken(); w != "" && len(b) > n {
+				b[n] += " «" + w + "»"
 			}
 		}
 	}
@@ -93,7 +99,7 @@ func islandOf(s Snapshot, pd *pageData, nowMS int64) Island {
 
 func islandText(t *testing.T, i Island) string {
 	t.Helper()
-	b, err := json.MarshalIndent(i, "", "  ")
+	b, err := json.MarshalIndent(i.withSpoken(), "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,8 +109,8 @@ func islandText(t *testing.T, i Island) string {
 // screens renders the title, the menu and the notch of s at nowMS.
 func screens(t *testing.T, s Snapshot, pd *pageData, nowMS int64) string {
 	t.Helper()
-	return fmt.Sprintf("== title\n%s\n\n== menu\n%s\n\n== notch\n%s\n",
-		s.Title(nowMS), menuText(s.Items(nowMS)), islandText(t, islandOf(s, pd, nowMS)))
+	return fmt.Sprintf("== title\n%s «%s»\n\n== menu\n%s\n\n== notch\n%s\n",
+		s.Title(nowMS), s.Spoken(nowMS), menuText(s.Items(nowMS)), islandText(t, islandOf(s, pd, nowMS)))
 }
 
 // emptyWeek is the week of goldenDay with nothing in it.
