@@ -1,11 +1,16 @@
 import { CartesianGrid, Line, LineChart, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import { Marks, plotInset } from "./Marks";
 
-/** ScoreLine: the score per day; days that are not workdays are gaps. */
-export function ScoreLine({ points, height = 200, onPoint }: { points: { label: string; score: number | null }[]; height?: number; onPoint?: (i: number) => void }) {
+/** ScoreLine: the score per day; days that are not workdays are gaps.
+ *  onPoint gets the index of a clicked day; with it the days can be
+ *  picked with the keyboard too (Tab, then the arrows, Enter). */
+export function ScoreLine({ points, height = 200, onPoint }: { points: { label: string; title?: string; score: number | null }[]; height?: number; onPoint?: (i: number) => void }) {
   const real = points.filter((p) => p.score !== null).map((p) => p.score as number);
   const mean = real.length ? Math.round(real.reduce((a, b) => a + b, 0) / real.length) : null;
+  const name = (p: { label: string; title?: string; score: number | null }) => `${p.title ?? p.label}, ${p.score === null ? "no score" : `score ${p.score}`}`;
   return (
+    <div className="relative">
     <ChartContainer config={{}} className="w-full" style={{ height }}>
       <LineChart data={points} margin={{ top: 8, right: 8, left: -24, bottom: 0 }} className={onPoint ? "cursor-pointer" : undefined}
         onClick={(e) => e?.activeTooltipIndex !== undefined && onPoint?.(e.activeTooltipIndex)}>
@@ -26,5 +31,10 @@ export function ScoreLine({ points, height = 200, onPoint }: { points: { label: 
         <Line dataKey="score" stroke="hsl(var(--foreground))" strokeWidth={1.75} dot={{ r: 2.5, fill: "hsl(var(--foreground))" }} connectNulls={false} isAnimationActive={false} />
       </LineChart>
     </ChartContainer>
+    {onPoint && (
+      <Marks label="Focus score per day. The arrow keys move between days, Enter opens one." points
+        names={points.map(name)} inset={plotInset(8, 8)} onPick={onPoint} readout={(i) => name(points[i])} />
+    )}
+    </div>
   );
 }

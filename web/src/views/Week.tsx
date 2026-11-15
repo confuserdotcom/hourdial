@@ -31,9 +31,9 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
   if (!w) return null;
 
   const mon = parseDate(w.start ?? w.monday);
-  const days = w.days.map((d) => ({ label: shortDay(parseDate(d.date)), byKind: d.byKind, faint: d.future }));
+  const days = w.days.map((d) => ({ label: shortDay(parseDate(d.date)), title: dayTitle(parseDate(d.date)), byKind: d.byKind, faint: d.future }));
   const openDay = (i: number) => w.days[i] && !w.days[i].future && go({ view: "today", date: w.days[i].date });
-  const scores = w.days.map((d) => ({ label: shortDay(parseDate(d.date)), score: d.future || d.trackedMS < 3_600_000 ? null : d.score }));
+  const scores = w.days.map((d) => ({ label: shortDay(parseDate(d.date)), title: dayTitle(parseDate(d.date)), score: d.future || d.trackedMS < 3_600_000 ? null : d.score }));
   const projects = w.projects.slice(0, 6);
   const billed = w.days.reduce((n, d) => n + (d.billedMS ?? 0), 0);
   const colors = ramp(projects.length);
