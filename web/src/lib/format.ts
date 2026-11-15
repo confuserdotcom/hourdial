@@ -81,6 +81,30 @@ export function doneText(d: { label: string; spans: number; ms: number }, range?
 
 export type Unit = "day" | "week" | "month";
 
+/** firstDay is the weekday weeks start on (0 = Sunday): Monday unless
+ *  config.toml's [display] week_start says otherwise. */
+let firstDay = 1;
+const WEEK_STARTS: Record<string, number> = { monday: 1, sunday: 0, saturday: 6 };
+
+/** setWeekStart takes week_start as /api/status sends it: "monday",
+ *  "sunday" or "saturday"; anything else is Monday. */
+export function setWeekStart(name?: string) {
+  firstDay = WEEK_STARTS[name ?? ""] ?? 1;
+}
+
+/** weekStartOf is the first day of d's week, at local midnight. */
+export function weekStartOf(d: Date): Date {
+  const m = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  m.setDate(m.getDate() - ((m.getDay() - firstDay + 7) % 7));
+  return m;
+}
+
+/** weekHeads turns seven day names, Sunday first, into the order of a
+ *  week. */
+export function weekHeads(sundayFirst: string[]): string[] {
+  return [...sundayFirst.slice(firstDay), ...sundayFirst.slice(0, firstDay)];
+}
+
 /** mondayOf is the Monday of d's week, at local midnight. */
 export function mondayOf(d: Date): Date {
   const m = new Date(d.getFullYear(), d.getMonth(), d.getDate());
@@ -103,7 +127,7 @@ export function stepDate(date: string, unit: Unit, n: number, today = new Date()
 export function holdsToday(date: string, unit: Unit, today = new Date()): boolean {
   const d = parseDate(date);
   if (unit === "day") return isoDate(d) === isoDate(today);
-  if (unit === "week") return isoDate(mondayOf(d)) === isoDate(mondayOf(today));
+  if (unit === "week") return isoDate(weekStartOf(d)) === isoDate(weekStartOf(today));
   return d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth();
 }
 
@@ -114,7 +138,7 @@ export function periodTitle(date: string, unit: Unit, today = new Date()): strin
   if (unit === "day") return holdsToday(date, unit, today) ? "Today" : dayTitle(d);
   if (unit === "week") {
     if (holdsToday(date, unit, today)) return "This week";
-    const m = mondayOf(d), s = addDays(m, 6);
+    const m = weekStartOf(d), s = addDays(m, 6);
     return m.getMonth() === s.getMonth()
       ? `${m.getDate()}–${s.getDate()} ${MONTHS[m.getMonth()]}`
       : `${m.getDate()} ${MONTHS[m.getMonth()]} – ${s.getDate()} ${MONTHS[s.getMonth()]}`;

@@ -30,7 +30,7 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
   if (loading && !w) return <Skeleton className="h-96 w-full" />;
   if (!w) return null;
 
-  const mon = parseDate(w.monday);
+  const mon = parseDate(w.start ?? w.monday);
   const days = w.days.map((d) => ({ label: shortDay(parseDate(d.date)), byKind: d.byKind, faint: d.future }));
   const openDay = (i: number) => w.days[i] && !w.days[i].future && go({ view: "today", date: w.days[i].date });
   const scores = w.days.map((d) => ({ label: shortDay(parseDate(d.date)), score: d.future || d.trackedMS < 3_600_000 ? null : d.score }));
@@ -53,7 +53,7 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
             <Why>The time tock saw you at the computer each day, labelled or not. Away time is left out until you label it as work.</Why>
             <Sum rows={w.days.filter((d) => !d.future).map((d) => [dayTitle(parseDate(d.date)), dur(d.trackedMS)])} total={["Week", dur(w.trackedMS)]} />
           </Explain>
-          <Export monday={w.monday} />
+          <Export monday={w.start ?? w.monday} />
         </span>
       </div>
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">

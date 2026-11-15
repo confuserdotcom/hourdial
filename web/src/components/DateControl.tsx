@@ -2,10 +2,10 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { addDays, holdsToday, isoDate, mondayOf, monthTitle, parseDate, periodTitle, stepDate, type Unit } from "@/lib/format";
+import { addDays, holdsToday, isoDate, monthTitle, parseDate, periodTitle, stepDate, weekHeads, weekStartOf, type Unit } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
-const HEAD = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const HEAD = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]; // Sunday first, see weekHeads
 
 /** DateControl: back, the period's name (a calendar to pick any day), on.
  *  The arrows step by the view's unit: a day, a week or a month. */
@@ -49,11 +49,11 @@ function Calendar({ date, unit, onPick }: { date: string; unit: Unit; onPick: (d
   const sel = parseDate(date);
   const [month, setMonth] = useState(new Date(sel.getFullYear(), sel.getMonth(), 1));
   const today = isoDate(new Date());
-  const start = mondayOf(month);
+  const start = weekStartOf(month);
   const cells = Array.from({ length: 42 }, (_, i) => addDays(start, i));
   const inPeriod = (d: Date) =>
     unit === "day" ? isoDate(d) === date
-      : unit === "week" ? isoDate(mondayOf(d)) === isoDate(mondayOf(sel))
+      : unit === "week" ? isoDate(weekStartOf(d)) === isoDate(weekStartOf(sel))
         : d.getMonth() === sel.getMonth() && d.getFullYear() === sel.getFullYear();
   const now = new Date();
   const lastMonth = month.getFullYear() === now.getFullYear() && month.getMonth() === now.getMonth();
@@ -69,7 +69,7 @@ function Calendar({ date, unit, onPick }: { date: string; unit: Unit; onPick: (d
         </Button>
       </div>
       <div className="grid grid-cols-7 gap-0.5 text-center">
-        {HEAD.map((h) => <span key={h} className="pb-1 text-[11px] text-faint">{h}</span>)}
+        {weekHeads(HEAD).map((h) => <span key={h} className="pb-1 text-[11px] text-faint">{h}</span>)}
         {cells.map((d) => {
           const iso = isoDate(d);
           const future = iso > today;

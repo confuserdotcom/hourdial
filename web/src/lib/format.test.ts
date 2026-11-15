@@ -38,7 +38,7 @@ test("doneText names the range a timeline label covers, else the count", () => {
   expect(doneText({ ...d, ms: 0 }, "14:41–14:53 (12m)")).toBe("Labelled 14:41–14:53 (12m) · Research");
 });
 
-import { holdsToday, mondayOf, periodTitle, stepDate } from "./format";
+import { holdsToday, mondayOf, periodTitle, setWeekStart, stepDate, weekHeads, weekStartOf } from "./format";
 
 test("the date control steps by the view's unit and stops at today", () => {
   const today = new Date(2026, 10, 11); // Wed 11 Nov
@@ -61,4 +61,30 @@ test("the date control names the period", () => {
   expect(periodTitle("2026-10-10", "week", today)).toBe("5–11 Oct");
   expect(periodTitle("2026-10-01", "week", today)).toBe("28 Sep – 4 Oct");
   expect(periodTitle("2026-10-10", "month", today)).toBe("Oct 2026");
+});
+
+test("weeks start on the week_start day", () => {
+  const sat = new Date(2026, 9, 10, 15); // Sat 10 Oct 2026
+  const heads = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+  try {
+    expect(isoDate(weekStartOf(sat))).toBe("2026-10-05");
+    expect(weekHeads(heads)[0]).toBe("Mo");
+    setWeekStart("sunday");
+    expect(isoDate(weekStartOf(sat))).toBe("2026-10-04");
+    expect(isoDate(weekStartOf(new Date(2026, 9, 11)))).toBe("2026-10-11");
+    expect(weekHeads(heads).join(" ")).toBe("Su Mo Tu We Th Fr Sa");
+    expect(holdsToday("2026-11-08", "week", new Date(2026, 10, 11))).toBe(true);
+    expect(periodTitle("2026-10-10", "week", new Date(2026, 10, 11))).toBe("4–10 Oct");
+    // Weeks holding a DST change in most zones.
+    expect(isoDate(weekStartOf(new Date(2026, 2, 31)))).toBe("2026-03-29");
+    expect(isoDate(weekStartOf(new Date(2026, 10, 3)))).toBe("2026-11-01");
+    setWeekStart("saturday");
+    expect(isoDate(weekStartOf(sat))).toBe("2026-10-10");
+    expect(isoDate(weekStartOf(new Date(2026, 9, 9, 23)))).toBe("2026-10-03");
+    expect(weekHeads(heads).join(" ")).toBe("Sa Su Mo Tu We Th Fr");
+    setWeekStart("tuesday");
+    expect(isoDate(weekStartOf(sat))).toBe("2026-10-05");
+  } finally {
+    setWeekStart();
+  }
 });

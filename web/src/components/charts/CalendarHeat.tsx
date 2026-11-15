@@ -1,18 +1,18 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import type { MonthDay } from "@/lib/api";
-import { dur, parseDate, dayTitle } from "@/lib/format";
+import { dur, parseDate, dayTitle, weekHeads, weekStartOf } from "@/lib/format";
 
-const HEAD = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const HEAD = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // Sunday first, see weekHeads
 
 /** CalendarHeat: the month as a calendar, each day shaded by deep time. */
 export function CalendarHeat({ first, days, onDay }: { first: string; days: MonthDay[]; onDay?: (date: string) => void }) {
   const start = parseDate(first);
-  const lead = (start.getDay() + 6) % 7;
+  const lead = Math.round((start.getTime() - weekStartOf(start).getTime()) / 86_400_000);
   const max = Math.max(1, ...days.map((d) => d.deepMS));
   const cells: (MonthDay | null)[] = [...Array(lead).fill(null), ...days];
   return (
     <div className="grid grid-cols-7 gap-1.5">
-      {HEAD.map((h) => (
+      {weekHeads(HEAD).map((h) => (
         <span key={h} className="pb-1 text-center text-[11px] text-faint">{h}</span>
       ))}
       {cells.map((d, i) =>

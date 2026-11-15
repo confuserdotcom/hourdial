@@ -132,10 +132,12 @@ export type Status = {
   session: { goal: string; startMS: number; plannedMS: number } | null;
   focus?: boolean; billing?: boolean;
   presets?: number[]; // session lengths in minutes, the default first
+  weekStart?: string; // "monday", "sunday" or "saturday"
 };
 export type WeekDay = { billedMS?: number; date: string; trackedMS: number; byKind: ByKind; future: boolean; score: number; deepMS: number };
 export type Week = {
-  monday: string; days: WeekDay[]; trackedMS: number; byKind: ByKind; categories: Cat[];
+  /** monday is the week's Monday; start its first day (see week_start). */
+  monday: string; start?: string; days: WeekDay[]; trackedMS: number; byKind: ByKind; categories: Cat[];
   projects: NameMS[]; apps: NameMS[]; distractions: NameMS[]; goals: Goal[]; plan: string; outages: Outage[];
 };
 /** Outage: time trackd did not record, and why. Never part of the timeline or the totals.
