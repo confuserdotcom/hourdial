@@ -191,10 +191,10 @@ export type WhyLine = { field: "category" | "project"; label: string; source: st
 export type RuleExample = { text: string; ms: number; from: string; to: string };
 export type RulePreview = { matchedMS: number; changedMS: number; examples: RuleExample[] };
 export type InvoicePreview = {
-  project: string; number: string; seconds: number; total: number; currency: string; days: number;
+  project: string; number: string; seconds: number; total: number; currency: string; totalText: string; days: number;
   modelOnlyS: number; overlaps: string[];
 };
-export type InvoiceIssued = { number: string; total: number; currency: string };
+export type InvoiceIssued = { number: string; total: number; currency: string; totalText: string };
 export type Feature = {
   id: string; group: string; name: string; note: string; on: boolean; live: boolean;
   isGroup: boolean; needs?: string; waits: boolean;

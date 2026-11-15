@@ -186,10 +186,12 @@ func (s *Server) invoice(r *http.Request) (any, error) {
 			Seconds    int64    `json:"seconds"`
 			Total      float64  `json:"total"`
 			Currency   string   `json:"currency"`
+			TotalText  string   `json:"totalText"` // as the PDF and the CLI write it
 			Days       int      `json:"days"`
 			ModelOnlyS int64    `json:"modelOnlyS"` // billed time only the local model labelled
 			Overlaps   []string `json:"overlaps"`   // issued invoices over some of the same days
-		}{d.Record.Project, d.Record.Number, d.Record.SecondsBilled, total, d.Record.Currency, len(d.Record.Lines), d.ModelOnlyS, overlaps}, nil
+		}{d.Record.Project, d.Record.Number, d.Record.SecondsBilled, total, d.Record.Currency,
+			app.InvoiceMoney(d.Record, d.Record.TotalMinor), len(d.Record.Lines), d.ModelOnlyS, overlaps}, nil
 	}
 	b, err := app.DraftPDF(d)
 	if err != nil {
@@ -245,10 +247,11 @@ func (s *Server) invoiceIssue(r *http.Request) (any, error) {
 	}
 	total, _ := strconv.ParseFloat(report.FormatMinor(inv.TotalMinor, inv.MinorUnits), 64) // display only
 	return struct {
-		Number   string  `json:"number"`
-		Total    float64 `json:"total"`
-		Currency string  `json:"currency"`
-	}{inv.Number, total, inv.Currency}, nil
+		Number    string  `json:"number"`
+		Total     float64 `json:"total"`
+		Currency  string  `json:"currency"`
+		TotalText string  `json:"totalText"` // as the PDF and the CLI write it
+	}{inv.Number, total, inv.Currency, app.InvoiceMoney(inv, inv.TotalMinor)}, nil
 }
 
 // sinceShown is a rule's since as the Library shows it, "" when it has none.

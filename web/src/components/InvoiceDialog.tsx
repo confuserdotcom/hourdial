@@ -77,7 +77,7 @@ export function InvoiceDialog({ open, monday, onClose }: { open: boolean; monday
         project, from: p.from, to: p.to, client: client.trim(), number: number.trim(),
         allowOverlap: okOverlap, confirmModel: okModel,
       });
-      toast(`Issued ${r.number} · ${money(r.total, r.currency)}`, {
+      toast(`Issued ${r.number} · ${r.totalText}`, {
         description: `Stored with its PDF; it stays as issued. tock invoice show ${r.number} --pdf saves a copy.`,
       });
       onClose();
@@ -90,7 +90,6 @@ export function InvoiceDialog({ open, monday, onClose }: { open: boolean; monday
 
   const rated = lib?.projects.filter((p) => p.rate != null && !p.archived) ?? [];
   const canIssue = !!prev && !busy && (prev.modelOnlyS === 0 || okModel) && (prev.overlaps.length === 0 || okOverlap);
-  const money = (v: number, c: string) => `${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${c ? ` ${c}` : ""}`;
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-md">
@@ -129,7 +128,7 @@ export function InvoiceDialog({ open, monday, onClose }: { open: boolean; monday
             </label>
             <p className="num min-h-5 text-sm">
               {err ? <span className="text-muted-foreground">{err}</span> : prev && (
-                <><b className="font-medium">{dur(prev.seconds * 1000)}</b> · <b className="font-medium">{money(prev.total, prev.currency)}</b> · <span className="text-muted-foreground">{prev.days} {prev.days === 1 ? "day" : "days"}</span></>
+                <><b className="font-medium">{dur(prev.seconds * 1000)}</b> · <b className="font-medium">{prev.totalText}</b> · <span className="text-muted-foreground">{prev.days} {prev.days === 1 ? "day" : "days"}</span></>
               )}
             </p>
             {prev && prev.modelOnlyS > 0 && (
