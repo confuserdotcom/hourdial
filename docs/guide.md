@@ -1861,7 +1861,9 @@ that sets `_NET_ACTIVE_WINDOW`, which nearly all do). It needs no cgo, no
 bundle and no permissions. It finds the session by itself: the session's
 variables first, then the sockets on disk. `TOCK_DESKTOP=hyprland`, `sway`,
 `i3` or `x11` in trackd's environment picks one by hand, and `tock doctor`
-says which it sees.
+says which it sees. GNOME and KDE on Wayland are not supported: trackd has
+no way to read their front window. Windows is experimental (see
+[Stability and support](stability.md#support-tiers)).
 
 ```sh
 make install-linux   # trackd and tock in ~/.local/bin, trackd.service enabled
@@ -2021,8 +2023,8 @@ Blocking cannot hide windows on X11; the drift notice still goes out.
 - **Terminals.** The zsh hook works the same. kitty, WezTerm, Alacritty,
   foot and ghostty are known terminals.
 - **Notifications** go through `notify-send`.
-- **Not on Linux:** browser URLs, the calendar, call detection and the menu
-  bar app.
+- **Not on Linux:** the calendar, call detection and the menu bar app.
+  Browser addresses need the tock extension (above).
 - **Plan notices.** `Up next` and `Starting now` for plan items come through
   `notify-send` without buttons, so there is no `Start focus` button; with
   `[plan] auto_start = true` the session still starts. Calendar events, and
