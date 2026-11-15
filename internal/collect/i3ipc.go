@@ -21,13 +21,22 @@ import (
 // i3 IPC, which Sway speaks too: "i3-ipc", the payload's length and the
 // message type (both uint32, native order: little-endian everywhere tock
 // runs), then the payload.
+// i3MaxPayload bounds one reply. Real Sway and i3 trees, read in the e2e
+// job (scripts/e2e/treesize.sh) with 42 windows titled like browser tabs
+// (about 100 characters), take about 1.1 KB per window, and decoding
+// allocates a bit less than the reply (51,548 bytes read, 42,264
+// allocated on i3). 4 MiB
+// holds about 3,800 such windows and costs trackd under 8 MiB at worst,
+// well inside its 40 MB budget; a server claiming more is not believed,
+// and trackd refuses it before allocating (the poll then falls back on
+// focus events, see winSource.poll).
 const (
 	i3Magic        = "i3-ipc"
 	i3RunCommand   = 0
 	i3Subscribe    = 2
 	i3GetTree      = 4
 	i3EventWindow  = 0x80000003
-	i3MaxPayload   = 64 << 20
+	i3MaxPayload   = 4 << 20
 	i3HeaderLength = len(i3Magic) + 8
 )
 

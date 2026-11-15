@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Minus, Plus, Maximize2 } from "lucide-react";
 import type { Outage, Row } from "@/lib/api";
 import { dur, hhmm, hourLabel, parseDate } from "@/lib/format";
-import { kindClass, kindColor, kindLabel } from "@/lib/kinds";
+import { kindClass, kindColor, kindInk, kindLabel } from "@/lib/kinds";
 import { snapAt } from "@/lib/range";
 import { onDay } from "@/lib/outage";
 import { clampWin, fit, isFull, pan, ticks, zoomAt, type Win } from "@/lib/zoom";
@@ -202,9 +202,10 @@ export function Timeline({ rows, outages, date, first, last, today, onPick, onRa
               onClick={() => laneFit(l)}
               onDoubleClick={(e) => e.stopPropagation()}
               title={`${l.name}: ${dur(l.ms)}. Click to zoom to it.`}
-              aria-label={`${l.name}, ${dur(l.ms)}${l.away ? "" : `, ${kindLabel(l.kind)}`}. Zoom to it`}
+              aria-label={`${l.name} ${dur(l.ms)}${l.away ? "" : `, ${kindLabel(l.kind)}`}. Zoom to it`}
             >
-              <span className="truncate">{l.name}</span>
+              {/* the name read aloud starts with the text shown: name, a space, duration */}
+              <span className="truncate">{l.name}</span>{" "}
               <span className="num text-xs text-muted-foreground">{dur(l.ms)}</span>
             </button>
             <div ref={i === 0 ? track : undefined} className="relative h-6 flex-1 overflow-hidden rounded-sm bg-secondary/40">
@@ -230,7 +231,7 @@ export function Timeline({ rows, outages, date, first, last, today, onPick, onRa
                   >
                     {r.invoice && <i className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-foreground/80" />}
                     {wd > 9 && !l.away && (
-                      <span className="pointer-events-none absolute inset-0 truncate px-1.5 text-left text-[11px] leading-6 text-background/90">{r.app}</span>
+                      <span className="pointer-events-none absolute inset-0 truncate px-1.5 text-left text-[11px] leading-6" style={{ color: kindInk(r.kind) }}>{r.app}</span>
                     )}
                   </button>
                 );

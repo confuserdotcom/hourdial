@@ -170,11 +170,11 @@ tock rules check | tock rules stats [--days N]
 tock rules dupes | tock rules merge [--project] <from> <into>
                                        look-alike names | fold one name into another everywhere
 tock category [add <name> <kind> [--afk D] |
-                set <name> [--kind K] [--afk D] [--interrupt on|off] |
-                rename <name> <new> | rm <name>]
+              set <name> [--kind K] [--afk D] [--interrupt on|off] |
+              rename <name> <new> | rm <name>]
                                        list or change your categories (rules.toml)
-tock project [add <name> [--category C] [--alias a,b] | set <name> ... |
-               rename <name> <new> | rm <name> | scan <dir> --category C]
+tock project [add <name> [--category C] [--alias a,b] [--rate N] | set <name> ... |
+             rename <name> <new> | rm <name> | scan <dir> --category C]
                                        projects; filed under a category they are modules
 
 Looking back:
@@ -199,22 +199,29 @@ Setup and data:
 tock init                              write starter ~/.config/tock/rules.toml
 tock doctor [--wait] [--open] [--deep] [--json]
                                        check trackd, permissions, rules, config and snapshots;
-                                       --deep: a full check of the database; --json: for scripts
+                                       --deep: a full check of the database
 tock bug-report [-o FILE] [--include-rules]
                                        a file to attach to an issue, without titles or URLs
 tock update [trust <fingerprint>]      Linux: the key trusted for the Mac's builds; trust one
 tock version                           the version of this build
-tock choice [<feature> on|off]         turn groups and features on and off (focus, billing, screen text…),
+tock choice [<feature> on|off]         turn features on and off (screen text, wake screen, Slack…),
                                        open the dashboard; piped: each feature and whether it is on
 tock backup [--out FILE]               archive tock.db and the rule, config and shell files
                                        (default ~/.local/share/tock/backups/)
 tock restore [<n|path> [--yes]]        list snapshots of the database, or put one back
                                        (stops and starts trackd)
+tock stop | tock start                 stop recording until tock start or your next login
 tock prune [--days N] [--dry-run]      delete window titles (and URL paths) older than N days
                                        (default [privacy] keep_titles); labels stay
 tock import activitywatch <export.json>
                                        ActivityWatch history (Export all buckets, or
                                        curl localhost:5600/api/0/export); again replaces it
+tock setup [--check] [--no-doctor]    after brew install: make the signing certificate, install
+                                       and start trackd and the menu bar app (safe to run again)
+tock setup --template NAME[,NAME] [--past] [--yes]
+                                       NAME: developer, designer, writer, client, own;
+                                       add the categories and rules a template has and you lack;
+                                       they label from now on unless --past (tock undo takes back)
 tock uninstall [--purge]              stop trackd and the menu bar, remove the apps and tock;
                                        --purge also deletes your data, rules and config
 tock shell-init zsh                    shell hook for terminal projects; in ~/.zshrc:
@@ -228,10 +235,9 @@ tock ask [--dry-run] "<question>"      ask about your time in plain words; answe
 tock recommend [accept | dismiss]      the pending suggestion: show it, take it, or not now
 tock ocr test [--now] | grant          read the front window's text once (in 3 s) | ask for Screen Recording
 tock invoice --project P [--from D] [--to D] [--client NAME] [-o FILE]
-                                       preview an invoice (DRAFT PDF, nothing stored; default last month)
-tock invoice issue --project P […]     issue it: numbered, stored, never changed (see Billing)
-tock invoice void | list | show | check | verify | recover
-                                       keep issued invoices (see Billing)
+                                       preview an invoice from the project's rate (DRAFT PDF; default last month)
+tock invoice issue|void|list|show|check|verify|recover …
+                                       issue and keep invoices (tock invoice help)
 tock sync [--days N]                   write this machine's last N days (default 2) to the
                                        [sync] folder now and read the other machines'
 tock slack [login | logout | status]   Slack status and do-not-disturb during focus sessions
@@ -398,6 +404,9 @@ show_in_recordings = false # true lets screen sharing and recordings see it
 all_displays = true      # a notch on every display; false: only the built-in one
 open_on_hover = false    # true: resting the pointer opens it, no click needed
 
+[model]                  # the local model; see The model
+enabled = true           # false: no model labels, only rules and tags
+
 [privacy]
 keep_titles = 30         # off unless set: days window titles are kept
 hide_apps = []           # bundle ids recorded as private time only: no title, no URL
@@ -468,6 +477,8 @@ depth = 0.5                   # "deep time": focus against your target
 blocks = 0.3                  # "long blocks": time in blocks of 25m or more
 calm = 0.2                    # "few switches": app switches an hour, none at 20
 stretch = 0.0                 # "longest run": longest run without a switch, full at 1h30
+
+# [plan] and [sync] are under Plan and Sync between machines.
 ```
 
 ## Plan
@@ -1158,7 +1169,10 @@ serves it with hot reload at `http://localhost:5173/#` followed by 64
 zeros; `make web` tests it and rebuilds `internal/web/static`, which is committed so
 Go builds need no Node. `TOCK_DEMO_PORT=7788 go test -tags demo -run
 TestDemo -timeout 0 ./internal/web` serves synthetic data at
-`http://127.0.0.1:7788/#` followed by 64 zeros.
+`http://127.0.0.1:7788/#` followed by 64 zeros. `cd web && npm run e2e`
+(after `npx playwright install chromium` once) builds the showcase server,
+serves a month of made-up data from a temp folder, and runs axe-core on
+every view plus a few flows in headless Chromium, as CI does.
 
 ## Duplicate names
 
@@ -1699,9 +1713,9 @@ $ tock doctor
 ok  ocr: on · permission granted · today 37 reads, avg 138 ms · skipped: away 12, private window 4
 ```
 
-One read costs about 1 s of CPU in the worker (Vision's accurate mode,
-which reads more than twice as many real words as its fast mode) and
-nothing in trackd's memory. At most one read a minute while an unclear
+One read of a browser window took about 0.8 s in the worker when measured
+(Vision's accurate mode; its fast mode took 0.1 s but got a fifth of the
+words right, against over half) and costs nothing in trackd's memory. At most one read a minute while an unclear
 window stays in front; raise `interval` to read less. Nothing runs while
 `enabled = false`.
 
@@ -1847,7 +1861,9 @@ that sets `_NET_ACTIVE_WINDOW`, which nearly all do). It needs no cgo, no
 bundle and no permissions. It finds the session by itself: the session's
 variables first, then the sockets on disk. `TOCK_DESKTOP=hyprland`, `sway`,
 `i3` or `x11` in trackd's environment picks one by hand, and `tock doctor`
-says which it sees.
+says which it sees. GNOME and KDE on Wayland are not supported: trackd has
+no way to read their front window. Windows is experimental (see
+[Stability and support](stability.md#support-tiers)).
 
 ```sh
 make install-linux   # trackd and tock in ~/.local/bin, trackd.service enabled
@@ -2007,8 +2023,8 @@ Blocking cannot hide windows on X11; the drift notice still goes out.
 - **Terminals.** The zsh hook works the same. kitty, WezTerm, Alacritty,
   foot and ghostty are known terminals.
 - **Notifications** go through `notify-send`.
-- **Not on Linux:** browser URLs, the calendar, call detection and the menu
-  bar app.
+- **Not on Linux:** the calendar, call detection and the menu bar app.
+  Browser addresses need the tock extension (above).
 - **Plan notices.** `Up next` and `Starting now` for plan items come through
   `notify-send` without buttons, so there is no `Start focus` button; with
   `[plan] auto_start = true` the session still starts. Calendar events, and
@@ -2190,8 +2206,10 @@ tock import activitywatch aw.json
 
 - Window events become time on that app, with the browser tab's address and
   title when the web watcher saw one. Time ActivityWatch marked afk is left out.
-- Your rules label it, like time from another machine, and it shows in the
-  timeline as `activitywatch · <app>`. Relabel it with a rule.
+- Your rules label it, like time from another machine. It shows under the
+  app's own name and counts with this machine's time in that app; `tock
+  export` keeps the stored name, `activitywatch · <app>`. Relabel it with a
+  rule.
 - URLs are stored like trackd stores them (host and path, no query), and
   `[privacy]` hide lists apply.
 - Importing again replaces the days in the file, so a newer export never

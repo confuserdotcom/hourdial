@@ -1,6 +1,8 @@
 package collect
 
 import (
+	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -51,6 +53,9 @@ type LinuxOptions struct {
 	BrowserFile string
 	// Now returns wall-clock unix ms; nil means the system clock.
 	Now func() int64
+	// Warn reports a problem the source works around, such as a window
+	// manager reply too big to read; nil writes it to stderr, trackd's log.
+	Warn func(msg string)
 }
 
 func (o *LinuxOptions) defaults() {
@@ -62,6 +67,9 @@ func (o *LinuxOptions) defaults() {
 	}
 	if o.Now == nil {
 		o.Now = func() int64 { return time.Now().Round(0).UnixMilli() }
+	}
+	if o.Warn == nil {
+		o.Warn = func(msg string) { fmt.Fprintln(os.Stderr, "trackd: "+msg) }
 	}
 }
 
@@ -75,6 +83,11 @@ type winSource struct {
 	done    chan struct{}
 	stop    sync.Once
 	since   atomic.Int64
+	// focused is the window the last focus event named, which a failed
+	// poll falls back on; failing is set by a failed poll, said once, and
+	// cleared by the next one that works.
+	focused atomic.Pointer[[2]string]
+	failing bool
 }
 
 func newWinSource(b windowBackend, opts LinuxOptions) *winSource {
@@ -120,6 +133,7 @@ func (s *winSource) Run() error {
 			smp := s.base()
 			smp.Activation = true
 			s.since.Store(smp.TS)
+			s.focused.Store(&[2]string{class, title})
 			s.fill(smp, class, title)
 			s.trySend(span.Input{Sample: smp})
 		})
@@ -145,10 +159,24 @@ func (s *winSource) Run() error {
 	}
 }
 
+// poll samples the focused window. When the backend cannot say (a Sway
+// tree too big to read, a dropped connection), it samples the window the
+// last focus event named, so idle and time keep reaching trackd, and says
+// so once.
 func (s *winSource) poll() {
 	class, title, err := s.b.active()
-	if err != nil {
-		return
+	if err == nil {
+		s.failing = false
+	} else {
+		if !s.failing {
+			s.failing = true
+			s.opts.Warn("window poll failed, using the last focus event until it works again: " + err.Error())
+		}
+		f := s.focused.Load()
+		if f == nil {
+			return
+		}
+		class, title = f[0], f[1]
 	}
 	smp := s.base()
 	s.fill(smp, class, title)

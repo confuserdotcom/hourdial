@@ -2,12 +2,16 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { SERIES, kindColor, kindFill, kindLabel } from "@/lib/kinds";
 import { dur } from "@/lib/format";
+import { dayName } from "@/lib/roving";
 import { KindTable } from "./KindTable";
+import { Marks, plotInset } from "./Marks";
 
-export type DayPoint = { label: string; byKind: Record<string, number>; faint?: boolean };
+/** title, when set, names the day in full for the keyboard ("Mon 3 Nov"). */
+export type DayPoint = { label: string; title?: string; byKind: Record<string, number>; faint?: boolean };
 
 /** DayBars: hours per day, stacked by kind. */
-/** onDay gets the index of a clicked day. */
+/** onDay gets the index of a clicked day; with it the days can be picked
+ *  with the keyboard too (Tab, then the arrows, Enter). */
 export function DayBars({ days, height = 240, onDay }: { days: DayPoint[]; height?: number; onDay?: (i: number) => void }) {
   const rows = days.map((d) => {
     const r: Record<string, number | string> = { label: d.label };
@@ -16,6 +20,7 @@ export function DayBars({ days, height = 240, onDay }: { days: DayPoint[]; heigh
   });
   return (
     <>
+    <div className="relative">
     <ChartContainer config={{}} className="w-full" style={{ height }} aria-hidden>
       <BarChart data={rows} margin={{ top: 4, right: 0, left: -24, bottom: 0 }} className={onDay ? "cursor-pointer" : undefined}
         onClick={(e) => e?.activeTooltipIndex !== undefined && onDay?.(e.activeTooltipIndex)}>
@@ -45,6 +50,12 @@ export function DayBars({ days, height = 240, onDay }: { days: DayPoint[]; heigh
         ))}
       </BarChart>
     </ChartContainer>
+    {onDay && (
+      <Marks label="Hours per day. The arrow keys move between days, Enter opens one."
+        names={days.map((d) => dayName(d.title ?? d.label, d.byKind))} inset={plotInset(4, 0)}
+        onPick={onDay} readout={(i) => dayName(days[i].title ?? days[i].label, days[i].byKind)} />
+    )}
+    </div>
     <KindTable caption="Hours per day, by kind of time" rows={days.map((d) => ({ label: d.label, byKind: d.byKind }))} />
     </>
   );

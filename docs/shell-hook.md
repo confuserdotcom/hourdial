@@ -21,7 +21,7 @@ Open a new shell. Each prompt and command appends one line to
 ```
 
 The hook uses zsh builtins only, so a prompt never starts a process. The log
-is owner-only, and it grows about 60 bytes per command (around 10 MB a year).
+is owner-only, and each line is the time and the directory, about 60 bytes.
 
 ## Map directories to projects
 
@@ -41,7 +41,8 @@ A `dir` rule only matches terminal views that have a directory. The category
 ## Which apps are terminals
 
 These terminals get directories by default: WezTerm, Terminal, iTerm2,
-Ghostty, kitty, Alacritty and Warp. To change the list, put the bundle ids in
+Ghostty, kitty, Alacritty and Warp, and on Linux kitty, WezTerm, Alacritty
+and foot. To change the list, put the bundle ids (window classes on Linux) in
 `~/.config/tock/config.toml`:
 
 ```toml

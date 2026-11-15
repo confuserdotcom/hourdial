@@ -56,10 +56,11 @@ export default function App() {
   }, [route.view]);
 
   // 1-6 switch views, ",", settings, ← → step the date, t back to today,
-  // f to the focus field; outside text fields and dialogs.
+  // f to the focus field; outside text fields and dialogs, and not for keys
+  // a control used already (the arrows on a chart move between its marks).
   useEffect(() => {
     const on = (e: KeyboardEvent) => {
-      if (e.metaKey || e.ctrlKey || e.altKey || (e.target as HTMLElement).closest("input,textarea,select,[role=dialog],[role=menu],[role=listbox]")) return;
+      if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey || (e.target as HTMLElement).closest("input,textarea,select,[role=dialog],[role=menu],[role=listbox]")) return;
       const k = Number(e.key);
       if (k >= 1 && k <= VIEWS.length) go({ view: VIEWS[k - 1] });
       else if (e.key === ",") go({ view: "settings" });

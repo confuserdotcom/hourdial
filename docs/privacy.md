@@ -19,13 +19,15 @@ window. Optional extras, each off until you turn it on:
 
 - **Calendar** (`[calendar]`): event titles and times from the calendars
   you pick, read through macOS's own calendar access.
-- **Screen text (OCR)** (`[ocr]`): text read from the screen for the apps you
-  list, to help label time. It stays in tock.db and is never sent anywhere.
+- **Screen text (OCR)** (`[ocr]`, macOS): a few keywords read from the
+  screen of windows the rules cannot label, and of the apps in `[ocr]
+  apps`, to help label time. The screenshot is never written to disk; the
+  keywords stay in tock.db and are never sent anywhere.
 
 ## What is never stored
 
-- **Private browser windows:** the URL is dropped, and on Chromium
-  browsers the title too. On macOS tock reads the URL from Chrome, Arc,
+- **Private browser windows:** recorded as `<app> (private)`, with no
+  title and no URL. On macOS tock reads the URL from Chrome, Arc,
   Brave, Edge, Vivaldi, Chromium and Safari (beta and nightly builds
   included), and only titles from Firefox and its forks (Zen, LibreWolf,
   Waterfox, Floorp). Browsers whose private windows it cannot recognise
@@ -168,7 +170,8 @@ does and does not cover.
 
 To keep less: `hide_apps` and `hide_sites` keep only the time,
 `keep_titles = N` deletes titles and URL paths after N days, `tock prune`
-removes old spans, and `tock uninstall --purge` removes everything.
+does that now (the spans and their labels stay), and `tock uninstall
+--purge` removes everything.
 
 ## What tock is for
 

@@ -79,7 +79,7 @@ func cmdInbox(env Env, args []string) error {
 	keys := make([]string, len(shown))
 	for i, it := range shown {
 		keys[i] = it.Key
-		line := fmt.Sprintf("%3d  %5s  %s", i+1, report.Dur(it.TotalMS), report.Safe(it.Key))
+		line := fmt.Sprintf("%3d  %5s  %s", i+1, report.Dur(it.TotalMS), report.Safe(classify.DisplayKey(it.Key)))
 		if it.Pages > 1 {
 			line += fmt.Sprintf(" · %d pages", it.Pages)
 		}
@@ -133,7 +133,7 @@ func listAuto(env Env, a *app.App, days int) error {
 	keys := make([]string, len(xs))
 	for i, x := range xs {
 		keys[i] = x.Key
-		fmt.Fprintf(env.Stdout, "%3d  %5s  %s  → %s (%s, %d%%)\n", i+1, report.Dur(x.MS), report.Safe(x.Key),
+		fmt.Fprintf(env.Stdout, "%3d  %5s  %s  → %s (%s, %d%%)\n", i+1, report.Dur(x.MS), report.Safe(classify.DisplayKey(x.Key)),
 			tagText(classify.Want{Category: x.Category, Project: x.Project}), x.Reason, int(x.Share*100+0.5))
 	}
 	if len(xs) > 0 {
@@ -167,9 +167,9 @@ func cmdIgnore(env Env, args []string) error {
 		return err
 	}
 	if *undo {
-		fmt.Fprintf(env.Stdout, "showing again: %s\n", report.Safe(key))
+		fmt.Fprintf(env.Stdout, "showing again: %s\n", report.Safe(classify.DisplayKey(key)))
 	} else {
-		fmt.Fprintf(env.Stdout, "ignored: %s (undo: tock ignore --undo %q)\n", report.Safe(key), key)
+		fmt.Fprintf(env.Stdout, "ignored: %s (undo: tock ignore --undo %q)\n", report.Safe(classify.DisplayKey(key)), key)
 	}
 	return nil
 }

@@ -1,0 +1,403 @@
+== title
+◷ 5h00 «tock, 5 hours tracked today»
+
+== menu
+5h00 today «5 hours today»
+[strip deep,deep,deep,deep,none,none,shallow,shallow,shallow,distract,none,none] «Today: deep 33%, shallow 25%, distracting 8%, no label 33%»
+--
+Next: 18:00 Read chapter 4 (in 40 min)
+Last session · 50m · Q78 ▸ «Last session, 50 minutes, quality 78»
+  15:00–15:50 · 0% deep · 1 interruption «15:00 to 15:50, 0% deep, 1 interruption»
+  on task 0 · longest 0 · few interruptions 0 · few switches 0 «on task 0, longest 0, few interruptions 0, few switches 0»
+  --
+  Rate ★5 [rate:5:41] «Rate 5 stars»
+  Rate ★4 [rate:4:41] «Rate 4 stars»
+  Rate ★3 [rate:3:41] «Rate 3 stars»
+  Rate ★2 [rate:2:41] «Rate 2 stars»
+  Rate ★1 [rate:1:41] «Rate 1 star»
+  --
+  Refile to Licence [refile:41]
+--
+Inbox · 48m [dash:inbox] «Inbox, 48 minutes»
+Open dashboard [dash]
+--
+Settings ▸
+  General
+  ✓ Local model labels [feature:model]
+  ✓ Notifications [feature:notify]
+  ✓ Notch [feature:notch]
+  --
+  Focus
+  ✓ Focus [feature:focus]
+  ✓ Suggestions [feature:recommend]
+  Break screen [feature:break_screen]
+  Wake screen [feature:wake_screen]
+  ✓ Start hotkey [feature:hotkey]
+  Block distractions [feature:block]
+  Urge surfing [feature:urge_surf]
+  --
+  Day routine
+  ✓ Day routine [feature:routine]
+  ✓ Start of day [feature:start]
+  ✓ Evening recap [feature:recap]
+  ✓ Overworking [feature:overwork]
+  ✓ Plan reminders [feature:plan]
+  --
+  Billing
+  ✓ Billing [feature:billing]
+  --
+  AI
+  Claude [feature:claude]
+  --
+  Integrations
+  Calendar meetings [feature:calendar]
+  Screen text [feature:ocr]
+  Slack status [feature:slack]
+  --
+  Privacy ▸
+    Hide Google Chrome [hide:app:com.google.Chrome]
+    Hide news.ycombinator.com [hide:site:news.ycombinator.com]
+    --
+    ✓ Messages [unhide:app:com.apple.MobileSMS]
+    ✓ Signal [unhide:app:org.whispersystems.signal-desktop]
+    ✓ mail.google.com [unhide:site:mail.google.com]
+  Notifications… [notify-settings]
+  Accessibility… [ax]
+  --
+  Quit tock menu bar [quit]
+
+== notch
+{
+  "state": "quiet",
+  "open": false,
+  "face": {},
+  "hover": {
+    "face": {
+      "left": "5h00",
+      "left_dim": "today",
+      "right": "81",
+      "right_dim": "48m to label",
+      "spoken": "5 hours today, score 81, 48 minutes to label"
+    },
+    "sub": "48m of today has no label yet.",
+    "buttons": [
+      {
+        "id": "dash",
+        "title": "Open Today",
+        "primary": true,
+        "spoken": "Open Today"
+      },
+      {
+        "id": "notch:label",
+        "title": "Label 48m",
+        "spoken": "Label 48 minutes"
+      }
+    ],
+    "pages": [
+      {
+        "id": "today",
+        "title": "Today",
+        "cells": [
+          {
+            "k": "Deep focus",
+            "v": "3h12",
+            "c": "+24m",
+            "tone": "good",
+            "spoken": "Deep focus 3 hours 12 minutes, plus 24 minutes"
+          },
+          {
+            "k": "Tracked",
+            "v": "5h00",
+            "spoken": "Tracked 5 hours"
+          }
+        ],
+        "dial": {
+          "arcs": [
+            {
+              "from": 0.375,
+              "to": 0.4583333333333333,
+              "kind": "deep"
+            },
+            {
+              "from": 0.4583333333333333,
+              "to": 0.5,
+              "kind": "away"
+            },
+            {
+              "from": 0.5833333333333334,
+              "to": 0.6458333333333334,
+              "kind": "shallow"
+            },
+            {
+              "from": 0.6458333333333334,
+              "to": 0.6666666666666666,
+              "kind": "distract"
+            },
+            {
+              "from": 0.6666666666666666,
+              "to": 0.7083333333333334,
+              "kind": "none"
+            }
+          ],
+          "now": 0.7222222222222222,
+          "center": "17:20",
+          "sub": "5h00 tracked",
+          "spoken": "The day as a dial: deep 09:00 to 11:00, away 11:00 to 12:00, shallow 14:00 to 15:30, distracting 15:30 to 16:00, no label 16:00 to 17:00; now 17:20; 5 hours tracked"
+        },
+        "mid": {
+          "id": "",
+          "title": "",
+          "bars": [
+            {
+              "label": "09",
+              "parts": [
+                {
+                  "kind": "deep",
+                  "ms": 3000000
+                }
+              ],
+              "spoken": "09: deep 50 minutes"
+            },
+            {
+              "label": "10",
+              "parts": [
+                {
+                  "kind": "deep",
+                  "ms": 2400000
+                }
+              ],
+              "spoken": "10: deep 40 minutes"
+            },
+            {
+              "label": "11",
+              "spoken": "11: nothing"
+            },
+            {
+              "label": "12",
+              "spoken": "12: nothing"
+            },
+            {
+              "label": "13",
+              "spoken": "13: nothing"
+            },
+            {
+              "label": "14",
+              "parts": [
+                {
+                  "kind": "shallow",
+                  "ms": 1800000
+                }
+              ],
+              "spoken": "14: shallow 30 minutes"
+            },
+            {
+              "label": "15",
+              "parts": [
+                {
+                  "kind": "shallow",
+                  "ms": 1200000
+                }
+              ],
+              "spoken": "15: shallow 20 minutes"
+            }
+          ]
+        },
+        "big": {
+          "id": "",
+          "title": "Projects",
+          "rows": [
+            [
+              "tock",
+              "3h00"
+            ],
+            [
+              "No project",
+              "1h00"
+            ],
+            [
+              "Licence",
+              "30m"
+            ]
+          ],
+          "rows_spoken": [
+            "tock, 3 hours",
+            "No project, 1 hour",
+            "Licence, 30 minutes"
+          ]
+        }
+      },
+      {
+        "id": "week",
+        "title": "This week",
+        "bars": [
+          {
+            "label": "Mon",
+            "parts": [
+              {
+                "kind": "deep",
+                "ms": 10800000
+              },
+              {
+                "kind": "shallow",
+                "ms": 1800000
+              },
+              {
+                "kind": "distract",
+                "ms": 900000
+              },
+              {
+                "kind": "none",
+                "ms": 4500000
+              }
+            ],
+            "spoken": "Mon: 5 hours; deep 3 hours, shallow 30 minutes, distracting 15 minutes, no label 1 hour 15 minutes"
+          },
+          {
+            "label": "Tue",
+            "parts": [
+              {
+                "kind": "deep",
+                "ms": 10800000
+              },
+              {
+                "kind": "shallow",
+                "ms": 1800000
+              },
+              {
+                "kind": "distract",
+                "ms": 900000
+              },
+              {
+                "kind": "none",
+                "ms": 4500000
+              }
+            ],
+            "spoken": "Tue: 5 hours; deep 3 hours, shallow 30 minutes, distracting 15 minutes, no label 1 hour 15 minutes"
+          },
+          {
+            "label": "Wed",
+            "parts": [
+              {
+                "kind": "deep",
+                "ms": 10800000
+              },
+              {
+                "kind": "shallow",
+                "ms": 1800000
+              },
+              {
+                "kind": "distract",
+                "ms": 900000
+              },
+              {
+                "kind": "none",
+                "ms": 4500000
+              }
+            ],
+            "spoken": "Wed: 5 hours; deep 3 hours, shallow 30 minutes, distracting 15 minutes, no label 1 hour 15 minutes"
+          },
+          {
+            "label": "Thu",
+            "hi": true,
+            "parts": [
+              {
+                "kind": "deep",
+                "ms": 10800000
+              },
+              {
+                "kind": "shallow",
+                "ms": 1800000
+              },
+              {
+                "kind": "distract",
+                "ms": 900000
+              },
+              {
+                "kind": "none",
+                "ms": 4500000
+              }
+            ],
+            "spoken": "Thu, today: 5 hours; deep 3 hours, shallow 30 minutes, distracting 15 minutes, no label 1 hour 15 minutes"
+          },
+          {
+            "label": "Fri",
+            "spoken": "Fri: nothing"
+          },
+          {
+            "label": "Sat",
+            "spoken": "Sat: nothing"
+          },
+          {
+            "label": "Sun",
+            "spoken": "Sun: nothing"
+          }
+        ],
+        "mid": {
+          "id": "",
+          "title": "",
+          "cells": [
+            {
+              "k": "Tracked",
+              "v": "20h00",
+              "spoken": "Tracked 20 hours"
+            },
+            {
+              "k": "Deep focus",
+              "v": "12h00",
+              "spoken": "Deep focus 12 hours"
+            }
+          ]
+        },
+        "big": {
+          "id": "",
+          "title": "By kind",
+          "rows": [
+            [
+              "Deep",
+              "12h00"
+            ],
+            [
+              "Shallow",
+              "2h00"
+            ],
+            [
+              "Distracting",
+              "1h00"
+            ],
+            [
+              "No label",
+              "5h00"
+            ]
+          ],
+          "rows_spoken": [
+            "Deep, 12 hours",
+            "Shallow, 2 hours",
+            "Distracting, 1 hour",
+            "No label, 5 hours"
+          ]
+        }
+      },
+      {
+        "id": "goals",
+        "title": "Goals",
+        "rings": [
+          {
+            "label": "Study",
+            "value": "1h00 / 2h00",
+            "sub": "3 day streak",
+            "frac": 0.5,
+            "kind": "shallow",
+            "spoken": "Study: 1 hour of 2 hours, short, 3 day streak"
+          },
+          {
+            "label": "Fun",
+            "value": "50m / 45m",
+            "frac": 1,
+            "kind": "distract",
+            "spoken": "Fun: 50 minutes of 45 minutes, over"
+          }
+        ]
+      }
+    ]
+  }
+}

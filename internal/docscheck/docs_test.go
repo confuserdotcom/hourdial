@@ -52,7 +52,7 @@ func TestNoPinnedVersion(t *testing.T) {
 var link = regexp.MustCompile(`\]\(((?:docs/|\.\./|\./)?[A-Za-z0-9_./-]+\.md)(?:#[^)]*)?\)`)
 
 func TestDocLinks(t *testing.T) {
-	for _, f := range []string{"README.md", "SECURITY.md", "docs/guide.md", "docs/index.md", "docs/privacy.md", "docs/verify.md", "docs/security-review.md"} {
+	for _, f := range []string{"README.md", "SECURITY.md", "CONTRIBUTING.md", "CHANGELOG.md", "docs/guide.md", "docs/index.md", "docs/privacy.md", "docs/verify.md", "docs/security-review.md", "docs/stability.md", "docs/architecture.md", "docs/accessibility.md", "docs/shell-hook.md", "docs/wezterm-title.md"} {
 		for _, m := range link.FindAllStringSubmatch(read(t, f), -1) {
 			target := filepath.Join(filepath.Dir(f), m[1])
 			if _, err := os.Stat(filepath.Join(root, target)); err != nil {

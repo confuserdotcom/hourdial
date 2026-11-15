@@ -1,0 +1,115 @@
+== title
+◷ 0s «tock, 0 seconds tracked today»
+
+== menu
+0s today «0 seconds today»
+--
+Start 25 min focus [start:25]
+More lengths ▸
+  Start 50 min focus [start:50]
+  Start 90 min focus [start:90]
+--
+Open dashboard [dash]
+--
+Settings ▸
+  Privacy ▸
+    Nothing to hide yet
+  Notifications… [notify-settings]
+  Accessibility… [ax]
+  --
+  Quit tock menu bar [quit]
+
+== notch
+{
+  "state": "quiet",
+  "open": false,
+  "face": {},
+  "hover": {
+    "face": {
+      "left": "0s",
+      "left_dim": "today",
+      "spoken": "0 seconds today"
+    },
+    "buttons": [
+      {
+        "id": "start:25",
+        "title": "Focus 25m",
+        "primary": true,
+        "spoken": "Start a 25 minute focus session"
+      },
+      {
+        "id": "start:50",
+        "title": "50m",
+        "spoken": "Start a 50 minute focus session"
+      },
+      {
+        "id": "dash",
+        "title": "Open Today",
+        "spoken": "Open Today"
+      }
+    ],
+    "pages": [
+      {
+        "id": "today",
+        "title": "Today",
+        "note": "Nothing tracked yet today."
+      },
+      {
+        "id": "week",
+        "title": "This week",
+        "bars": [
+          {
+            "label": "Mon",
+            "spoken": "Mon: nothing"
+          },
+          {
+            "label": "Tue",
+            "spoken": "Tue: nothing"
+          },
+          {
+            "label": "Wed",
+            "spoken": "Wed: nothing"
+          },
+          {
+            "label": "Thu",
+            "hi": true,
+            "spoken": "Thu, today: nothing"
+          },
+          {
+            "label": "Fri",
+            "spoken": "Fri: nothing"
+          },
+          {
+            "label": "Sat",
+            "spoken": "Sat: nothing"
+          },
+          {
+            "label": "Sun",
+            "spoken": "Sun: nothing"
+          }
+        ],
+        "mid": {
+          "id": "",
+          "title": "",
+          "cells": [
+            {
+              "k": "Tracked",
+              "v": "0s",
+              "spoken": "Tracked 0 seconds"
+            },
+            {
+              "k": "Deep focus",
+              "v": "0s",
+              "spoken": "Deep focus 0 seconds"
+            }
+          ]
+        }
+      },
+      {
+        "id": "goals",
+        "title": "Goals",
+        "note": "No goals yet · tock goal add"
+      }
+    ]
+  }
+}

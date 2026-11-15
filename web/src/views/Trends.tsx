@@ -10,7 +10,7 @@ import { Explain, Sum, Why } from "@/components/Explain";
 import { STATS } from "@/lib/explain";
 import type { ReactNode } from "react";
 import { useApi, type Hours, type Month } from "@/lib/api";
-import { delta, dur, hourLabel, monthTitle, parseDate } from "@/lib/format";
+import { dayTitle, delta, dur, hourLabel, monthTitle, parseDate } from "@/lib/format";
 import { go } from "@/lib/route";
 import { useGroups } from "@/lib/groups";
 import { cn } from "@/lib/utils";
@@ -80,7 +80,7 @@ function MonthBody({ m }: { m: Month }) {
           </Panel>
           {focus && (
             <Panel label="Focus score">
-              <ScoreLine points={m.days.map((d) => ({ label: label(d.date), score: d.score < 0 ? null : d.score }))} height={160} onPoint={(i) => m.days[i] && go({ view: "today", date: m.days[i].date })} />
+              <ScoreLine points={m.days.map((d) => ({ label: label(d.date), title: dayTitle(parseDate(d.date)), score: d.score < 0 ? null : d.score }))} height={160} onPoint={(i) => m.days[i] && go({ view: "today", date: m.days[i].date })} />
             </Panel>
           )}
         </div>

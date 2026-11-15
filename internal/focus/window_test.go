@@ -56,6 +56,21 @@ func TestWindowTopNames(t *testing.T) {
 	}
 }
 
+// Imported Xcode and local Xcode are one app on the session card.
+func TestWindowMergesImportedApp(t *testing.T) {
+	views, labels := build(
+		wseg{0, 20, "Xcode", "Code", "", ""},
+		wseg{20, 30, classify.ImportMachine + " · Xcode", "Code", "", ""},
+		wseg{30, 45, "term", "Code", "", ""},
+	)
+	from, to := win(0, 60)
+	b := Window(views, labels, from, to, config.DefaultFocus())
+	want := []Share{{"Xcode", 30 * minute}, {"term", 15 * minute}}
+	if !reflect.DeepEqual(b.Apps, want) {
+		t.Fatalf("Apps = %+v, want %+v", b.Apps, want)
+	}
+}
+
 func TestWindowClipsToWindow(t *testing.T) {
 	views, labels := build(
 		wseg{0, 10, "before", "Before", "", ""},

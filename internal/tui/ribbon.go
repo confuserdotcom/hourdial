@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"tock/internal/classify"
 	"tock/internal/clockfmt"
 	"tock/internal/report"
 )
@@ -101,7 +102,7 @@ func rowTip(r report.Row, loc *time.Location, clk clockfmt.Clock) string {
 	case label == "—":
 		label = "unlabelled"
 	}
-	s := clock(r.Start) + "–" + clock(r.End) + "  " + report.Dur(r.End-r.Start) + "  " + label + " · " + r.App
+	s := clock(r.Start) + "–" + clock(r.End) + "  " + report.Dur(r.End-r.Start) + "  " + label + " · " + classify.DisplayApp(r.App)
 	if r.Text != "" {
 		s += " · " + r.Text
 	}

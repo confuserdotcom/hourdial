@@ -78,3 +78,38 @@ func TestMarkRemoteLatestSwitchWins(t *testing.T) {
 		t.Fatalf("got  %s\nwant %s", got, want)
 	}
 }
+
+func TestDisplayApp(t *testing.T) {
+	for _, c := range []struct{ in, want string }{
+		{"activitywatch · Xcode", "Xcode"},
+		{"ryuk · WezTerm", "ryuk · WezTerm"}, // another machine's prefix says where the time came from
+		{"Xcode", "Xcode"},
+	} {
+		if got := DisplayApp(c.in); got != c.want {
+			t.Errorf("DisplayApp(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
+	if got := DisplayKey("activitywatch · Xcode · Build"); got != "Xcode · Build" {
+		t.Errorf("DisplayKey = %q", got)
+	}
+}
+
+// Imported views show the app alone, but their inbox key keeps the import
+// machine's prefix so ignore lists stored before the change still match.
+func TestDisplayAppKeepsImportedKeys(t *testing.T) {
+	title := "main.go"
+	v := SpanView{ID: -(RemoteIDBase + 3), BundleID: "com.apple.dt.Xcode", App: ImportMachine + " · Xcode", Title: &title}
+	if got := DisplayApp(v.App); got != "Xcode" {
+		t.Fatalf("display app = %q, want Xcode", got)
+	}
+	if !IsImported(v) || !strings.HasPrefix(Key(v), ImportMachine+" · ") {
+		t.Fatalf("key = %q, want the imported key kept", Key(v))
+	}
+	labels := make([]Label, 1)
+	if items := Inbox([]SpanView{v}, labels, map[string]bool{Key(v): true}); len(items) != 0 {
+		t.Fatalf("old prefixed key no longer ignored: %+v", items)
+	}
+	if items := Inbox([]SpanView{v}, labels, nil); len(items) != 1 {
+		t.Fatalf("imported view missing from the inbox: %+v", items)
+	}
+}

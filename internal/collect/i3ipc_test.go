@@ -2,10 +2,12 @@ package collect
 
 import (
 	"bytes"
+	"encoding/binary"
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -208,5 +210,69 @@ func TestSwayHide(t *testing.T) {
 func TestHideWindowsX11(t *testing.T) {
 	if ok, err := HideWindows(desktop.X11, "x"); ok || err != ErrUnsupported {
 		t.Errorf("x11 hide = %v %v", ok, err)
+	}
+}
+
+// A reply claiming more than i3MaxPayload bytes is refused before anything is
+// allocated for it: trackd's memory budget is not the window manager's to spend.
+func TestI3RefusesAHugeReply(t *testing.T) {
+	a, b := net.Pipe()
+	defer a.Close()
+	defer b.Close()
+	go func() {
+		h := make([]byte, i3HeaderLength)
+		copy(h, []byte(i3Magic))
+		binary.LittleEndian.PutUint32(h[6:], 1<<30) // 1 GiB to follow
+		b.Write(h)
+	}()
+	_, _, err := i3Read(a)
+	if err == nil || !strings.Contains(err.Error(), "payload of") {
+		t.Fatalf("err = %v; want a refusal", err)
+	}
+}
+
+// A tree of 3,000 windows at the size measured on real Sway and i3 (about
+// 1.1 KB each) is read whole.
+func TestI3ReadsALargeDesktop(t *testing.T) {
+	tree := bytes.Repeat([]byte("x"), 3000*1100)
+	_, p, err := i3Read(bytes.NewReader(i3Encode(i3GetTree, tree)))
+	if err != nil || len(p) != len(tree) {
+		t.Fatalf("read %d bytes, err %v", len(p), err)
+	}
+}
+
+// A tree too big to read does not stop tracking: the poll says so once and
+// carries on with the window the last focus event named, so idle and time
+// still reach trackd.
+func TestSwayRefusedTreeKeepsTracking(t *testing.T) {
+	f := newFakeSway(t)
+	f.tree = `{"name":"` + strings.Repeat("x", i3MaxPayload) + `"}`
+	var mu sync.Mutex
+	var warned []string
+	src, err := NewSway(f.sock, LinuxOptions{PollInterval: 20 * time.Millisecond, Proc: t.TempDir(),
+		Warn: func(msg string) { mu.Lock(); warned = append(warned, msg); mu.Unlock() }})
+	if err != nil {
+		t.Fatal(err)
+	}
+	runErr := make(chan error, 1)
+	go func() { runErr <- src.Run() }()
+	f.events <- `{"change":"focus","container":{"app_id":"foot","name":"~/tock"}}`
+	if s := next(t, src.Inputs()); s.BundleID != "foot" || !s.Activation {
+		t.Fatalf("event sample = %+v", s)
+	}
+	for range 3 {
+		if s := next(t, src.Inputs()); s.BundleID != "foot" || *s.Title != "~/tock" || s.Activation {
+			t.Fatalf("poll sample = %+v", s)
+		}
+	}
+	src.Stop()
+	close(f.events)
+	if err := <-runErr; err != nil {
+		t.Fatalf("Run = %v", err)
+	}
+	mu.Lock()
+	defer mu.Unlock()
+	if len(warned) != 1 || !strings.Contains(warned[0], "payload of") {
+		t.Fatalf("warnings = %q, want one about the refused reply", warned)
 	}
 }

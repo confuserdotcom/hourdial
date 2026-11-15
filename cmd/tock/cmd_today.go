@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"tock/internal/app"
+	"tock/internal/classify"
 	"tock/internal/report"
 )
 
@@ -88,7 +89,7 @@ func cmdToday(env Env, args []string) error {
 		if *withKeys {
 			for _, it := range r.Items[:min(len(r.Items), keysPerRow)] {
 				listed = append(listed, it.Key)
-				fmt.Fprintf(env.Stdout, "    %3d  %5s  %s\n", len(listed), report.Dur(it.TotalMS), report.Safe(it.Key))
+				fmt.Fprintf(env.Stdout, "    %3d  %5s  %s\n", len(listed), report.Dur(it.TotalMS), report.Safe(classify.DisplayKey(it.Key)))
 			}
 		}
 	}

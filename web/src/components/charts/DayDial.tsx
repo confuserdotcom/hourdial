@@ -5,21 +5,30 @@ import { dur, hhmm, hourLabel, minClock, parseDate } from "@/lib/format";
 import { kindFill } from "@/lib/kinds";
 import { useNow } from "@/lib/live";
 import { SERIES } from "@/lib/kinds";
+import { hourName } from "@/lib/roving";
+import { useRoving } from "./Marks";
 
 const SIZE = 248, C = SIZE / 2, R = 100, W = 16;
 
 /** DayDial is the whole day as a 24-hour ring, midnight at the top: what
  *  you did in kind colours, your work hours outside it, a hand at now.
- *  Pointing at an hour shows its minutes; a click zooms the timeline there. */
+ *  Pointing at an hour shows its minutes; a click zooms the timeline there.
+ *  From the keyboard the ring is one tab stop: the arrows go round the
+ *  hours and Enter zooms. */
 export function DayDial({ d, onHour }: { d: Day; onHour: (h: number) => void }) {
   const now = useNow(d.today ? 30_000 : 0);
   const day0 = parseDate(d.date).getTime();
   const as = useMemo(() => arcs(d.timeline, day0), [d.timeline, day0]);
-  const [hover, setHover] = useState<number | null>(null);
+  const [pointer, setHover] = useState<number | null>(null);
   const nowT = d.today ? Math.min(1, Math.max(0, (now - day0) / 86_400_000)) : 1;
   const work = d.work && !d.work.off ? { a: (d.work.from - day0) / 86_400_000, b: (d.work.to - day0) / 86_400_000 } : null;
+  // Tab lands on the hour now, or on the last hour with time in it.
+  const startHour = Math.max(0, Math.min(23, Math.floor(nowT * 24), d.hourLast ?? 23));
+  const { item, shown } = useRoving(24, onHour, { wrap: true, start: startHour });
+  const hover = shown ?? pointer;
 
   const hourMS = (h: number) => SERIES.reduce((s, k) => s + (d.hours[k]?.[h] ?? 0), 0);
+  const byKind = (h: number) => Object.fromEntries(SERIES.map((k) => [k, d.hours[k]?.[h] ?? 0]));
   const pick = (e: React.MouseEvent<SVGSVGElement>) => {
     const box = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - box.left) / box.width) * SIZE - C, y = ((e.clientY - box.top) / box.height) * SIZE - C;
@@ -30,8 +39,8 @@ export function DayDial({ d, onHour }: { d: Day; onHour: (h: number) => void }) 
 
   return (
     <div className="relative mx-auto aspect-square w-full max-w-[248px]">
-      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="h-full w-full cursor-pointer select-none" role="img"
-        aria-label={`The day as a clock: ${dur(d.trackedMS)} tracked. Click an hour to zoom the timeline.`}
+      <svg viewBox={`0 0 ${SIZE} ${SIZE}`} className="h-full w-full cursor-pointer select-none" role="group"
+        aria-label={`The day as a clock: ${dur(d.trackedMS)} tracked. The arrow keys go round the hours, Enter zooms the timeline to one.`}
         onPointerMove={(e) => setHover(pick(e))} onPointerLeave={() => setHover(null)}
         onClick={(e) => { const h = pick(e); if (h !== null) onHour(h); }}>
         <defs>
@@ -62,6 +71,17 @@ export function DayDial({ d, onHour }: { d: Day; onHour: (h: number) => void }) 
           const [x, y] = point(C, R - W / 2 - 19, h / 24);
           return <text key={h} x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={10} fill="hsl(var(--faint-text))" className="num">{hourLabel(h)}</text>;
         })}
+        {/* the hours for the keyboard: invisible, the mouse uses pick */}
+        {Array.from({ length: 24 }, (_, h) => (
+          <path key={`k${h}`} d={arcPath(C, R, h / 24, (h + 1) / 24)} fill="none" stroke="transparent" strokeWidth={W}
+            pointerEvents="none" className="outline-none" role="button" aria-label={hourName(h, byKind(h))} {...item(h)} />
+        ))}
+        {shown !== null && (
+          <g fill="none" stroke="hsl(var(--ring))" strokeWidth={2} pointerEvents="none">
+            <path d={arcPath(C, R + W / 2 + 3, shown / 24, (shown + 1) / 24)} />
+            <path d={arcPath(C, R - W / 2 - 3, shown / 24, (shown + 1) / 24)} />
+          </g>
+        )}
         {d.today && (
           <g>
             <line x1={hx} y1={hy} x2={point(C, R + W / 2 + 2, nowT)[0]} y2={point(C, R + W / 2 + 2, nowT)[1]} stroke="hsl(var(--foreground))" strokeWidth={2.5} strokeLinecap="round" />
@@ -74,7 +94,7 @@ export function DayDial({ d, onHour }: { d: Day; onHour: (h: number) => void }) 
           <div>
             <div className="num text-[26px] font-semibold leading-none tracking-[-0.02em]">{minClock(hover * 60)}</div>
             <div className="num mt-1.5 text-xs text-muted-foreground">{dur(hourMS(hover))} active</div>
-            <div className="mt-0.5 text-[11px] text-faint">click to zoom</div>
+            <div className="mt-0.5 text-[11px] text-faint">{shown !== null ? "Enter to zoom" : "click to zoom"}</div>
           </div>
         ) : (
           <div>

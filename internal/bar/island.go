@@ -112,6 +112,8 @@ type Face struct {
 	// EndMS is a countdown target: the Cocoa side writes the countdown in
 	// Right itself, so the island stays the same from second to second.
 	EndMS int64 `json:"end_ms,omitempty"`
+	// Spoken is the face in words for VoiceOver (see withSpoken).
+	Spoken string `json:"spoken,omitempty"`
 }
 
 // Panel is the open notch below its face.
@@ -129,14 +131,18 @@ type Panel struct {
 	// Pages replace Lead to Rows in the open quiet notch: you swipe between
 	// them, and the panel can be resized (see Page).
 	Pages []Page `json:"pages,omitempty"`
+	// StripSpoken and RowsSpoken are Strip and Rows in words for VoiceOver.
+	StripSpoken string   `json:"strip_spoken,omitempty"`
+	RowsSpoken  []string `json:"rows_spoken,omitempty"`
 }
 
 // Cell is one figure of a number row: label, value, change and its tone.
 type Cell struct {
-	K    string `json:"k"`
-	V    string `json:"v"`
-	C    string `json:"c,omitempty"`
-	Tone string `json:"tone,omitempty"` // "good", "bad" or "" (muted)
+	K      string `json:"k"`
+	V      string `json:"v"`
+	C      string `json:"c,omitempty"`
+	Tone   string `json:"tone,omitempty"`   // "good", "bad" or "" (muted)
+	Spoken string `json:"spoken,omitempty"` // the cell in words for VoiceOver
 }
 
 // NButton is a button of the panel.
@@ -144,6 +150,7 @@ type NButton struct {
 	ID      string `json:"id"`
 	Title   string `json:"title"`
 	Primary bool   `json:"primary,omitempty"`
+	Spoken  string `json:"spoken,omitempty"` // what it does, for VoiceOver
 }
 
 // Entry is one inbox key to label.
@@ -155,20 +162,22 @@ type Entry struct {
 	Dur    string   `json:"dur"`
 	MS     int64    `json:"-"`
 	Opts   []Option `json:"opts"`
-	Saved  string   `json:"saved,omitempty"` // what the pick did
-	Picked int      `json:"picked"`          // the option picked, -1 = none
+	Saved  string   `json:"saved,omitempty"`  // what the pick did
+	Picked int      `json:"picked"`           // the option picked, -1 = none
+	Spoken string   `json:"spoken,omitempty"` // the entry in words for VoiceOver
 }
 
 // Option is a label offered for an entry.
 type Option struct {
-	Label string `json:"label"`          // as WantText writes it
-	Kind  string `json:"kind,omitempty"` // its category's kind
-	Pct   int    `json:"pct,omitempty"`  // the guess's share, 0 = not a guess
+	Label  string `json:"label"`            // as WantText writes it
+	Kind   string `json:"kind,omitempty"`   // its category's kind
+	Pct    int    `json:"pct,omitempty"`    // the guess's share, 0 = not a guess
+	Spoken string `json:"spoken,omitempty"` // the option in words for VoiceOver
 }
 
 // JSON is the island as the Cocoa side reads it.
 func (i Island) JSON() string {
-	b, err := json.Marshal(i)
+	b, err := json.Marshal(i.withSpoken())
 	if err != nil { // only plain fields: cannot happen
 		return `{"state":"quiet","face":{}}`
 	}

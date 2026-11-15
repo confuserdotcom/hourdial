@@ -59,7 +59,7 @@ func TestTodayPagesNormalDay(t *testing.T) {
 		t.Fatalf("pages = %v", got)
 	}
 	today := ps[0]
-	if today.Cells[0] != (Cell{"Score", "81", "+6", "good"}) || today.Cells[1] != (Cell{"Deep focus", "3h12", "+24m", "good"}) {
+	if today.Cells[0] != (Cell{"Score", "81", "+6", "good", ""}) || today.Cells[1] != (Cell{"Deep focus", "3h12", "+24m", "good", ""}) {
 		t.Fatalf("today cells = %+v", today.Cells)
 	}
 	// The day as a 24-hour dial replaces the strip: 09–12 deep, a hand at 15:00.
@@ -139,8 +139,8 @@ func TestPagesJSON(t *testing.T) {
 	if err := json.Unmarshal([]byte(i.JSON()), &back); err != nil {
 		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(back.Hover.Pages, i.Hover.Pages) {
-		t.Fatalf("pages did not round-trip:\n%+v\n%+v", back.Hover.Pages, i.Hover.Pages)
+	if want := i.withSpoken().Hover.Pages; !reflect.DeepEqual(back.Hover.Pages, want) {
+		t.Fatalf("pages did not round-trip:\n%+v\n%+v", back.Hover.Pages, want)
 	}
 }
 

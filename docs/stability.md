@@ -52,7 +52,9 @@ Within one major version:
 ### Database
 
 - `tock.db` only moves forward through numbered migrations, applied when a
-  newer tock or trackd opens it.
+  newer tock or trackd opens it. A shipped migration is never changed, and
+  schema changes are batched: at most one new migration per release. A
+  test pins each shipped migration so an edit fails the build.
 - Additive migrations (new tables, columns, indexes) leave the database
   usable by older 1.x binaries: an older trackd keeps recording into a
   database a newer tock migrated.
