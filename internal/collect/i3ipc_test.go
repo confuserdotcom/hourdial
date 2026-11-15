@@ -231,6 +231,16 @@ func TestI3RefusesAHugeReply(t *testing.T) {
 	}
 }
 
+// A tree of 3,000 windows at the size measured on real Sway and i3 (about
+// 1.1 KB each) is read whole.
+func TestI3ReadsALargeDesktop(t *testing.T) {
+	tree := bytes.Repeat([]byte("x"), 3000*1100)
+	_, p, err := i3Read(bytes.NewReader(i3Encode(i3GetTree, tree)))
+	if err != nil || len(p) != len(tree) {
+		t.Fatalf("read %d bytes, err %v", len(p), err)
+	}
+}
+
 // A tree too big to read does not stop tracking: the poll says so once and
 // carries on with the window the last focus event named, so idle and time
 // still reach trackd.

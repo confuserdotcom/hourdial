@@ -100,10 +100,13 @@ through it before you share it.
 
 **Sway, i3 and X11** (`internal/collect/i3ipc.go`, `x11.go`)
 - Sway and i3: the socket is `$SWAYSOCK`, `$I3SOCK` or one under
-  `$XDG_RUNTIME_DIR`, which is yours alone. A reply over 1 MiB is
-  refused before it is read (i3MaxPayload), well below trackd's memory
-  budget; a real `get_tree` reply for a large desktop serialises to
-  roughly 0.25 MiB.
+  `$XDG_RUNTIME_DIR`, which is yours alone. A reply over 4 MiB is
+  refused before it is read. Real Sway and i3 trees, measured in the e2e
+  job with 42 windows titled like browser tabs, take about 1.1 KB per
+  window, so 4 MiB holds about 3,800 windows; reading and decoding a
+  reply that size costs under 8 MiB, well inside trackd's 40 MB budget.
+  When a tree is refused, trackd logs it once and keeps sampling the
+  window its last focus event named.
 - Blocking an app moves its windows to the scratchpad by app id; the id is
   regex-quoted and its `"` escaped before it goes into the command
   (`SwayHideCommands`). The id comes from the window, that is from a
@@ -140,8 +143,9 @@ Found in the 2026-11-14 pass and not changed:
   root's with the sticky bit, so only the X server can make the socket;
   where it does not exist, another local user could make it first and
   read the cookie.
-- The Sway/i3 reply cap is now 1 MiB (i3MaxPayload), below trackd's
-  memory budget. Only your own window manager can send one.
+- The Sway/i3 reply cap is 4 MiB, set from real trees measured in the
+  e2e job and below trackd's memory budget. Only your own window manager
+  can send one.
 - A tock built without a build time accepts older signed Linux builds
   (see Updates).
 

@@ -55,4 +55,9 @@ func TestRealTreeSize(t *testing.T) {
 	}
 	t.Logf("tree-size: windows=%d bytes=%d per_window=%d decode_alloc=%d",
 		windows, len(tree), len(tree)/windows, after.TotalAlloc-before.TotalAlloc)
+	// With enough windows the fixed part (outputs, workspaces) is small, and
+	// the cap must still hold a desktop of 3,000 of them.
+	if windows >= 20 && len(tree)/windows*3000 > i3MaxPayload {
+		t.Errorf("%d bytes per window: the reply cap of %d bytes holds fewer than 3000 windows", len(tree)/windows, i3MaxPayload)
+	}
 }
