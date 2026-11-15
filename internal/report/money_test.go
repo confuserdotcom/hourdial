@@ -3,6 +3,8 @@ package report
 import (
 	"testing"
 	"time"
+
+	"tock/internal/numfmt"
 )
 
 func TestRoundSeconds(t *testing.T) {
@@ -94,6 +96,36 @@ func TestTaxMinor(t *testing.T) {
 	}
 	if sub, tax := int64(31833), TaxMinor(31833, 2000); sub+tax != 38200 {
 		t.Errorf("total %d, want 38200", sub+tax)
+	}
+}
+
+// JPY has no minor unit and KWD three: rates, amounts and tax round in
+// those units, and print in them.
+func TestZeroAndThreeDecimalCurrencies(t *testing.T) {
+	yen, err := RateMinor(8000, 0)
+	if err != nil || yen != 8000 {
+		t.Fatalf("JPY rate = %d, %v", yen, err)
+	}
+	if _, err := RateMinor(8000.5, 0); err == nil {
+		t.Fatal("JPY rate with a decimal accepted")
+	}
+	amt := AmountMinor(3*3600+20*60, yen) // 26 666.67 yen → 26 667
+	tax := TaxMinor(amt, 1000)            // 2 666.7 → 2 667
+	if amt != 26667 || tax != 2667 || numfmt.Comma.Money(amt+tax, 0, "JPY", false) != "29,334 JPY" {
+		t.Errorf("JPY: amount %d tax %d", amt, tax)
+	}
+
+	kwd, err := RateMinor(12.345, 3)
+	if err != nil || kwd != 12345 {
+		t.Fatalf("KWD rate = %d, %v", kwd, err)
+	}
+	amt = AmountMinor(100*60, kwd) // 20.575 KWD exactly
+	tax = TaxMinor(amt, 550)       // 1.131625 → 1.132
+	if amt != 20575 || tax != 1132 || numfmt.Comma.Money(amt+tax, 3, "KWD", true) != "KWD 21.707" {
+		t.Errorf("KWD: amount %d tax %d", amt, tax)
+	}
+	if AmountMinor(1, 12345) != 3 { // 3.429… fils → 3
+		t.Errorf("KWD one second = %d", AmountMinor(1, 12345))
 	}
 }
 
