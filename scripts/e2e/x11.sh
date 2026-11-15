@@ -30,3 +30,10 @@ xterm -T tock-e2e-beta -e sleep 1800 &
 sleep 2
 export E2E_TITLES=tock-e2e-alpha,tock-e2e-beta
 go test -tags e2e ./e2e -v -count=1 -timeout 25m
+
+if [ "$wm" = i3 ]; then
+	# the size of a real get_tree reply per window
+	wm_msg() { i3-msg "$@" >/dev/null; }
+	open_window() { xterm -T "$1" -e sleep 600 & }
+	. scripts/e2e/treesize.sh
+fi

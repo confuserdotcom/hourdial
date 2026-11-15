@@ -26,3 +26,8 @@ export E2E_TITLES=tock-e2e-alpha,tock-e2e-beta
 export E2E_FOCUS='swaymsg -q "[title=\"^{title}$\"] focus"'
 export E2E_DESKTOP=sway
 go test -tags e2e ./e2e -v -count=1 -timeout 25m
+
+# the size of a real get_tree reply per window
+wm_msg() { swaymsg "$@"; }
+open_window() { swaymsg -q exec "foot -T '$1' sleep 600"; }
+. scripts/e2e/treesize.sh
