@@ -2,6 +2,7 @@ package collect
 
 import (
 	"bytes"
+	"encoding/binary"
 	"net"
 	"os"
 	"path/filepath"
@@ -208,5 +209,23 @@ func TestSwayHide(t *testing.T) {
 func TestHideWindowsX11(t *testing.T) {
 	if ok, err := HideWindows(desktop.X11, "x"); ok || err != ErrUnsupported {
 		t.Errorf("x11 hide = %v %v", ok, err)
+	}
+}
+
+// A reply claiming more than i3MaxPayload bytes is refused before anything is
+// allocated for it: trackd's memory budget is not the window manager's to spend.
+func TestI3RefusesAHugeReply(t *testing.T) {
+	a, b := net.Pipe()
+	defer a.Close()
+	defer b.Close()
+	go func() {
+		h := make([]byte, i3HeaderLength)
+		copy(h, []byte(i3Magic))
+		binary.LittleEndian.PutUint32(h[6:], 1<<30) // 1 GiB to follow
+		b.Write(h)
+	}()
+	_, _, err := i3Read(a)
+	if err == nil || !strings.Contains(err.Error(), "payload of") {
+		t.Fatalf("err = %v; want a refusal", err)
 	}
 }
