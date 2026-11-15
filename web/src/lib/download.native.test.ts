@@ -9,7 +9,7 @@ vi.mock("./api", () => ({
   })),
 }));
 
-let revoke: ReturnType<typeof vi.fn>;
+let revoke: ReturnType<typeof vi.fn<(url: string) => void>>;
 let clicks: number;
 
 async function load(ua: string) {
@@ -20,8 +20,9 @@ async function load(ua: string) {
     body: { appendChild: () => {} },
     createElement: () => ({ click: () => clicks++, remove: () => {} }),
   });
-  revoke = vi.fn();
-  vi.stubGlobal("URL", Object.assign(Object.create(URL), { createObjectURL: () => "blob:x", revokeObjectURL: revoke }));
+  revoke = vi.fn<(url: string) => void>();
+  vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:x");
+  vi.spyOn(URL, "revokeObjectURL").mockImplementation(revoke);
   return (await import("./download")).download;
 }
 
@@ -44,6 +45,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 test("waits for tockbar, however long the save sheet stays open", async () => {
