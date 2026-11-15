@@ -406,6 +406,9 @@ keep = 7                 # daily copies of tock.db trackd keeps; 0 = none
 [billing]
 enabled = true           # the Billing group; false hides rates and stops tock invoice issue
 
+[display]
+week_start = "monday"    # or "sunday", "saturday": the first day of every week
+
 [invoice]                # for tock invoice; all optional
 name = "Your Name"
 address = ["1 Main Street", "City"]
@@ -585,7 +588,7 @@ runs `tock slack start` and `tock slack stop`.
 [[goal]]
 category = "Study"
 at_least = "2h"
-per = "day"            # the default; or "week" (Monday to Sunday)
+per = "day"            # the default; or "week" (Monday to Sunday, see week_start)
 
 [[goal]]
 project = "tock"
@@ -995,10 +998,20 @@ with a daily sparkline, switches per hour and each category's change. For
 the current month it ends with what tock learned about you: see
 Recommendations.
 
-`tock review` recaps a week (this week on a weekend, else last week):
+`tock review` recaps a week (this week on its last two days, the weekend
+for a Monday week, else last week):
 totals, each goal, the top distractions and the best day. It then asks
 for next week's focus, or takes `--plan`. The week tab shows the plan of
 the week on screen. Plans stay in tock.db.
+
+Weeks start on Monday. `week_start = "sunday"` or `"saturday"` under
+`[display]` in config.toml moves the first day everywhere a week is
+counted or drawn: the week tab and the dashboard, `tock review`, `tock
+report`, `--week` on `tock top`, `tock commits` and `tock agents`, week
+goals and their streaks, focus sessions of the week, `tock ask` about
+this or last week, and the notch's week page. A week's plan is saved
+under its first day, so plans written before a change show up in the
+week that starts on that day only.
 
 `tock top` ranks the last 7 days (or `--week`, `--month`, `--days N`):
 categories with their kind, apps and sites (URL hosts) with the category

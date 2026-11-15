@@ -7,6 +7,9 @@ Versions follow [semantic versioning](docs/stability.md) from v1.0.0 on.
 ## v1.0.0 — unreleased
 
 ### Added
+- **Weeks can start on Sunday or Saturday.** `week_start` under
+  `[display]` in config.toml moves the first day of every week tock
+  counts or draws. Monday stays the default.
 - **A stability promise.** [docs/stability.md](docs/stability.md) lists
   what stays the same across 1.x: config keys, commands, flags, exit codes,
   the `--json` and export formats, the database and the sync folder. Breaks
