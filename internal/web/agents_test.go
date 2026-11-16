@@ -44,8 +44,22 @@ func TestAgentsAndBudgets(t *testing.T) {
 	if ag.From != "2026-10-05" || ag.To != "2026-10-11" || len(ag.Rows) != 1 {
 		t.Fatalf("week = %+v", ag)
 	}
-	if code, _, _ := f.do("GET", "/api/agents?range=year", testToken, nil); code != 400 {
-		t.Fatalf("bad range: %d", code)
+	f.get("/api/agents?range=month", &ag)
+	if ag.From != "2026-10-01" || ag.To != "2026-10-31" || len(ag.Rows) != 1 {
+		t.Fatalf("month = %+v", ag)
+	}
+	f.get("/api/agents?from=2026-10-09&to=2026-10-10", &ag)
+	if ag.From != "2026-10-09" || ag.To != "2026-10-10" || len(ag.Rows) != 1 || ag.Rows[0].AgentMS != 30*60_000 {
+		t.Fatalf("from-to = %+v", ag)
+	}
+	f.get("/api/agents?from=2026-10-08&to=2026-10-09", &ag)
+	if len(ag.Rows) != 0 {
+		t.Fatalf("days before = %+v", ag)
+	}
+	for _, q := range []string{"range=year", "from=2026-10-09", "from=2026-10-10&to=2026-10-09", "from=x&to=2026-10-09", "from=2025-01-01&to=2026-10-09"} {
+		if code, _, _ := f.do("GET", "/api/agents?"+q, testToken, nil); code != 400 {
+			t.Fatalf("%s: %d", q, code)
+		}
 	}
 	var bs []budgetJSON
 	f.get("/api/budgets", &bs)

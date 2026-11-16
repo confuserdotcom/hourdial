@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"time"
 
 	"tock/internal/classify"
 )
@@ -24,21 +25,39 @@ type agentsJSON struct {
 	Peak    int            `json:"peak"`
 }
 
-// agents is the agent ledger of a day (date=YYYY-MM-DD, default today) or
-// of the week holding it (range=week).
+// agents is the agent ledger of a day (date=YYYY-MM-DD, default today), of
+// the week or month holding it (range=week, range=month), or of the days
+// from= to to= inclusive, a year at most.
 func (s *Server) agents(r *http.Request) (any, error) {
 	day, err := s.date(r)
 	if err != nil {
 		return nil, err
 	}
+	q := r.URL.Query()
 	from, to := day, day.AddDate(0, 0, 1)
-	switch r.URL.Query().Get("range") {
-	case "", "day":
-	case "week":
-		from = s.a.WeekOf(day)
-		to = from.AddDate(0, 0, 7)
-	default:
-		return nil, badRequest("range must be day or week")
+	if q.Has("from") || q.Has("to") {
+		loc := s.now().Location()
+		f, err1 := time.ParseInLocation(dateLayout, q.Get("from"), loc)
+		t, err2 := time.ParseInLocation(dateLayout, q.Get("to"), loc)
+		if err1 != nil || err2 != nil {
+			return nil, badRequest("from and to must both be YYYY-MM-DD")
+		}
+		if t.Before(f) || t.After(f.AddDate(1, 0, 0)) {
+			return nil, badRequest("to must be on or after from, within a year of it")
+		}
+		from, to = f, t.AddDate(0, 0, 1)
+	} else {
+		switch q.Get("range") {
+		case "", "day":
+		case "week":
+			from = s.a.WeekOf(day)
+			to = from.AddDate(0, 0, 7)
+		case "month":
+			from = time.Date(day.Year(), day.Month(), 1, 0, 0, 0, 0, day.Location())
+			to = from.AddDate(0, 1, 0)
+		default:
+			return nil, badRequest("range must be day, week or month")
+		}
 	}
 	ag, err := s.a.Agents(from, to)
 	if err != nil {
