@@ -38,7 +38,7 @@ func decide(self, have, installed string, payloadOK bool) plan {
 	}
 	if !payloadOK {
 		return plan{kind: "stop", title: "This copy of tock is incomplete",
-			text: "Download it again from github.com/confuserdotcom/tock/releases."}
+			text: "Download it again from github.com/confuserdotcom/hourdial/releases."}
 	}
 	if installed != "" && installed == have {
 		return plan{kind: "open", cmd: []string{"/usr/bin/open", "tock://dashboard"}}

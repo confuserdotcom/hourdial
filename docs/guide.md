@@ -1,6 +1,6 @@
 # hourdial guide
 
-Everything hourdial does, in detail. The [README](https://github.com/confuserdotcom/tock#readme) covers install
+Everything hourdial does, in detail. The [README](https://github.com/confuserdotcom/hourdial#readme) covers install
 and the first day.
 
 Sections:
@@ -1903,7 +1903,7 @@ Without Go, take `tock-<version>-linux-amd64.tar.gz` (or `arm64`) from a
 GitHub release, check it against `SHA256SUMS`, and install the two binaries.
 From v1.0.0 every tarball, `tock.rb` and the `.dmg` also carry signed build
 provenance; `gh attestation verify tock-<version>-linux-amd64.tar.gz -R
-confuserdotcom/tock` checks that GitHub's release workflow built that file
+confuserdotcom/hourdial` checks that GitHub's release workflow built that file
 from the tag, not someone's laptop:
 
 ```sh

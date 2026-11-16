@@ -63,7 +63,7 @@ Without Homebrew, download the `.dmg` from
 [Releases](https://github.com/confuserdotcom/hourdial/releases). It isn't
 notarized, so the first time you open it, allow it under System Settings,
 Privacy & Security, Open Anyway. To build from source, see the
-[README](https://github.com/confuserdotcom/tock#install).
+[README](https://github.com/confuserdotcom/hourdial#install).
 
 On Linux under Hyprland, Sway, i3 or X11, run `make install-linux`, or download a tarball
 from [Releases](https://github.com/confuserdotcom/hourdial/releases). Coming from
