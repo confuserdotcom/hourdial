@@ -57,11 +57,13 @@ name = "Atlas"
 aliases = ["atlas-ios"]
 repos = ["/Users/sam/code/atlas-ios"]
 rate = 95
+budget = "120h"
 
 [[project]]
 name = "Northwind"
 repos = ["/Users/sam/code/northwind-web"]
 rate = 120
+budget = "60h"
 
 [[project]]
 name = "tock"
