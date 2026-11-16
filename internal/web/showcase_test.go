@@ -3,10 +3,13 @@
 package web
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -306,6 +309,23 @@ func writeAgentLogs(t *testing.T, dir string, day time.Time, n int, runs []agent
 //
 //	TOCK_DEMO_PORT=7799 go test -tags demo -run TestShowcase -timeout 0 ./internal/web
 func TestShowcase(t *testing.T) {
+	a, e := showcase(t)
+	port := os.Getenv("TOCK_DEMO_PORT")
+	if port == "" {
+		port = "7799"
+	}
+	ln, err := net.Listen("tcp", "127.0.0.1:"+port)
+	if err != nil {
+		t.Fatal(err)
+	}
+	token := fmt.Sprintf("%064d", 0)
+	fmt.Printf("showcase: http://127.0.0.1:%d/#t=%s\n", ln.Addr().(*net.TCPAddr).Port, token)
+	t.Fatal(http.Serve(ln, New(a, token, ln.Addr().(*net.TCPAddr).Port, e.NowFunc()).Handler()))
+}
+
+// showcase is the app over the made-up month, its clock at 17:20 on the
+// showcase day.
+func showcase(t *testing.T) (*app.App, *apptest.Env) {
 	e := apptest.New(t, showcaseRules)
 	e.WriteConfig(t, "[invoice]\nname = \"Sam Rivera\"\ncurrency = \"EUR\"\n")
 	now := time.Date(2026, 11, 5, 17, 20, 0, 0, apptest.Zone)
@@ -362,16 +382,64 @@ func TestShowcase(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer a.Close()
-	port := os.Getenv("TOCK_DEMO_PORT")
-	if port == "" {
-		port = "7799"
+	t.Cleanup(func() { a.Close() })
+	return a, e
+}
+
+// TestSampleData writes the sample a first run shows (web/public/sample.json):
+// the API's answers on the showcase day, with one invoice issued so the list
+// has a row.
+//
+//	TOCK_SAMPLE_OUT=$PWD/web/public/sample.json go test -tags demo -run TestSampleData ./internal/web
+func TestSampleData(t *testing.T) {
+	out := os.Getenv("TOCK_SAMPLE_OUT")
+	if out == "" {
+		t.Skip("TOCK_SAMPLE_OUT names the file to write")
 	}
-	ln, err := net.Listen("tcp", "127.0.0.1:"+port)
+	a, e := showcase(t)
+	oct := func(d int) time.Time { return time.Date(2026, 10, d, 0, 0, 0, 0, apptest.Zone) }
+	if _, err := a.IssueInvoice(app.InvoiceSpec{Project: "Atlas", From: oct(1), To: oct(31)}); err != nil {
+		t.Fatal(err)
+	}
+	h := New(a, testToken, 0, e.NowFunc()).Handler()
+	const d = "2026-11-05"
+	paths := []string{"/api/day?date=" + d, "/api/week?date=" + d, "/api/hours", "/api/month?month=" + d[:7],
+		"/api/budgets", "/api/library", "/api/inbox?days=7", "/api/labels", "/api/invoices"}
+	for _, r := range []string{"day", "week", "month"} {
+		ag := "/api/agents?date=" + d
+		if r != "day" {
+			ag += "&range=" + r
+		}
+		top := "/api/top?date=" + d
+		if r != "day" {
+			top += "&range=" + r
+		}
+		paths = append(paths, ag, top, top+"&series=project")
+		if r == "day" {
+			paths = append(paths, top+"&range=day", top+"&range=day&series=project")
+		}
+	}
+	paths = append(paths, "/api/top?range=today", "/api/top?range=week", "/api/top?range=month")
+	answers := map[string]json.RawMessage{}
+	for _, p := range paths {
+		req := httptest.NewRequest("GET", p, nil)
+		req.Header.Set("X-Tock-Token", testToken)
+		req.Host = "127.0.0.1:0"
+		w := httptest.NewRecorder()
+		h.ServeHTTP(w, req)
+		if w.Code != 200 {
+			t.Fatalf("GET %s: %d %s", p, w.Code, w.Body)
+		}
+		answers[p] = json.RawMessage(bytes.TrimSpace(w.Body.Bytes()))
+	}
+	b, err := json.Marshal(struct {
+		Day     string                     `json:"day"`
+		Answers map[string]json.RawMessage `json:"answers"`
+	}{d, answers})
 	if err != nil {
 		t.Fatal(err)
 	}
-	token := fmt.Sprintf("%064d", 0)
-	fmt.Printf("showcase: http://127.0.0.1:%d/#t=%s\n", ln.Addr().(*net.TCPAddr).Port, token)
-	t.Fatal(http.Serve(ln, New(a, token, ln.Addr().(*net.TCPAddr).Port, e.NowFunc()).Handler()))
+	if err := os.WriteFile(out, append(b, '\n'), 0o644); err != nil {
+		t.Fatal(err)
+	}
 }

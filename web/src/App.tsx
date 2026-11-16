@@ -5,7 +5,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useApi, type Inbox as InboxT, type Status } from "@/lib/api";
+import { currentSample, realGet, setSample, useApi, useSample, type Day, type Inbox as InboxT, type Status } from "@/lib/api";
+import { SAMPLE_NOTE, type Sample } from "@/lib/sample";
+import { Skeleton } from "@/components/ui/skeleton";
 import { dayTitle, holdsToday, hhmm, isoDate, parseDate, setClock, setDateStyle, setNumbers, setWeekStart, stepDate, dur } from "@/lib/format";
 import { go, ranged, unitOf, UNITS, useRoute, VIEWS, type View } from "@/lib/route";
 import { cn } from "@/lib/utils";
@@ -49,8 +51,29 @@ function useTick(ms = 60_000) {
 }
 
 export default function App() {
-  const route = useRoute();
+  const asked = useRoute();
   const tick = useTick();
+  // A first run shows the sample (lib/sample.ts) until something of the
+  // user's own is recorded; the check asks the server itself every tick.
+  const sample = useSample();
+  const [checked, setChecked] = useState(false);
+  useEffect(() => {
+    let live = true;
+    realGet<Day>(`/api/day?date=${isoDate(new Date())}`)
+      .then(async (d) => {
+        if (!d?.firstRun) return live && currentSample() && setSample(null);
+        if (currentSample()) return;
+        const s = (await (await fetch("./sample.json", { cache: "no-store" })).json()) as Sample;
+        if (live) setSample(s);
+      })
+      .catch(() => undefined) // no sample then: the views say what is missing
+      .finally(() => live && setChecked(true));
+    return () => {
+      live = false;
+    };
+  }, [tick]);
+  // The sample has one day: every view shows that one.
+  const route = sample ? { ...asked, date: sample.day, to: sample.day, unit: asked.unit === "custom" ? ("day" as const) : asked.unit } : asked;
   const [n, setN] = useState(0);
   const status = useApi<Status>("/api/status", tick + n);
   setWeekStart(status.data?.weekStart);
@@ -58,7 +81,7 @@ export default function App() {
   setDateStyle(status.data?.date);
   setNumbers(status.data?.numbers);
   const inbox = useApi<InboxT>("/api/inbox?days=7", tick);
-  const unit = unitOf(route);
+  const unit = sample ? undefined : unitOf(route);
   const step = (k: number) => unit && go({ date: stepDate(route.date, unit, k) });
   const reload = () => setN((x) => x + 1);
   const inboxN = inbox.data?.items.length ?? 0;
@@ -132,7 +155,7 @@ export default function App() {
                   {UNITS.map((u) => <ToggleGroupItem key={u} value={u} className="h-7 px-2.5 text-xs">{UNIT_NAMES[u]}</ToggleGroupItem>)}
                 </ToggleGroup>
               )}
-              {ranged(route.view) && <CustomRange from={route.date} to={route.to} on={route.unit === "custom"} />}
+              {ranged(route.view) && !sample && <CustomRange from={route.date} to={route.to} on={route.unit === "custom"} />}
               {unit && <DateControl date={route.date} unit={unit} onDate={(d) => go({ date: d })} />}
               {unit && <span className="mx-2 h-4 w-px bg-border" aria-hidden />}
               <button onClick={openPalette}
@@ -154,13 +177,24 @@ export default function App() {
             })}
           </nav>
           <main key={route.view} className="mx-auto w-full max-w-[1400px] flex-1 px-6 py-6 animate-in fade-in-0 slide-in-from-bottom-1 duration-200 motion-reduce:animate-none">
-            {route.view === "agents" && <Agents route={route} tick={tick} />}
-            {route.view === "projects" && <Projects route={route} tick={tick} />}
-            {route.view === "invoices" && <Invoices route={route} tick={tick} />}
-            {route.view === "timeline" && <Today date={route.date} tick={tick} />}
-            {route.view === "inbox" && <Inbox onChange={inbox.reload} />}
-            {route.view === "rules" && <Library tick={tick} sub={route.sub} />}
-            {route.view === "settings" && <Settings onChange={reload} />}
+            {sample && route.view !== "rules" && route.view !== "settings" && (
+              <p role="status" className="anim-rise mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-agent/40 bg-agent/10 px-4 py-2.5 text-sm">
+                <span className="h-2 w-2 shrink-0 rounded-full bg-agent" aria-hidden />
+                <span className="font-medium">{SAMPLE_NOTE}</span>
+                <span className="text-muted-foreground">Not recording? Run <code className="num">tock doctor</code>, or see the status at the foot of the sidebar.</span>
+              </p>
+            )}
+            {!checked ? <Skeleton className="h-64" /> : (
+              <>
+                {route.view === "agents" && <Agents route={route} tick={tick} />}
+                {route.view === "projects" && <Projects route={route} tick={tick} />}
+                {route.view === "invoices" && <Invoices route={route} tick={tick} />}
+                {route.view === "timeline" && <Today date={route.date} tick={tick} />}
+                {route.view === "inbox" && <Inbox onChange={inbox.reload} />}
+                {route.view === "rules" && <Library tick={tick} sub={route.sub} />}
+                {route.view === "settings" && <Settings onChange={reload} />}
+              </>
+            )}
           </main>
         </div>
       </div>

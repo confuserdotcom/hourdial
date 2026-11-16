@@ -34,7 +34,7 @@ const cell = "px-0 py-1.5";
  *  recent use, and the edits and clean-up for them; and the rules. */
 export default function Library({ tick, sub }: { tick: number; sub: LibSection }) {
   const [n, setN] = useState(0);
-  const { data: lib, error, loading } = useApi<Lib>("/api/library", tick + n);
+  const { data: lib, error, loading } = useApi<Lib>("/api/library", tick + n, true);
   const reload = () => setN((x) => x + 1);
   const [q, setQ] = useState("");
   const [staleOnly, setStaleOnly] = useState(false);

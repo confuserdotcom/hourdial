@@ -145,3 +145,34 @@ test("a project opens to its days and hands its range to an invoice draft", asyn
   await page.getByRole("button", { name: "Draft invoice" }).click();
   await expect(page).toHaveURL(/#invoices\/2026-11-02\.\.2026-11-05\/@Atlas$/);
 });
+
+test("a first run shows the sample, read-only, and leaves setup real", async ({ page }) => {
+  // The server answers as a new install does: nothing recorded yet.
+  await page.route(/\/api\/day\?/, (r) => r.fulfill({ json: { firstRun: true } }));
+  await open(page, "agents");
+  const note = page.getByRole("status").filter({ hasText: "Sample data. Your own day replaces it after your first hour." });
+  await expect(note).toBeVisible();
+  await expect(page.locator("main")).toContainText("Atlas");
+  // One day only: no custom range, no stepping.
+  await expect(page.getByRole("button", { name: /^Custom/ })).toHaveCount(0);
+
+  await page.goto("/#projects/week");
+  await ready(page);
+  await expect(note).toBeVisible();
+  await expect(page.getByRole("button", { name: "Export" })).toHaveCount(0);
+
+  await page.goto("/#invoices");
+  await ready(page);
+  const issued = page.getByRole("region", { name: "Issued" });
+  await expect(issued.locator("li")).toHaveCount(1);
+  await expect(issued.getByRole("button")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Draft" })).toContainText("the sample is never invoiced");
+
+  await page.goto("/#timeline");
+  await ready(page);
+  await expect(note).toBeVisible();
+
+  await page.goto("/#rules/projects");
+  await ready(page);
+  await expect(note).toHaveCount(0);
+});

@@ -12,7 +12,7 @@ import { TimeTable } from "@/components/Tables";
 import { Explain, Sum, Why } from "@/components/Explain";
 import { STATS } from "@/lib/explain";
 import { KindsHelp } from "@/components/KindsHelp";
-import { useApi, type Hours, type Week as WeekT } from "@/lib/api";
+import { useApi, useSample, type Hours, type Week as WeekT } from "@/lib/api";
 import { dur, hhmm, parseDate, shortDay, dayTitle, addDays, isoDate } from "@/lib/format";
 import { download } from "@/lib/download";
 import { byKindRows, kindColor, kindHelp, kindLabel } from "@/lib/kinds";
@@ -23,6 +23,7 @@ import { go } from "@/lib/route";
 export default function Week({ date, tick }: { date: string; tick: number }) {
   const { data: w, error, loading } = useApi<WeekT>(`/api/week?date=${date}`, tick);
   const hours = useApi<Hours>("/api/hours");
+  const sample = useSample();
   const groups = useGroups();
   if (error) return <Empty>Couldn't load this week: {error}</Empty>;
   if (loading && !w) return <Skeleton className="h-96 w-full" />;
@@ -51,7 +52,7 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
             <Why>The time hourdial saw you at the computer each day, labelled or not. Away time is left out until you label it as work.</Why>
             <Sum rows={w.days.filter((d) => !d.future).map((d) => [dayTitle(parseDate(d.date)), dur(d.trackedMS)])} total={["Week", dur(w.trackedMS)]} />
           </Explain>
-          <Export monday={w.start ?? w.monday} />
+          {!sample && <Export monday={w.start ?? w.monday} />}
         </span>
       </div>
       <div className="grid gap-5 lg:grid-cols-[1.4fr_1fr]">

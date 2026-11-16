@@ -1,6 +1,7 @@
 // The dashboard API (internal/web). Every request carries the per-run token,
 // which arrives in the URL fragment and is kept in sessionStorage.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { answer, isReal, SAMPLE_LOCKED, writable, type Sample } from "./sample";
 
 const TOKEN_RE = /^#(?:t=)?([0-9a-f]{64})/;
 let token = "";
@@ -58,15 +59,38 @@ async function call<T>(path: string, body?: unknown): Promise<T> {
   }
 }
 
-export const get = <T,>(path: string) => call<T>(path);
+// The sample of a first run (lib/sample.ts): while one is set, the record
+// is read from it and can't be written, exported or invoiced.
+let sample: Sample | null = null;
+const watchers = new Set<() => void>();
+export function setSample(s: Sample | null) {
+  sample = s;
+  watchers.forEach((f) => f());
+}
+export const currentSample = () => sample;
+const watch = (f: () => void) => (watchers.add(f), () => void watchers.delete(f));
+/** useSample is the sample in use, or null with the user's own data. */
+export const useSample = () => useSyncExternalStore(watch, currentSample);
+
+const locked = () => Promise.reject(new ApiError(409, SAMPLE_LOCKED));
+
+/** realGet always asks the server, sample or not. */
+export const realGet = <T,>(path: string) => call<T>(path);
+export const get = <T,>(path: string): Promise<T> => {
+  if (!sample || isReal(path)) return call<T>(path);
+  const a = answer(sample, path);
+  return a === undefined ? locked() : Promise.resolve(a as T);
+};
 
 /** getRaw fetches path with the token and returns the response itself, for
  *  downloads; a failed request throws like call does. */
-export const getRaw = (path: string) => request(path);
-export const post = <T,>(path: string, body: unknown) => call<T>(path, body);
+export const getRaw = (path: string): Promise<Response> => (sample ? locked() : request(path));
+export const post = <T,>(path: string, body: unknown): Promise<T> => (sample && !writable(path) ? locked() : call<T>(path, body));
 
-/** useApi loads path and reloads it when path or the refresh tick change. */
-export function useApi<T>(path: string | null, tick = 0) {
+/** useApi loads path and reloads it when path or the refresh tick change;
+ *  real asks the server even while the sample is shown. */
+export function useApi<T>(path: string | null, tick = 0, real = false) {
+  const sampled = useSample();
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -76,14 +100,14 @@ export function useApi<T>(path: string | null, tick = 0) {
     if (!path) return;
     let live = true;
     setLoading(true);
-    get<T>(path)
+    (real ? realGet<T>(path) : get<T>(path))
       .then((d) => live && (setData(d), setError(null)))
       .catch((e: Error) => live && setError(e.message))
       .finally(() => live && setLoading(false));
     return () => {
       live = false;
     };
-  }, [path, tick, n]);
+  }, [path, tick, n, real, sampled]);
   return { data, error, loading, reload };
 }
 

@@ -6,7 +6,7 @@ import { Empty, Panel } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { get, post, useApi, type InvoiceIssued, type InvoicePreview, type IssuedInvoice, type Library } from "@/lib/api";
+import { get, post, useApi, useSample, type InvoiceIssued, type InvoicePreview, type IssuedInvoice, type Library } from "@/lib/api";
 import { download } from "@/lib/download";
 import { dur, isoDate, weekStartOf } from "@/lib/format";
 import { useLive } from "@/lib/live";
@@ -21,6 +21,7 @@ const field = "h-8 w-full rounded-md border bg-background px-2.5 text-sm placeho
  *  number for good. With Billing off it says what Billing is and turns it on. */
 export default function Invoices({ route, tick }: { route: Route; tick: number }) {
   const { reload: reloadApp } = useLive();
+  const sample = useSample();
   const lib = useApi<Library>("/api/library", tick);
   const billing = !!lib.data?.billing;
   const list = useApi<{ invoices: IssuedInvoice[] }>(billing ? "/api/invoices" : null, tick);
@@ -60,12 +61,15 @@ export default function Invoices({ route, tick }: { route: Route; tick: number }
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
       <Issued list={list.data?.invoices ?? null} error={list.error} />
-      <Draft lib={lib.data} route={route} onIssued={list.reload} />
+      {sample
+        ? <Panel label="Draft"><Empty>These are sample invoices. Drafting and issuing open with hours of your own; the sample is never invoiced.</Empty></Panel>
+        : <Draft lib={lib.data} route={route} onIssued={list.reload} />}
     </div>
   );
 }
 
 function Issued({ list, error }: { list: IssuedInvoice[] | null; error: string | null }) {
+  const sample = useSample();
   async function pdf(n: string) {
     try {
       const r = await download(`/api/invoices/${encodeURIComponent(n)}.pdf`, `${n}.pdf`);
@@ -101,10 +105,10 @@ function Issued({ list, error }: { list: IssuedInvoice[] | null; error: string |
                 </div>
               </div>
               <div className={cn("num text-right font-medium", i.status === "void" && "line-through opacity-60")}>{i.total}</div>
-              <button onClick={() => pdf(i.number)} aria-label={`Save the PDF of ${i.number}`} title="Save the stored PDF"
+              {!sample && <button onClick={() => pdf(i.number)} aria-label={`Save the PDF of ${i.number}`} title="Save the stored PDF"
                 className="press grid h-8 w-8 shrink-0 place-items-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
                 <Download className="h-4 w-4" />
-              </button>
+              </button>}
             </li>
           ))}
         </ul>
