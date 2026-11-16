@@ -99,6 +99,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/rules/preview", s.api(s.rulePreview))
 	mux.HandleFunc("GET /api/invoice", s.api(s.invoice))
 	mux.HandleFunc("POST /api/invoice/issue", s.api(s.invoiceIssue))
+	mux.HandleFunc("GET /api/invoices", s.api(s.invoices))
+	mux.HandleFunc("GET /api/invoices/{file}", s.api(s.invoicePDF))
 	mux.HandleFunc("GET /api/settings", s.api(s.settings))
 	mux.HandleFunc("POST /api/settings", s.api(s.settingsSave))
 	mux.HandleFunc("POST /api/settings/hide", s.api(s.settingsHide))
