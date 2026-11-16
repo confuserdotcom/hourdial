@@ -157,6 +157,21 @@ func TestDayAfterTravel(t *testing.T) {
 			if first != c.first {
 				t.Errorf("first hour with time on the 10th = %d, want %d", first, c.first)
 			}
+			// The week and a range total count every hour once too.
+			w, err := a.Week(time.Date(2026, 10, 10, 12, 0, 0, 0, c.loc))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if w.TrackedMS != 8*3_600_000 {
+				t.Errorf("week tracked %v, want 8h", time.Duration(w.TrackedMS)*time.Millisecond)
+			}
+			top, err := a.Top(time.Date(2026, 10, 9, 0, 0, 0, 0, c.loc), time.Date(2026, 10, 12, 0, 0, 0, 0, c.loc))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if top.TotalMS != 8*3_600_000 {
+				t.Errorf("top over the trip %v, want 8h", time.Duration(top.TotalMS)*time.Millisecond)
+			}
 		})
 	}
 }
