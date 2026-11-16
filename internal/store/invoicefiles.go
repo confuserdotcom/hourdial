@@ -51,6 +51,10 @@ func WriteInvoiceFiles(dir string, inv Invoice) error {
 }
 
 func writeFileAtomic(dir, name string, b []byte) error {
+	// Names come from invoice numbers; keep them inside dir.
+	if name == "" || name == "." || strings.Contains(name, "..") || strings.ContainsAny(name, `/\`) {
+		return fmt.Errorf("store: invoice file %q: not a plain file name", name)
+	}
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		return fmt.Errorf("store: invoice files: %w", err)
 	}

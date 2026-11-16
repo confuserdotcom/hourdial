@@ -2,11 +2,24 @@ package store
 
 import "fmt"
 
+// labelColumn maps a caller's column name to the constant spelled in SQL,
+// so only these literals are ever spliced into a query.
+func labelColumn(column string) (string, bool) {
+	switch column {
+	case "category":
+		return "category", true
+	case "project":
+		return "project", true
+	}
+	return column, false
+}
+
 // RenameLabel renames a category or project ("category" or "project") from
 // one name to another, case-insensitively, in manual overrides, away labels,
 // kept labels, timeline edits and cached suggestions. Renamed away rows get atMS so caches see the change.
 func (s *Store) RenameLabel(column, from, to string, atMS int64) error {
-	if column != "category" && column != "project" {
+	column, ok := labelColumn(column)
+	if !ok {
 		return fmt.Errorf("store: rename label: column %q", column)
 	}
 	tx, err := s.db.Begin()
@@ -34,7 +47,8 @@ func (s *Store) RenameLabel(column, from, to string, atMS int64) error {
 // LabelUses counts the rows that name a category or project, as
 // RenameLabel would rename them, except cached suggestions.
 func (s *Store) LabelUses(column, name string) (int, error) {
-	if column != "category" && column != "project" {
+	column, ok := labelColumn(column)
+	if !ok {
 		return 0, fmt.Errorf("store: label uses: column %q", column)
 	}
 	n := 0
