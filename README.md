@@ -48,6 +48,11 @@ What you get:
 The command is `tock` (the project's earlier name); it will follow the new
 name in a later release, and `tock` will keep working.
 
+<picture>
+  <source srcset="docs/readme/turn.avif" type="image/avif">
+  <img src="docs/readme/turn.webp" width="100%" alt="A hand closes on the hourdial dial and turns it: the red of drift shrinks and the teal of focus grows.">
+</picture>
+
 ## Why you can trust it
 
 A tracker sees every window you open, so it has to earn its place.
