@@ -13,12 +13,12 @@ did while they ran.
 
 <picture class="shot">
   <source media="(prefers-color-scheme: dark)" srcset="readme/web-dark.png">
-  <img src="readme/web-light.png" alt="The hourdial dashboard for one day: a timeline with one row per category, a focus score compared with a usual Thursday, minutes per hour, a donut of the kinds of time, goal rings, and tables of categories and apps.">
+  <img src="readme/web-light.png" alt="The Agents view of the hourdial dashboard for one day: a dial of leverage, the agents' time against your time with them, when each project's sessions ran, and agent time, prompts and sessions per project.">
 </picture>
 
 <picture class="shot">
   <source media="(prefers-color-scheme: dark)" srcset="readme/web-week-dark.png">
-  <img src="readme/web-week-light.png" alt="The week view: hours per day stacked by kind of time, a donut of the week, the focus score per day, and a weekday-by-hour heat map of when you focus.">
+  <img src="readme/web-week-light.png" alt="The Projects view for a week: time, billable time and its value, each project's share, days, value and budget, and under them hours per day stacked by kind of time and a donut of the week.">
 </picture>
 
 ## What it does

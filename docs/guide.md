@@ -832,7 +832,7 @@ project = "Acme"
 since = 2026-11-20T14:05:00     # local time; 2026-11-20 means midnight
 ```
 
-`tock rules stats` and the dashboard's Library show the date.
+`tock rules stats` and the dashboard's Rules view show the date.
 
 ## The model
 
@@ -1067,7 +1067,36 @@ only.
 Links that leave the page open in your browser. `tock web` serves the same
 page to your browser and runs until you press ctrl-c.
 
-- **Today:** the timeline, with one row per category on a shared hour axis
+The sidebar has three groups. **Ledger** is what the time came to:
+Agents, Projects and Invoices. **Record** is the time itself: Timeline and
+Inbox. **Setup** is Rules. Agents and Projects take a range in the top
+bar: **Day**, **Week**, **Month**, or **Custom** for any days up to a
+year. Links to the old tabs (`#today`, `#week`, `#trends`, `#top`,
+`#library`) open the view that took them over.
+
+- **Agents** (the first view): what your coding agents worked on in the
+  range, from Claude Code's session logs in `~/.claude/projects` (only
+  times, folders and titles are read, never prompts). A dial and three
+  figures give the agents' time, your time with an agent's terminal in
+  front of you, and the leverage between them. For one day, **When they
+  ran** draws each project's sessions against the clock. **By project**
+  lists agent time, your time, prompts and sessions; a row opens the
+  project in Projects.
+- **Projects:** time, billable time and its value at each project's rate
+  for the range, a strip of each project's share, then one row per
+  project: its days, time, value and budget. A row opens to its days and
+  **Draft invoice**, which takes the project and the range to Invoices.
+  Under the rows are the charts of the range: the week's (below, with
+  **Export**), the month's, or the day's top categories, apps, sites and
+  projects.
+- **Invoices:** issued invoices on the left, newest first, each with its
+  stored PDF; a draft on the right. Pick a project with a rate and a
+  period (or any first and last day), check the total, and **Save DRAFT**
+  for a PDF marked DRAFT. **Issue…** asks once, because it is permanent:
+  it does what `tock invoice issue` does, with a box to tick for time only
+  the model labelled and one for days another invoice bills. With Billing
+  off the view says what Billing is and turns it on.
+- **Timeline:** one row per category on a shared hour axis
   (hover a bar for its app and title, click it to label or delete it, drag
   across the lanes to edit a range, **Add time** for time hourdial didn't see;
   see [Editing the timeline](#editing-the-timeline)). It zooms down to a
@@ -1096,24 +1125,21 @@ page to your browser and runs until you press ctrl-c.
   minutes per hour stacked by kind and a donut of the kinds of time. Then
   goal rings, tables of categories and apps with totals, and the work
   blocks.
-- **Week:** **Export** saves the week report, the week's entries as CSV or
-  JSON, or its hours by project. **Invoice…** there previews an invoice
-  for a project with a rate over the month before, the week's month or the
-  week, with the hours and total, and saves a PDF marked DRAFT. **Issue**
-  there does what `tock invoice issue` does, with a box to tick for time
-  only the model labelled and one for days another invoice bills. Then hours per day by kind, a donut of the
+- **Projects, a week:** **Export** saves the week report, the week's
+  entries as CSV or JSON, or its hours by project; **Invoice…** there
+  opens Invoices with the week. Then hours per day by kind, a donut of the
   week's kinds, the score per day against its mean, a weekday × hour heat
   map of when you focus, a donut of projects, goal rings (days held),
   distractions, and categories and apps. Click a day's bar or score to
   open that day.
-- **Trends:** a month at a time. Tracked, focus,
+- **Projects, a month:** Tracked, focus,
   average score and switches against last month; a calendar shaded by
   deep time; deep time per day with its 7-day mean; the score per day;
   categories against last month; and your best hours. Click a day in the
   calendar to open it.
-- **Top:** categories, apps, sites and projects for today, the week or the
-  month. Unlabelled time leads to the Inbox, a category or a project to
-  the Library.
+- **Projects, a day or custom days:** the top categories, apps, sites and
+  projects. Unlabelled time leads to the Inbox, a category or a project to
+  Rules.
 - **Inbox:** unlabelled activity with the local guess or Claude's
   suggestion. **Accept** learns the suggestion's broadest safe rule, as
   `tock tag <n>` does. **Other…** opens the label sheet: search a category
@@ -1121,14 +1147,14 @@ page to your browser and runs until you press ctrl-c.
   button is **Label…**, and a double click on a row opens the sheet too.
   **Ignore** has an undo. Keys: `j`/`k` move, Return or `a` accept, `l`
   label, `i` ignore, `u` undo.
-- **Library:** your categories, projects and goals. Each row shows its time
+- **Rules:** your categories, projects and goals, and the rules. Each row shows its time
   in the last 30 days and when it was last seen; names unseen for 30 days
   are greyed, with **Archive** on projects, and look-alike names offer a
   **Merge**. Click a row to edit it (projects take an hourly rate here,
   which invoices and `tock export --by project` use), or **Add**. Adding,
   changing and removing can be undone from the toast; a rename moves past
   entries too, and a merge asks first because it can't be undone.
-  **Rules** lists every rule in the order hourdial checks them, learned ones
+  The **Rules** section lists every rule in the order hourdial checks them, learned ones
   first, with the time each labelled in the last 30 days; a rule that never
   matched or is always beaten by an earlier one says so. Click a rule to
   change its patterns or what it files time as, or to delete it (a wrong
@@ -1145,19 +1171,25 @@ page to your browser and runs until you press ctrl-c.
   sessions** sets `[focus] presets`, the first being the default.
   **Invoices** sets everything in `[invoice]` and the `[[invoice.client]]`
   list (rewritten as one block at the end of the file, so comments inside
-  those tables go); a project picks its client in the Library. These forms
+  those tables go); a project picks its client in Rules. These forms
   save with **Save** and refuse what config.toml would refuse, saying why.
   **Never record** edits `[privacy] hide_apps` and `hide_sites`. The theme (system, dark or light) is kept in the window or
   browser.
 
-The top bar's date steps by the view's unit: a day on Today, a week on
-Week, a month on Trends; click it for a calendar, and **Today** (or `t`)
-comes back. The views sit in a sidebar. Under them, a focus box starts a
+The top bar's date steps by the range: a day on Timeline, and a day, week
+or month on Agents and Projects; click it for a calendar, and **Today** (or `t`)
+comes back. Under the views in the sidebar, a focus box starts a
 session at one of your preset lengths, or counts down the running one and
 ends it; below that, whether trackd is recording (hover for when it last
 wrote) and whether rules.toml and config.toml load (click to fix them).
 
-Today opens on three cards: the whole day as a 24-hour dial (your time in
+A new install has nothing to show, so it shows a sample day instead,
+under a line that says so: "Sample data. Your own day replaces it after
+your first hour." The sample can't be changed, exported or invoiced, and
+Rules and Settings stay your own. It goes as soon as hourdial has recorded
+anything.
+
+Timeline opens on three cards: the whole day as a 24-hour dial (your time in
 kind colours, your work hours round the outside, a hand at now; click an
 hour to zoom the timeline there), the focus score, and a Focus card where
 you name what you are about to work on, pick a length and start (`f` puts
@@ -1290,8 +1322,8 @@ agents worked 4h36 · you 1h51 in their windows · 2.5× leverage
 - **prompts:** how many prompts you typed. hourdial counts them from each
   entry's type; it never reads their text.
 
-`--days N` and `--week` widen the range. The dashboard's Today page has
-the same table for the day it shows.
+`--days N` and `--week` widen the range. The dashboard's Agents view shows
+the same for a day, a week, a month or any days.
 
 The sessions also label your terminal time. A terminal window whose title
 holds a session's title, in front while the session ran, works in the
@@ -1325,7 +1357,7 @@ project in `rules.toml`. Without `budget_since` the budget counts all
 recorded time. The pace is the project's average a day over the last 7
 days; under a minute a day gives no run-out day. `--budget none` drops it.
 
-The dashboard's Today page shows each budget as a bar. When a project
+The dashboard's Projects view and Timeline show each budget as a bar. When a project
 reaches 80% of its budget, and again when it runs out, the menu bar app
 (or a plain notification) says so, once for each; changing the budget or
 its start date lets it speak again.
@@ -1339,7 +1371,7 @@ tock project set ATLAS --rate 80     # or: tock project add ATLAS --rate 80
 ```
 
 That writes `rate = 80` under the project in `rules.toml`; the dashboard's
-Library does the same. `--rate none` drops it.
+Rules view does the same. `--rate none` drops it.
 
 Each span row gets `rate` and `amount` (rate × hours, to the cent).
 `tock export --by project --from 2026-10-01 --to 2026-10-31` writes one row
