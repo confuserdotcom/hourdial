@@ -667,3 +667,23 @@ func TestPublishedTree(t *testing.T) {
 		t.Fatalf("-ldflags = %q; want main.version=%s", flags, p.Version)
 	}
 }
+
+// Trust reports a pin it could not write: a directory where the key goes
+// makes the last rename fail, and Trust must not claim the key is pinned.
+func TestTrustReportsFailedPin(t *testing.T) {
+	d := t.TempDir()
+	pinned, offered := filepath.Join(d, "cfg", "update.pub"), filepath.Join(d, "update.pub")
+	if err := os.MkdirAll(filepath.Join(pinned, "x"), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	p := newKey(t).Public().(ed25519.PublicKey)
+	if err := os.WriteFile(offered, EncodePub(p), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := Trust(pinned, offered, Fingerprint(p)); err == nil {
+		t.Fatal("Trust succeeded but nothing was pinned")
+	}
+	if _, err := os.Stat(filepath.Join(d, "cfg", ".update.pub.tmp")); !os.IsNotExist(err) {
+		t.Error("the temporary key file was left behind")
+	}
+}

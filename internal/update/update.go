@@ -332,7 +332,8 @@ func Trust(pinned, offered, fp string) (ed25519.PublicKey, error) {
 	if err := os.WriteFile(tmp, EncodePub(pub), 0o644); err != nil {
 		return nil, fmt.Errorf("update: pin: %w", err)
 	}
-	if err := os.Chmod(tmp, 0o644); err == nil {
+	err = os.Chmod(tmp, 0o644)
+	if err == nil {
 		err = os.Rename(tmp, pinned)
 	}
 	if err != nil {
