@@ -29,6 +29,12 @@ jobs:
         run: CGO_ENABLED=0 go build ./...
       - name: test
         run: CGO_ENABLED=0 go test ./... -count=1
+      # Day boundaries are local: run again where midnight and DST are odd
+      # (Sao Paulo: UTC-3; Lord Howe: a 30-minute DST shift).
+      - name: test in other zones
+        run: |
+          TZ=America/Sao_Paulo CGO_ENABLED=0 go test ./... -count=1
+          TZ=Australia/Lord_Howe CGO_ENABLED=0 go test ./... -count=1
       - name: cross-build for Windows
         run: |
           GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go vet ./...
