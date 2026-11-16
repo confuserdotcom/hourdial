@@ -80,4 +80,4 @@ test("an invoice for a rated project previews and issues with its number and tot
   await expect(dialog).toBeHidden();
   // The toast names the number the invoice got and the total it was issued for.
   const issued = page.getByText(/^Issued \S+ · /);
-  await expect(issued).toHaveText(new RegExp(`^Issued [A-Za-z0-9-]*\\d[A-Za-z0-9-]* · ${total.replace(/[.]/g, "\\.")}$`));});
+  await expect(issued).toHaveText(new RegExp(`^Issued [A-Za-z0-9-]*\\d[A-Za-z0-9-]* · ${total.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));});
