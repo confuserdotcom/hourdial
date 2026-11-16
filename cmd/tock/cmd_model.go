@@ -123,7 +123,7 @@ func printAgreement(env Env, ag classify.Agreement) {
 	fmt.Fprintf(env.Stdout, "  agrees      %3d%% of the time  (%d%% of spans, 95%% range %d-%d%%)\n",
 		pct64(ag.AgreedMS, ag.MS), pct(ag.Agreed, ag.Spans), int(lo*100+0.5), int(hi*100+0.5))
 	fmt.Fprintf(env.Stdout, "  blank       %3d%% of the time\n", pct64(ag.UnlabelledMS, ag.MS))
-	fmt.Fprintln(env.Stdout, "  You label by hand mostly what tock missed, so this is a floor.")
+	fmt.Fprintln(env.Stdout, "  You label by hand mostly what hourdial missed, so this is a floor.")
 	for _, r := range ag.PerCategory {
 		prec := "-"
 		if r.GuessedMS >= 10*60_000 { // less is noise

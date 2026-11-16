@@ -346,7 +346,7 @@ func Respond(a *app.App, id int64, action string) (string, error) {
 	case strings.HasPrefix(action, ActQuietRule):
 		switch err := a.MarkRuleQuiet(d.Rule, d.RuleFP, d.Category); {
 		case errors.Is(err, app.ErrRuleChanged):
-			return "rule changed, not marked (open tock to pick it again)", nil
+			return "rule changed, not marked (open hourdial to pick it again)", nil
 		case err != nil:
 			return "", err
 		}

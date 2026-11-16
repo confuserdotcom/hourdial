@@ -63,7 +63,7 @@ func TestFocusLoopAlertsOnce(t *testing.T) {
 	f, logb := testLoop(t, e, n, nil)
 	f.tick()
 	f.tick()
-	want := []string{"tock · focus|5 min distracted in your 25 min session, 15 min left."}
+	want := []string{"hourdial · focus|5 min distracted in your 25 min session, 15 min left."}
 	if !reflect.DeepEqual(n.got, want) {
 		t.Fatalf("notifications = %q, want %q", n.got, want)
 	}
@@ -394,7 +394,7 @@ func TestFocusLoopBreakOver(t *testing.T) {
 	n := &recNotifier{}
 	f, _ := testLoop(t, e, n, nil)
 	f.tick()
-	if want := []string{"tock · break|52 min without a break. Stand up for 10 min."}; !reflect.DeepEqual(n.got, want) {
+	if want := []string{"hourdial · break|52 min without a break. Stand up for 10 min."}; !reflect.DeepEqual(n.got, want) {
 		t.Fatalf("09:52 notifications = %q, want %q", n.got, want)
 	}
 	n.got = nil

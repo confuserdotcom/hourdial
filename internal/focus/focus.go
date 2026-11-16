@@ -32,11 +32,11 @@ const (
 
 // Notification titles.
 const (
-	TitleFocus = "tock · focus"
-	TitleDone  = "tock · session done"
-	TitleBreak = "tock · break"
-	TitleRecap = "tock · recap"
-	TitleAway  = "tock · away"
+	TitleFocus = "hourdial · focus"
+	TitleDone  = "hourdial · session done"
+	TitleBreak = "hourdial · break"
+	TitleRecap = "hourdial · recap"
+	TitleAway  = "hourdial · away"
 	// TitleStart is the start-of-day notice.
 	TitleStart = "Start of day"
 	// TitleMidday is the midday check-in notice.

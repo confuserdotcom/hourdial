@@ -109,7 +109,7 @@ func cmdDoctor(env Env, args []string) error {
 	case err != nil:
 		bad("trackd", err.Error(), installMethod().Reinstall(env.Linux))
 	case h.TooOld():
-		bad("trackd", app.TooOldText+" (a newer tock updated it)", installMethod().Reinstall(env.Linux))
+		bad("trackd", app.TooOldText+" (a newer hourdial updated it)", installMethod().Reinstall(env.Linux))
 	case !h.TrackdUp && env.Linux:
 		bad("trackd", "not running", "systemctl --user restart trackd")
 	case !h.TrackdUp:
@@ -321,7 +321,7 @@ func doctorAFK(env Env, cfg config.Config, ok func(name, detail string), bad fun
 	}
 	if len(blind) > 0 {
 		bad("afk", strings.Join(blind, ", ")+" does not report input; its windows over "+stale+" are cut",
-			"update tock there and add the hypridle listener (README › Linux)")
+			"update hourdial there and add the hypridle listener (README › Linux)")
 	}
 }
 

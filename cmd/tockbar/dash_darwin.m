@@ -38,12 +38,12 @@ static NSString *origin(NSURL *u) {
 // keys for the label search, Reload.
 static NSMenu *buildMenu(void) {
     NSMenu *m = [NSMenu new];
-    NSMenuItem *appItem = [m addItemWithTitle:@"tock" action:nil keyEquivalent:@""];
-    NSMenu *app = [[NSMenu alloc] initWithTitle:@"tock"];
+    NSMenuItem *appItem = [m addItemWithTitle:@"hourdial" action:nil keyEquivalent:@""];
+    NSMenu *app = [[NSMenu alloc] initWithTitle:@"hourdial"];
     [app addItemWithTitle:@"Close Window" action:@selector(performClose:) keyEquivalent:@"w"];
     [app addItem:[NSMenuItem separatorItem]];
-    [app addItemWithTitle:@"Hide tock" action:@selector(hide:) keyEquivalent:@"h"];
-    [app addItemWithTitle:@"Quit tock" action:@selector(terminate:) keyEquivalent:@"q"];
+    [app addItemWithTitle:@"Hide hourdial" action:@selector(hide:) keyEquivalent:@"h"];
+    [app addItemWithTitle:@"Quit hourdial" action:@selector(terminate:) keyEquivalent:@"q"];
     appItem.submenu = app;
 
     NSMenuItem *editItem = [m addItemWithTitle:@"Edit" action:nil keyEquivalent:@""];
@@ -83,7 +83,7 @@ static NSMenu *buildMenu(void) {
                                            styleMask:style
                                              backing:NSBackingStoreBuffered
                                                defer:NO];
-    self.win.title = @"tock";
+    self.win.title = @"hourdial";
     self.win.titlebarAppearsTransparent = YES;
     self.win.titleVisibility = NSWindowTitleHidden;
     self.win.minSize = NSMakeSize(900, 600);

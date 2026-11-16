@@ -180,7 +180,7 @@ func (m Choice) draw() string {
 	}
 	var b strings.Builder
 	line := func(s string) { b.WriteString(ansi.Truncate(s, m.width, "…") + "\n") }
-	line(sHead.Render("tock") + sDim.Render(" · choices   space turn on/off · enter save · q quit"))
+	line(sHead.Render("hourdial") + sDim.Render(" · choices   space turn on/off · enter save · q quit"))
 	group := ""
 	for i, f := range config.Features {
 		if f.Group != group {

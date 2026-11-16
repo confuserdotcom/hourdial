@@ -66,7 +66,7 @@ func check(src, b []byte, table, key string, want func(any) bool) ([]byte, error
 		return nil, fmt.Errorf("config: set [%s] %s: change it by hand: %w", table, key, err)
 	}
 	if t, ok := m[table].(map[string]any); !ok || !want(t[key]) {
-		return nil, fmt.Errorf("config: set [%s] %s: the file sets it in a way tock cannot edit; change it by hand", table, key)
+		return nil, fmt.Errorf("config: set [%s] %s: the file sets it in a way hourdial cannot edit; change it by hand", table, key)
 	}
 	if bytes.Equal(b, src) {
 		return src, nil
@@ -327,7 +327,7 @@ func UnsetKey(src []byte, table, key string) ([]byte, error) {
 		return nil, fmt.Errorf("config: unset [%s] %s: change it by hand: %w", table, key, err)
 	}
 	if Sets(b, table, key) {
-		return nil, fmt.Errorf("config: unset [%s] %s: the file sets it in a way tock cannot edit; change it by hand", table, key)
+		return nil, fmt.Errorf("config: unset [%s] %s: the file sets it in a way hourdial cannot edit; change it by hand", table, key)
 	}
 	return b, nil
 }

@@ -90,7 +90,7 @@ export default function Today({ date, tick }: { date: string; tick: number }) {
   const addTime = () => {
     const to = d.today ? Math.floor(now / 60_000) * 60_000 : day0 + 10 * 3_600_000;
     const from = Math.max(day0, to - (d.today ? 1_800_000 : 3_600_000));
-    setTarget({ title: "Add time", sub: "Time tock didn't see: a meeting, a call, paper.", range: { date: d.date, from, to, mode: "add" } });
+    setTarget({ title: "Add time", sub: "Time hourdial didn't see: a meeting, a call, paper.", range: { date: d.date, from, to, mode: "add" } });
   };
   const kindRows = byKindRows(d.byKind);
   const kinds = kindRows.map((k) => ({ name: kindLabel(k.kind), ms: k.ms, color: kindColor(k.kind), kind: k.kind, hint: kindHelp(k.kind) }));

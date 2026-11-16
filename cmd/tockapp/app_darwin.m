@@ -31,13 +31,13 @@ static NSWindow *working(void) {
                                               styleMask:NSWindowStyleMaskTitled
                                                 backing:NSBackingStoreBuffered
                                                   defer:NO];
-    w.title = @"tock";
+    w.title = @"hourdial";
     w.releasedWhenClosed = NO;
     NSProgressIndicator *spin = [[NSProgressIndicator alloc] initWithFrame:NSMakeRect(24, 40, 18, 18)];
     spin.style = NSProgressIndicatorStyleSpinning;
     spin.controlSize = NSControlSizeSmall;
     [spin startAnimation:nil];
-    NSTextField *l = [NSTextField labelWithString:@"Setting up tock…"];
+    NSTextField *l = [NSTextField labelWithString:@"Setting up hourdial…"];
     l.font = [NSFont systemFontOfSize:13 weight:NSFontWeightMedium];
     l.frame = NSMakeRect(52, 48, 270, 18);
     NSTextField *s = [NSTextField labelWithString:@"macOS may ask for your password."];
@@ -105,7 +105,7 @@ int launcherRun(const char *kind, const char *title, const char *text, const cha
                 status = done.terminationStatus;
                 [w orderOut:nil];
                 if (status == 0) {
-                    say(@"tock is running",
+                    say(@"hourdial is running",
                         @"Look for its clock in the menu bar. If a permission is still missing, System Settings is open at it: turn tock on there.",
                         @"OK", nil, NSAlertStyleInformational);
                 } else {

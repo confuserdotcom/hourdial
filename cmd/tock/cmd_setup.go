@@ -257,7 +257,7 @@ func (s *setup) trust() error {
 		return nil
 	}
 	s.say("macOS will ask for your password to trust %s for code signing.", signName)
-	s.say("It signs tock's apps on this Mac, so Accessibility and Screen Recording stay granted across updates.")
+	s.say("It signs hourdial's apps on this Mac, so Accessibility and Screen Recording stay granted across updates.")
 	if out, err := setupRun("security", "add-trusted-cert", "-r", "trustRoot", "-p", "codeSign", "-k", s.keychain(), s.certPath()); err != nil {
 		return fmt.Errorf("setup: trusting the certificate was cancelled or failed (%v: %s); run tock setup again", err, strings.TrimSpace(out))
 	}
@@ -373,7 +373,7 @@ func (s *setup) checkMac() error {
 	if missing > 0 {
 		return fmt.Errorf("setup: %d missing; run tock setup", missing)
 	}
-	s.say("tock is set up.")
+	s.say("hourdial is set up.")
 	return nil
 }
 
@@ -450,7 +450,7 @@ func (s *setup) checkLinux() error {
 	if missing > 0 {
 		return fmt.Errorf("setup: %d missing; run tock setup", missing)
 	}
-	s.say("tock is set up.")
+	s.say("hourdial is set up.")
 	return nil
 }
 

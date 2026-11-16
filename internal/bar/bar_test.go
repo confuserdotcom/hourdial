@@ -95,7 +95,7 @@ func settingsTitles(s Snapshot) string {
 	for _, l := range strings.Split(titles([]Item{s.privacy()}), "\n") {
 		out += "\n  " + l
 	}
-	return out + "\n  Notifications… [notify-settings]\n  Accessibility… [ax]\n  --\n  Quit tock menu bar [quit]"
+	return out + "\n  Notifications… [notify-settings]\n  Accessibility… [ax]\n  --\n  Quit hourdial menu bar [quit]"
 }
 
 func TestSnapshotDay(t *testing.T) {
@@ -169,16 +169,16 @@ func TestSnapshotNotSetUp(t *testing.T) {
 		why  error
 		want string
 	}{
-		{fmt.Errorf("app: %w", classify.ErrNoRules), "Set up tock [setup]"},
+		{fmt.Errorf("app: %w", classify.ErrNoRules), "Set up hourdial [setup]"},
 		{app.ErrNoDB, "Waiting for trackd to start"},
-		{errors.New("disk on fire"), "tock could not open · see tockbar.log"},
-		{nil, "tock could not open · see tockbar.log"},
+		{errors.New("disk on fire"), "hourdial could not open · see tockbar.log"},
+		{nil, "hourdial could not open · see tockbar.log"},
 	} {
 		s := NotReady(c.why)
-		if s.OK || s.Title(0) != "◷ tock" {
+		if s.OK || s.Title(0) != "◷ hourdial" {
 			t.Fatalf("%v: ok %v title %q", c.why, s.OK, s.Title(0))
 		}
-		if got, want := titles(s.Items(0)), c.want+"\n--\nQuit tock menu bar [quit]"; got != want {
+		if got, want := titles(s.Items(0)), c.want+"\n--\nQuit hourdial menu bar [quit]"; got != want {
 			t.Fatalf("%v: menu:\n%s\nwant:\n%s", c.why, got, want)
 		}
 	}
@@ -1022,7 +1022,7 @@ func TestRespondQuietRuleStale(t *testing.T) {
 	moved := strings.Replace(apptest.Rules, "[[rule]]\nbundle = [\"term\"]\ntitle",
 		"[[rule]]\napp = \"Slack\"\ncategory = \"Communication\"\n\n[[rule]]\nbundle = [\"term\"]\ntitle", 1)
 	e.WriteRules(t, moved)
-	if msg, err := Respond(a, id, ActQuietRule+strconv.FormatInt(s.ID, 10)); err != nil || msg != "rule changed, not marked (open tock to pick it again)" {
+	if msg, err := Respond(a, id, ActQuietRule+strconv.FormatInt(s.ID, 10)); err != nil || msg != "rule changed, not marked (open hourdial to pick it again)" {
 		t.Fatalf("stale respond = %q, %v", msg, err)
 	}
 	if after, _ := os.ReadFile(e.Rules); string(after) != moved {

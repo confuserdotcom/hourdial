@@ -94,7 +94,7 @@ func TestRunnerDrawsAndBeats(t *testing.T) {
 	if last(u.titles) != "◷ 2h54" || !strings.Contains(last(u.menus), "start:25\tStart 25 min focus") {
 		t.Fatalf("title %q menu %q", u.titles, last(u.menus))
 	}
-	if last(u.spoken) != "tock, 2 hours 54 minutes tracked today" {
+	if last(u.spoken) != "hourdial, 2 hours 54 minutes tracked today" {
 		t.Fatalf("spoken title = %q", last(u.spoken))
 	}
 	if len(u.auth) != 1 || !u.auth[0] {
@@ -239,7 +239,7 @@ func TestRunnerWaitsForTock(t *testing.T) {
 	e := apptest.New(t, apptest.Rules) // no database yet
 	r, u, _ := testRunner(t, e)
 	r.handle(event{kind: evReady})
-	if last(u.titles) != "◷ tock" || !strings.Contains(last(u.menus), "Waiting for trackd to start") {
+	if last(u.titles) != "◷ hourdial" || !strings.Contains(last(u.menus), "Waiting for trackd to start") {
 		t.Fatalf("title %q menu %q", last(u.titles), last(u.menus))
 	}
 	e.Seed(t, apptest.DaySpans()...)
@@ -250,7 +250,7 @@ func TestRunnerWaitsForTock(t *testing.T) {
 	}
 	e.Clock = e.Clock.Add(reopenEvery)
 	r.tick()
-	if r.a == nil || last(u.titles) == "◷ tock" {
+	if r.a == nil || last(u.titles) == "◷ hourdial" {
 		t.Fatalf("not reopened: %q", last(u.titles))
 	}
 }
@@ -262,11 +262,11 @@ func TestRunnerSetsUpRules(t *testing.T) {
 	}
 	r, u, _ := testRunner(t, e)
 	r.handle(event{kind: evReady})
-	if !strings.Contains(last(u.menus), "setup\tSet up tock") {
+	if !strings.Contains(last(u.menus), "setup\tSet up hourdial") {
 		t.Fatalf("menu = %q", last(u.menus))
 	}
 	r.handle(event{kind: evMenu, id: bar.IDSetup})
-	if r.a == nil || last(u.titles) == "◷ tock" {
+	if r.a == nil || last(u.titles) == "◷ hourdial" {
 		t.Fatalf("not opened after setup: %q %q", last(u.titles), last(u.menus))
 	}
 	if b, err := os.ReadFile(e.Rules); err != nil || len(b) == 0 {

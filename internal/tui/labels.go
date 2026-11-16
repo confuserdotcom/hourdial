@@ -319,7 +319,7 @@ func (m Model) askNewModule() (tea.Model, tea.Cmd) {
 		return m, nil
 	}
 	cat := c.Name
-	m.ask = &askDlg{title: "New module of " + cat, prompt: "its name; tock then finds it in window titles", done: func(m Model, name string) (tea.Model, tea.Cmd) {
+	m.ask = &askDlg{title: "New module of " + cat, prompt: "its name; hourdial then finds it in window titles", done: func(m Model, name string) (tea.Model, tea.Cmd) {
 		if name == "" {
 			return m, nil
 		}

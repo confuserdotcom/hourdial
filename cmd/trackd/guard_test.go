@@ -34,8 +34,8 @@ func TestFocusLoopBlocks(t *testing.T) {
 		calls           []string
 		note            string
 	}{
-		{true, true, []string{"close arc www.youtube.com"}, "tock · focus|Closed a distracting tab in Arc. 15 min left in your session."},
-		{false, true, []string{"close arc www.youtube.com", "hide arc"}, "tock · focus|Hid Arc. 15 min left in your session."},
+		{true, true, []string{"close arc www.youtube.com"}, "hourdial · focus|Closed a distracting tab in Arc. 15 min left in your session."},
+		{false, true, []string{"close arc www.youtube.com", "hide arc"}, "hourdial · focus|Hid Arc. 15 min left in your session."},
 		{false, false, []string{"close arc www.youtube.com", "hide arc"}, ""},
 	} {
 		e := distractedEnv(t, apptest.Rules)

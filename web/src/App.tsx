@@ -217,7 +217,7 @@ function Health({ s }: { s: Status | null }) {
           </span>
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-xs text-xs">
-          {!s ? "Waiting for tock" : rec ? `trackd last wrote at ${hhmm(s.lastSeenMS)} · ${dur(Date.now() - s.lastSeenMS)} ago` : s.paused ? s.paused : "Start it from the menu bar app, or run tock doctor"}
+          {!s ? "Waiting for hourdial" : rec ? `trackd last wrote at ${hhmm(s.lastSeenMS)} · ${dur(Date.now() - s.lastSeenMS)} ago` : s.paused ? s.paused : "Start it from the menu bar app, or run tock doctor"}
         </TooltipContent>
       </Tooltip>
       {s?.rulesError && <button className={cn(link, "block text-bad")} onClick={() => go({ view: "library", sub: "rules" })} title={s.rulesError}>Rules have an error</button>}

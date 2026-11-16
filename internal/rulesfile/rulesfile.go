@@ -71,7 +71,7 @@ func (f Files) Lock(fn func() error) error {
 			break
 		}
 		if !errors.Is(err, flock.ErrHeld) || time.Now().After(deadline) {
-			return fmt.Errorf("rulesfile: lock: another tock is changing the rules: %w", err)
+			return fmt.Errorf("rulesfile: lock: another hourdial is changing the rules: %w", err)
 		}
 		time.Sleep(20 * time.Millisecond)
 	}

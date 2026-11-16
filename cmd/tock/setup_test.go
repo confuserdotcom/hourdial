@@ -267,7 +267,7 @@ func TestSetupCheck(t *testing.T) {
 		t.Fatal(te.errb)
 	}
 	code, out = te.run(t, "", "setup", "--check", "--from", from)
-	if code != 0 || strings.Contains(out, "missing") || !strings.Contains(out, "tock is set up.") {
+	if code != 0 || strings.Contains(out, "missing") || !strings.Contains(out, "hourdial is set up.") {
 		t.Fatalf("check after setup: code %d\n%s", code, out)
 	}
 }

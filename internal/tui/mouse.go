@@ -251,7 +251,7 @@ func (m Model) clickRowSelect(i int) (Model, tea.Cmd, bool) {
 
 // tabAt is the tab whose name in the header covers column x.
 func (m Model) tabAt(x int) (int, bool) {
-	at := ansi.StringWidth("tock") + len(headerGap)
+	at := ansi.StringWidth("hourdial") + len(headerGap)
 	for i, n := range m.tabNames() {
 		if n == "" {
 			continue

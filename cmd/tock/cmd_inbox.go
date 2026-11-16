@@ -16,7 +16,7 @@ func cmdInbox(env Env, args []string) error {
 	fs := newFlags("inbox")
 	days := fs.Int("days", 7, "how many days back to look")
 	all := fs.Bool("all", false, "show every key, not only the top 20 above [inbox] min_minutes")
-	auto := fs.Bool("auto", false, "list the keys tock labelled on its own")
+	auto := fs.Bool("auto", false, "list the keys hourdial labelled on its own")
 	if err := parseFlags(fs, args); err != nil {
 		return err
 	}
@@ -110,7 +110,7 @@ func cmdInbox(env Env, args []string) error {
 	return saveListing(env, keys)
 }
 
-// autoLine says how many keys tock labelled on its own today.
+// autoLine says how many keys hourdial labelled on its own today.
 func autoLine(env Env, today []store.AutoLabel) {
 	if len(today) == 0 {
 		return

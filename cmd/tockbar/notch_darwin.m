@@ -1143,7 +1143,7 @@ static void haptic(NSHapticFeedbackPattern p) {
     return NSAccessibilityGroupRole;
 }
 - (NSString *)accessibilityLabel {
-    return @"tock notch";
+    return @"hourdial notch";
 }
 - (NSString *)accessibilityHelp {
     return self.panelShown ? @"Press to close" : @"Press to open";

@@ -20,7 +20,7 @@ type Feature struct {
 var Features = []Feature{
 	{ID: "model", Group: "General", Name: "Local model labels", Note: "labels activity on this machine", Table: "model", Key: "enabled",
 		On: func(c Config) bool { return c.Model.Enabled }},
-	{ID: "notify", Group: "General", Name: "Notifications", Note: "every notice tock sends", Table: "focus", Key: "notify",
+	{ID: "notify", Group: "General", Name: "Notifications", Note: "every notice hourdial sends", Table: "focus", Key: "notify",
 		On: func(c Config) bool { return c.Focus.Notify }},
 	{ID: "notch", Group: "General", Name: "Notch", Note: "sessions, recaps and labelling in the notch", Table: "notch", Key: "enabled",
 		On: func(c Config) bool { return c.Notch.Enabled }},

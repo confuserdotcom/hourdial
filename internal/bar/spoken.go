@@ -111,19 +111,19 @@ func spokenLeft(ms int64) string {
 func (s Snapshot) Spoken(nowMS int64) string {
 	switch {
 	case !s.OK && errors.Is(s.Why, classify.ErrNoRules):
-		return "tock, not set up yet"
+		return "hourdial, not set up yet"
 	case !s.OK && errors.Is(s.Why, app.ErrNoDB):
-		return "tock, waiting for trackd"
+		return "hourdial, waiting for trackd"
 	case !s.OK:
-		return "tock, could not open"
+		return "hourdial, could not open"
 	case s.Session != nil:
 		goal := s.Session.Goal
 		if goal == "" {
 			goal = "focus session"
 		}
-		return "tock, " + goal + ", " + spokenLeft(s.Session.PlannedMS-nowMS)
+		return "hourdial, " + goal + ", " + spokenLeft(s.Session.PlannedMS-nowMS)
 	}
-	out := "tock, " + Say(report.Dur(s.TrackedMS)) + " tracked today"
+	out := "hourdial, " + Say(report.Dur(s.TrackedMS)) + " tracked today"
 	switch {
 	case s.TooOld || !s.TrackdUp:
 		out += ", trackd is not running"

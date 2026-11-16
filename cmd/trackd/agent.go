@@ -46,7 +46,7 @@ func installService(dataDir, stateDir string) error {
 	if exe, err = filepath.EvalSymlinks(exe); err != nil {
 		return err
 	}
-	return service.InstallUnit(service.Unit{Name: unitName, Description: "tock activity tracker", Program: exe,
+	return service.InstallUnit(service.Unit{Name: unitName, Description: "hourdial activity tracker", Program: exe,
 		LogPath: filepath.Join(stateDir, "trackd.log"), Missing: "trackd not found; reinstall tock"})
 }
 

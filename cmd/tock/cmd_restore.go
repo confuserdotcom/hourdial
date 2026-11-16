@@ -166,7 +166,7 @@ func cmdRestore(env Env, args []string) error {
 		return err
 	}
 	if pick.schema > store.LatestVersion() {
-		return fmt.Errorf("restore: the snapshot is from a newer tock (schema v%d, this one v%d); update tock first", pick.schema, store.LatestVersion())
+		return fmt.Errorf("restore: the snapshot is from a newer hourdial (schema v%d, this one v%d); update hourdial first", pick.schema, store.LatestVersion())
 	}
 	if !*yes && !env.Interactive {
 		return usagef("restore: confirm with --yes")
@@ -185,7 +185,7 @@ func cmdRestore(env Env, args []string) error {
 	if v, err := schemaOf(tmp); err != nil {
 		return err
 	} else if v > store.LatestVersion() {
-		return fmt.Errorf("restore: the snapshot is from a newer tock (schema v%d, this one v%d); update tock first", v, store.LatestVersion())
+		return fmt.Errorf("restore: the snapshot is from a newer hourdial (schema v%d, this one v%d); update hourdial first", v, store.LatestVersion())
 	}
 	when := envDay(env, time.UnixMilli(pick.atMS).In(env.Now().Location()))
 	keep := env.dbPath() + ".before-restore-" + env.Now().Format("20060102-150405")

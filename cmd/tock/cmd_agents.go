@@ -46,7 +46,7 @@ func cmdAgents(env Env, args []string) error {
 
 func agentLines(ag report.Agents, nums numfmt.Style) []string {
 	if len(ag.Rows) == 0 {
-		return []string{"no agent sessions in this range (tock reads Claude Code's logs in ~/.claude/projects)"}
+		return []string{"no agent sessions in this range (hourdial reads Claude Code's logs in ~/.claude/projects)"}
 	}
 	const maxName = 40
 	w := len("project")

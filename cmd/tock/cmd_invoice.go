@@ -130,7 +130,7 @@ func (f invoiceFlags) spec(env Env) (app.InvoiceSpec, error) {
 		return app.InvoiceSpec{}, usagef("invoice: --from is after --to")
 	}
 	return app.InvoiceSpec{Project: *f.project, From: from, To: to, Client: *f.client, Number: *f.number,
-		Generator: "tock " + version}, nil
+		Generator: "hourdial " + version}, nil
 }
 
 // printDraft prints a draft's totals and what to look at before issuing.

@@ -99,7 +99,7 @@ static NSImage *menuGlyph(void) {
         g = [[NSBundle mainBundle] imageForResource:@"MenuGlyph"];
         g.template = YES; // macOS tints it for light, dark and highlighted
         g.size = NSMakeSize(16, 16);
-        g.accessibilityDescription = @"tock";
+        g.accessibilityDescription = @"hourdial";
     });
     return g;
 }
@@ -128,7 +128,7 @@ void bar_set_title(const char *title, const char *spoken) {
     dispatch_async(dispatch_get_main_queue(), ^{
         applyTitle(t);
         NSStatusBarButton *b = bar.item.button;
-        b.accessibilityLabel = w.length > 0 ? w : @"tock";
+        b.accessibilityLabel = w.length > 0 ? w : @"hourdial";
         b.toolTip = w.length > 0 ? w : nil;
     });
 }

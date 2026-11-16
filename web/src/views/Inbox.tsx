@@ -87,7 +87,7 @@ export default function Inbox({ onChange }: { onChange: () => void }) {
       )}
       <Panel label="To label" aside={data.smallKeys ? `${data.smallKeys} small things (${dur(data.smallMS)}) left out` : undefined}>
         {items.length === 0 ? (
-          <Empty>{data.firstRun ? "Nothing recorded yet. Leave tock running for a few minutes and what it can't label shows up here." : "Everything is filed. tock asks again when something new shows up."}</Empty>
+          <Empty>{data.firstRun ? "Nothing recorded yet. Leave hourdial running for a few minutes and what it can't label shows up here." : "Everything is filed. tock asks again when something new shows up."}</Empty>
         ) : (
           <ul className="divide-y">
             {items.map((it, i) => (

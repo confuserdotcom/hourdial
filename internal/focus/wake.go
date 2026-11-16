@@ -19,7 +19,7 @@ const (
 // Wake notices.
 const (
 	TitleWake     = "Off task"
-	TitleWakeWarn = "tock · off task"
+	TitleWakeWarn = "hourdial · off task"
 	// TopicWake is the full-screen wake notice; the menu bar app shows it
 	// over every screen.
 	TopicWake = "wake"

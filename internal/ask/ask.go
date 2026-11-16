@@ -105,7 +105,7 @@ func Parse(raw json.RawMessage, rs *classify.Ruleset) (Query, error) {
 		return q, fmt.Errorf("ask: bad answer: %w", err)
 	}
 	if q.Unsupported != nil && strings.TrimSpace(*q.Unsupported) != "" {
-		return q, fmt.Errorf("tock cannot answer that: %s", report.Safe(*q.Unsupported))
+		return q, fmt.Errorf("hourdial cannot answer that: %s", report.Safe(*q.Unsupported))
 	}
 	for _, p := range []**string{&q.Category, &q.Project, &q.App, &q.Site, &q.Kind} {
 		if *p != nil && strings.TrimSpace(**p) == "" {

@@ -56,7 +56,7 @@ type libChangeJSON struct {
 // a busy rules lock is a conflict to retry, anything else the user's input.
 func libErr(err error) error {
 	if errors.Is(err, syscall.EWOULDBLOCK) {
-		return httpError{http.StatusConflict, "another tock is changing the rules: try again"}
+		return httpError{http.StatusConflict, "another hourdial is changing the rules: try again"}
 	}
 	return badRequest(err.Error())
 }

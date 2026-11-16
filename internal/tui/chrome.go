@@ -40,7 +40,7 @@ func superscript(n int) string {
 
 func (m Model) header() string {
 	names := m.tabNames()
-	parts := []string{sBrand.Bold(true).Render("tock")}
+	parts := []string{sBrand.Bold(true).Render("hourdial")}
 	for i, n := range names {
 		if n == "" {
 			continue

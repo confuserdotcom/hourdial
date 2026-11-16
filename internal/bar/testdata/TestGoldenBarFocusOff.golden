@@ -1,5 +1,5 @@
 == title
-◷ 5h00 «tock, 5 hours tracked today»
+◷ 5h00 «hourdial, 5 hours tracked today»
 
 == menu
 5h00 today «5 hours today»
@@ -64,7 +64,7 @@ Settings ▸
   Notifications… [notify-settings]
   Accessibility… [ax]
   --
-  Quit tock menu bar [quit]
+  Quit hourdial menu bar [quit]
 
 == notch
 {

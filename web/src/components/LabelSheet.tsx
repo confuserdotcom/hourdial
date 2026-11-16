@@ -36,7 +36,7 @@ export function undoToast(msg: string, after: () => void, note?: string) {
 
 const MODES: { v: Mode; label: string; hint: string }[] = [
   { v: "label", label: "Label", hint: "Labels everything in the range; time away in it counts as worked." },
-  { v: "add", label: "Add entry", hint: "Replaces the range with one entry, for time tock didn't see." },
+  { v: "add", label: "Add entry", hint: "Replaces the range with one entry, for time hourdial didn't see." },
   { v: "cut", label: "Delete", hint: "Removes the range from the timeline." },
 ];
 
@@ -196,7 +196,7 @@ export function LabelSheet({ target, onClose, onDone }: { target: Target | null;
         )}
         {!r && (
           <p className="text-xs text-muted-foreground">
-            {learn ? "Return labels it and saves a rule, so tock files the same thing by itself next time." : "Return labels these entries only."}
+            {learn ? "Return labels it and saves a rule, so hourdial files the same thing by itself next time." : "Return labels these entries only."}
           </p>
         )}
       </SheetContent>

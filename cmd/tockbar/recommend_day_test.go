@@ -138,7 +138,7 @@ func TestRecommendDay(t *testing.T) {
 
 	// The session ends; nothing else is due in the hour.
 	title, _, _, _ = one("09:55", at(trackd, 9, 55, 0))
-	if title != "tock · session done" {
+	if title != "hourdial · session done" {
 		t.Fatalf("09:55 post = %q, want the session done notice", u.posts[seen-1])
 	}
 	noPost("10:00", at(trackd, 10, 0, 0))
@@ -147,7 +147,7 @@ func TestRecommendDay(t *testing.T) {
 	// 60 min of activity (09:25) and suggests a 10 min break.
 	noPost("10:24", at(trackd, 10, 24, 0))
 	title, body, cat, cats = one("10:25", at(trackd, 10, 25, 0))
-	if title != "tock · break" || body != "60 min without a break. Stand up for 10 min." || !strings.HasPrefix(cat, "break-") ||
+	if title != "hourdial · break" || body != "60 min without a break. Stand up for 10 min." || !strings.HasPrefix(cat, "break-") ||
 		!slices.Equal(actions(cats, cat), []string{"rec:accept|Take a break (10 min)", "rec:dismiss|Not now", "snooze|Snooze 30 min"}) {
 		t.Fatalf("10:25 post = %q, want the break reminder with Take a break (10 min) first", u.posts[seen-1])
 	}

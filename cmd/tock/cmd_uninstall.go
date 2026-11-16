@@ -84,9 +84,9 @@ func cmdUninstall(env Env, args []string) error {
 		fmt.Fprintf(env.Stdout, "removed %s\n", p)
 	}
 	if *purge {
-		fmt.Fprintln(env.Stdout, "tock is uninstalled and your data deleted.")
+		fmt.Fprintln(env.Stdout, "hourdial is uninstalled and your data deleted.")
 	} else {
-		fmt.Fprintf(env.Stdout, "tock is uninstalled. Your data is kept in %s and %s;\ndelete those folders to remove it too.\n", env.DataDir, env.ConfigDir)
+		fmt.Fprintf(env.Stdout, "hourdial is uninstalled. Your data is kept in %s and %s;\ndelete those folders to remove it too.\n", env.DataDir, env.ConfigDir)
 	}
 	if brew {
 		fmt.Fprintln(env.Stdout, "Homebrew installed the tock command: brew uninstall tock removes it.")

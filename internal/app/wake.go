@@ -11,7 +11,7 @@ import (
 )
 
 // ErrNoWorkLabel means This is work has no label to file the view under.
-var ErrNoWorkLabel = errors.New("no work label to file it under: label it in tock instead")
+var ErrNoWorkLabel = errors.New("no work label to file it under: label it in hourdial instead")
 
 // SetPaper marks the running session (session, or 0 for whatever runs) as
 // paper work: its idle time never counts as off task.

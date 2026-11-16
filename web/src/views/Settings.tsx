@@ -80,7 +80,7 @@ export default function Settings({ onChange }: { onChange: () => void }) {
         </p>
       )}
 
-      <Panel id="set-features" label="What tock does">
+      <Panel id="set-features" label="What hourdial does">
         <p className="-mt-1 mb-4 text-sm text-muted-foreground">
           Turn off a whole part of tock with its group: its settings below are kept and come back when you turn it on.
         </p>

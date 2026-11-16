@@ -46,11 +46,11 @@ func decide(self, have, installed string, payloadOK bool) plan {
 	from := payloadDir(self)
 	run := []string{filepath.Join(from, "tock"), "setup", "--from", from, "--cli"}
 	if installed == "" {
-		return plan{kind: "setup", title: "Set up tock", ok: "Set Up", cmd: run,
-			text: "tock puts its recorder, trackd, and the menu bar app in your home folder and starts them.\n\n" +
-				"macOS asks for your password once, to trust the certificate tock signs them with. " +
+		return plan{kind: "setup", title: "Set up hourdial", ok: "Set Up", cmd: run,
+			text: "hourdial puts its recorder, trackd, and the menu bar app in your home folder and starts them.\n\n" +
+				"macOS asks for your password once, to trust the certificate hourdial signs them with. " +
 				"The certificate is made on this Mac and stays in your keychain. Nothing you do leaves this Mac."}
 	}
-	return plan{kind: "setup", title: "Update tock", ok: "Update", cmd: run,
-		text: "tock " + installed + " is set up. Replace it with " + have + "?\n\nYour data, rules and settings stay as they are."}
+	return plan{kind: "setup", title: "Update hourdial", ok: "Update", cmd: run,
+		text: "hourdial " + installed + " is set up. Replace it with " + have + "?\n\nYour data, rules and settings stay as they are."}
 }

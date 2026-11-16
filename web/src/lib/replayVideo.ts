@@ -103,7 +103,7 @@ export function drawFrame(ctx: Ctx, rows: Row[], from: number, to: number, at: n
   ctx.fillText(title, PAD, 100);
   ctx.textAlign = "right";
   ctx.fillStyle = pal.faint;
-  ctx.fillText("tock replay", VIDEO_W - PAD, 100);
+  ctx.fillText("hourdial replay", VIDEO_W - PAD, 100);
   ctx.textAlign = "left";
 
   ctx.font = `600 132px ${FONT}`;

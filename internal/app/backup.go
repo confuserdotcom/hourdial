@@ -95,7 +95,7 @@ func (a *App) NoteDamage() error {
 		return err
 	}
 	_, err = a.st.AddNotice(store.Notice{AtMS: now, Topic: TopicIntegrity,
-		Title: "tock's database looks damaged",
+		Title: "hourdial's database looks damaged",
 		Body:  "Run tock doctor. Snapshots to restore from are listed by tock restore."})
 	return err
 }

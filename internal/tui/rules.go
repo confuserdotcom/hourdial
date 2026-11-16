@@ -151,7 +151,7 @@ func (t rulesTab) view(w, h int) []string {
 	if len(t.rows) == 0 {
 		return emptyState(w, classify.RulesFile,
 			sText.Render("No rules yet: all activity lands in the inbox."),
-			sDim.Render("Label it there and tock learns rules for you,"),
+			sDim.Render("Label it there and hourdial learns rules for you,"),
 			sDim.Render("or write them by hand."),
 			"", keycap("e", "open rules.toml")+"   "+keycap("3", "inbox"))
 	}

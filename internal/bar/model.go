@@ -260,7 +260,7 @@ func loadLast(a *app.App, now time.Time) (*LastSession, error) {
 func (s Snapshot) Title(nowMS int64) string {
 	switch {
 	case !s.OK:
-		return "◷ tock"
+		return "◷ hourdial"
 	case s.Session != nil:
 		return "◉ " + report.Countdown(s.Session.PlannedMS-nowMS)
 	case !s.TrackdUp || s.Paused:
@@ -288,14 +288,14 @@ var sep = Item{Separator: true}
 // Items is the menu at nowMS.
 func (s Snapshot) Items(nowMS int64) []Item {
 	if !s.OK {
-		first := label("tock could not open · see tockbar.log")
+		first := label("hourdial could not open · see tockbar.log")
 		switch {
 		case errors.Is(s.Why, classify.ErrNoRules):
-			first = Item{Title: "Set up tock", ID: IDSetup}
+			first = Item{Title: "Set up hourdial", ID: IDSetup}
 		case errors.Is(s.Why, app.ErrNoDB):
 			first = label("Waiting for trackd to start")
 		}
-		return []Item{first, sep, {Title: "Quit tock menu bar", ID: IDQuit}}
+		return []Item{first, sep, {Title: "Quit hourdial menu bar", ID: IDQuit}}
 	}
 	groups := [][]Item{s.header(nowMS), s.context(nowMS), s.action(), s.goItems(), {s.settings()}}
 	var out []Item
@@ -494,7 +494,7 @@ func (s Snapshot) settings() Item {
 		Item{Title: "Notifications…", ID: IDNotifySettings},
 		Item{Title: "Accessibility…", ID: IDAccess},
 		sep,
-		Item{Title: "Quit tock menu bar", ID: IDQuit})
+		Item{Title: "Quit hourdial menu bar", ID: IDQuit})
 	return Item{Title: "Settings", Sub: sub}
 }
 
