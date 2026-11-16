@@ -8,6 +8,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -53,14 +55,17 @@ kind = "distract"
 [[project]]
 name = "Atlas"
 aliases = ["atlas-ios"]
+repos = ["/Users/sam/code/atlas-ios"]
 rate = 95
 
 [[project]]
 name = "Northwind"
+repos = ["/Users/sam/code/northwind-web"]
 rate = 120
 
 [[project]]
 name = "tock"
+repos = ["/Users/sam/code/tock"]
 category = "Code"
 
 [[project]]
@@ -167,7 +172,7 @@ func showcaseToday() []block {
 		{hm(13, 4), hm(14, 41), "com.figma.Desktop", "Figma", "Northwind — Checkout flow", ""},
 		{hm(14, 41), hm(14, 53), "arc", "Arc", "Spacing scale for dense UI", "chatgpt.com/c/7"},
 		{hm(14, 53), hm(15, 9), "arc", "Arc", "Dribbble - checkout", "dribbble.com/shots/2214"},
-		{hm(15, 9), hm(16, 31), "term", "WezTerm", "tock │ nvim notch.m", ""},
+		{hm(15, 9), hm(16, 31), "term", "WezTerm", "tock │ Resize the notch", ""},
 		{hm(16, 31), hm(16, 44), "com.tinyspeck.slackmacgap", "Slack", "#northwind", ""},
 		{hm(16, 44), -1, "notion.id", "Notion", "Northwind — Spec v3", ""},
 	}
@@ -216,7 +221,7 @@ func showcaseDay(r *rand.Rand, wd time.Weekday) []block {
 		add(50+j(50), "notion.id", "Notion", "Northwind — Spec", "")
 	}
 	add(6+j(10), "com.tinyspeck.slackmacgap", "Slack", "#northwind", "")
-	add(50+j(70), "term", "WezTerm", "tock │ make test", "")
+	add(50+j(70), "term", "WezTerm", "tock │ Fix the flaky store test", "")
 	if r.Intn(3) == 0 {
 		add(10+j(25), "arc", "Arc", "r/macapps", "reddit.com/r/macapps")
 	}
@@ -224,6 +229,74 @@ func showcaseDay(r *rand.Rand, wd time.Weekday) []block {
 		add(30+j(30), "notion.id", "Notion", "blog: what I learned", "")
 	}
 	return out
+}
+
+// agentRun is one coding-agent session: minutes of the day it worked in a
+// repo, and how many prompts started it off.
+type agentRun struct {
+	repo     string
+	from, to int
+	prompts  int
+	title    string // the session's title, as its terminal shows it
+}
+
+// showcaseAgentsToday runs beside showcaseToday: tock's agent works through
+// the Atlas morning, Atlas and Northwind get one each, and tock's second
+// one is the terminal afternoon.
+func showcaseAgentsToday() []agentRun {
+	return []agentRun{
+		{"tock", hm(9, 24), hm(10, 52), 4, "Notch on every display"},
+		{"atlas-ios", hm(10, 8), hm(11, 2), 6, "Playback tests"},
+		{"northwind-web", hm(13, 10), hm(14, 22), 5, "Checkout form states"},
+		{"tock", hm(15, 12), hm(16, 28), 9, "Resize the notch"},
+	}
+}
+
+// showcaseAgentsDay makes up a past day's sessions: client repos in the
+// morning, tock in the afternoon.
+func showcaseAgentsDay(r *rand.Rand, wd time.Weekday) []agentRun {
+	if wd == time.Saturday || wd == time.Sunday {
+		return nil
+	}
+	var out []agentRun
+	if r.Intn(4) > 0 {
+		s := hm(9, 20+r.Intn(40))
+		out = append(out, agentRun{[]string{"atlas-ios", "atlas-ios", "northwind-web"}[r.Intn(3)], s, s + 35 + r.Intn(70), 2 + r.Intn(6), "Morning run"})
+	}
+	if r.Intn(3) > 0 {
+		s := hm(14, 30+r.Intn(60))
+		out = append(out, agentRun{"tock", s, s + 30 + r.Intn(80), 2 + r.Intn(8), "Fix the flaky store test"})
+	}
+	return out
+}
+
+// writeAgentLogs writes the runs as Claude Code session logs under dir: a
+// human prompt now and then, and an assistant line for each minute worked.
+func writeAgentLogs(t *testing.T, dir string, day time.Time, n int, runs []agentRun) {
+	t.Helper()
+	for i, run := range runs {
+		var b strings.Builder
+		id := fmt.Sprintf("%s-%d-%d", day.Format("0102"), n, i)
+		line := func(typ string, min int, extra string) {
+			ts := day.Add(time.Duration(min) * time.Minute).UTC().Format(time.RFC3339Nano)
+			fmt.Fprintf(&b, `{"type":%q,"timestamp":%q,"cwd":%q,"sessionId":%q%s}`+"\n", typ, ts, "/Users/sam/code/"+run.repo, id, extra)
+		}
+		fmt.Fprintf(&b, `{"type":"ai-title","aiTitle":%q,"sessionId":%q}`+"\n", run.title, id)
+		every := max(1, (run.to-run.from)/max(1, run.prompts))
+		for m := run.from; m <= run.to; m++ {
+			if (m-run.from)%every == 0 && (m-run.from)/every < run.prompts {
+				line("user", m, `,"origin":{"kind":"human"}`)
+			}
+			line("assistant", m, "")
+		}
+		p := filepath.Join(dir, run.repo)
+		if err := os.MkdirAll(p, 0o700); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(p, id+".jsonl"), []byte(b.String()), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
 }
 
 // TestShowcase serves a month of made-up freelancer data for the README
@@ -266,6 +339,13 @@ func TestShowcase(t *testing.T) {
 		put(day, showcaseDay(r, day.Weekday()))
 	}
 	put(midnight, showcaseToday())
+	logs := t.TempDir()
+	ar := rand.New(rand.NewSource(11))
+	for d := 42; d >= 1; d-- {
+		day := midnight.AddDate(0, 0, -d)
+		writeAgentLogs(t, logs, day, d, showcaseAgentsDay(ar, day.Weekday()))
+	}
+	writeAgentLogs(t, logs, midnight, 0, showcaseAgentsToday())
 	at := func(h, m int) int64 { return midnight.Add(time.Duration(hm(h, m)) * time.Minute).UnixMilli() }
 	if _, err := db.Exec(`INSERT INTO call(start_ms, end_ms) VALUES(?, ?)`, at(11, 30), at(12, 2)); err != nil {
 		t.Fatal(err)
@@ -276,7 +356,7 @@ func TestShowcase(t *testing.T) {
 	day := now.Format("2006-01-02")
 	e.Summary(t, day, 0, "A long morning in Atlas playback, the Northwind checkout flow after lunch, then tock's notch until five.")
 	e.Heartbeat(t, now.UnixMilli())
-	a, err := app.Open(app.Paths{DB: e.DB, Rules: e.Rules, Learned: e.Learned, Config: e.Config, ShellLog: e.ShellLog}, e.NowFunc())
+	a, err := app.Open(app.Paths{DB: e.DB, Rules: e.Rules, Learned: e.Learned, Config: e.Config, ShellLog: e.ShellLog, Agents: logs}, e.NowFunc())
 	if err != nil {
 		t.Fatal(err)
 	}
