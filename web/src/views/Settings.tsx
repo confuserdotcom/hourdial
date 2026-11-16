@@ -122,7 +122,7 @@ export default function Settings({ onChange }: { onChange: () => void }) {
           <Button variant="outline" size="sm" className="h-7 px-2.5 text-xs" onClick={() => copy(s.configPath)}><Copy className="h-3.5 w-3.5" />Copy path</Button>
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          Everything else (notice timings, the score's weights, blocking lists) is set in this file. tock keeps your comments when it writes it.
+          Everything else (notice timings, the score's weights, blocking lists) is set in this file. hourdial keeps your comments when it writes it.
         </p>
       </Panel>
 

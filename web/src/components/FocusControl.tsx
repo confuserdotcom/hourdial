@@ -75,7 +75,7 @@ export function FocusPanel() {
   if (!on) {
     return (
       <div className="flex h-full flex-col justify-center gap-3 text-sm text-muted-foreground">
-        <p>Focus is off, so tock doesn't run sessions, breaks or distraction notices.</p>
+        <p>Focus is off, so hourdial doesn't run sessions, breaks or distraction notices.</p>
         <Button variant="outline" size="sm" className="self-start" onClick={() => go({ view: "settings" })}>Turn Focus on</Button>
       </div>
     );
@@ -110,7 +110,7 @@ export function FocusPanel() {
   return (
     <form className="flex h-full flex-col justify-center" onSubmit={(e) => { e.preventDefault(); if (!busy) start(minutes, goal).then(() => setGoal("")); }}>
       <label htmlFor="focus-goal" className="text-[17px] font-medium tracking-[-0.01em]">What are you working on next?</label>
-      <p className="mt-1 text-xs text-muted-foreground">Name it, pick a length, and tock keeps the time while you work.</p>
+      <p className="mt-1 text-xs text-muted-foreground">Name it, pick a length, and hourdial keeps the time while you work.</p>
       <input id="focus-goal" ref={field} value={goal} onChange={(e) => setGoal(e.target.value)} maxLength={120} autoComplete="off"
         placeholder="Write the intro, fix the sync bug…"
         className="mt-4 h-11 w-full rounded-md border border-input bg-background px-3.5 text-sm outline-none transition-colors placeholder:text-faint focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30" />

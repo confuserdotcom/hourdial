@@ -54,7 +54,7 @@ export default function App() {
   const inboxN = inbox.data?.items.length ?? 0;
 
   useEffect(() => {
-    document.title = `tock · ${TITLES[route.view]}`;
+    document.title = `hourdial · ${TITLES[route.view]}`;
   }, [route.view]);
 
   // 1-6 switch views, ",", settings, ← → step the date, t back to today,
@@ -90,7 +90,7 @@ export default function App() {
           <div className={cn("flex h-14 shrink-0 items-center px-5 [-webkit-app-region:drag]", NATIVE && "h-[76px] items-end pb-3")}>
             <button onClick={() => go({ view: "today", date: isoDate(new Date()) })}
               className={cn("flex items-center gap-2 rounded-md text-[15px] font-semibold tracking-tight [-webkit-app-region:no-drag] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")} title="Today">
-              <Mark /> tock
+              <Mark /> hourdial
             </button>
           </div>
           <nav className="mt-2 flex flex-col gap-0.5 px-3" aria-label="Views">
