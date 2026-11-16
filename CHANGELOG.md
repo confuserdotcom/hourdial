@@ -38,6 +38,10 @@ Versions follow [semantic versioning](docs/stability.md) from v1.0.0 on.
   check them.
 
 ### Changed
+- **tock is now called hourdial.** The name shows in the menu bar, the
+  dashboard, the terminal UI, notifications and the docs. The command is
+  still `tock`, and your data, rules and settings stay where they were
+  (`~/.config/tock` and the rest), so nothing needs moving.
 - Without a rules file, tock writes starter rules instead of asking you to
   run `tock init` first; time trackd already recorded shows straight away.
 - The title model overrules a rule for a whole site or app only where you
