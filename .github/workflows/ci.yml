@@ -29,6 +29,14 @@ jobs:
         run: CGO_ENABLED=0 go build ./...
       - name: test
         run: CGO_ENABLED=0 go test ./... -count=1
+      # tockapp and tockbar are macOS-only; elsewhere their shared helpers
+      # look unused, so the macOS job checks them.
+      - name: staticcheck
+        run: |
+          go install honnef.co/go/tools/cmd/staticcheck@v0.8.2
+          pkgs=$(go list ./... | grep -vE '/cmd/tock(app|bar)$')
+          CGO_ENABLED=0 "$(go env GOPATH)/bin/staticcheck" $pkgs
+          GOOS=windows CGO_ENABLED=0 "$(go env GOPATH)/bin/staticcheck" $pkgs
       - name: cross-build for Windows
         run: |
           GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go vet ./...
@@ -145,6 +153,9 @@ jobs:
         run: make build
       - name: test
         run: go test ./... -count=1
+      - name: staticcheck
+        if: matrix.os == 'macos-latest'
+        run: go run honnef.co/go/tools/cmd/staticcheck@v0.8.2 ./...
       # The cgo collectors, the notch and the menu bar run only here.
       - name: race
         if: matrix.os == 'macos-latest'
