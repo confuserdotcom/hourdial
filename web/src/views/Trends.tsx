@@ -72,7 +72,7 @@ function MonthBody({ m }: { m: Month }) {
       </div>
       <div className="grid items-start gap-5 lg:grid-cols-[1fr_1.3fr]">
         <Panel label="Deep time by day" aside={`${c.workdays} workdays · click a day to open it`}>
-          <CalendarHeat first={m.first} days={m.days} onDay={(date) => go({ view: "today", date })} />
+          <CalendarHeat first={m.first} days={m.days} onDay={(date) => go({ view: "timeline", date })} />
         </Panel>
         <div className="space-y-5">
           <Panel label="Deep time">
@@ -80,7 +80,7 @@ function MonthBody({ m }: { m: Month }) {
           </Panel>
           {focus && (
             <Panel label="Focus score">
-              <ScoreLine points={m.days.map((d) => ({ label: label(d.date), title: dayTitle(parseDate(d.date)), score: d.score < 0 ? null : d.score }))} height={160} onPoint={(i) => m.days[i] && go({ view: "today", date: m.days[i].date })} />
+              <ScoreLine points={m.days.map((d) => ({ label: label(d.date), title: dayTitle(parseDate(d.date)), score: d.score < 0 ? null : d.score }))} height={160} onPoint={(i) => m.days[i] && go({ view: "timeline", date: m.days[i].date })} />
             </Panel>
           )}
         </div>

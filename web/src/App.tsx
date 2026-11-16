@@ -1,19 +1,20 @@
 import { useEffect, useState } from "react";
-import { CalendarDays, ChartColumn, CircleQuestionMark, Inbox as InboxIcon, Library as LibraryIcon, ListOrdered, Search, Settings as Gear, Sun } from "lucide-react";
+import { Bot, CircleQuestionMark, Clock, FolderKanban, Inbox as InboxIcon, ReceiptText, Search, Settings as Gear, Tags } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useApi, type Inbox as InboxT, type Status } from "@/lib/api";
 import { holdsToday, hhmm, isoDate, setClock, setDateStyle, setNumbers, setWeekStart, stepDate, dur } from "@/lib/format";
-import { DATED, go, useRoute, VIEWS, type View } from "@/lib/route";
+import { go, ranged, unitOf, UNITS, useRoute, VIEWS, type View } from "@/lib/route";
 import { cn } from "@/lib/utils";
 import { GroupsContext, groupsOf } from "@/lib/groups";
 import { LiveContext } from "@/lib/live";
+import Agents from "@/views/Agents";
+import Projects from "@/views/Projects";
+import Invoices from "@/views/Invoices";
 import Today from "@/views/Today";
-import Week from "@/views/Week";
-import Trends from "@/views/Trends";
 import Library from "@/views/Library";
-import Top from "@/views/Top";
 import Inbox from "@/views/Inbox";
 import Settings from "@/views/Settings";
 import Palette, { openPalette } from "@/components/Palette";
@@ -25,8 +26,9 @@ import { FocusDock, focusField } from "@/components/FocusControl";
 // NATIVE: inside the tock window, which leaves room for the traffic lights.
 const NATIVE = /tock-app/.test(navigator.userAgent);
 
-const TITLES: Record<View, string> = { today: "Today", week: "Week", trends: "Trends", top: "Top", inbox: "Inbox", library: "Library", settings: "Settings" };
-const ICONS: Record<View, typeof Sun> = { today: Sun, week: CalendarDays, trends: ChartColumn, top: ListOrdered, inbox: InboxIcon, library: LibraryIcon, settings: Gear };
+const TITLES: Record<View, string> = { agents: "Agents", projects: "Projects", invoices: "Invoices", timeline: "Timeline", inbox: "Inbox", rules: "Rules", settings: "Settings" };
+const ICONS: Record<View, typeof Bot> = { agents: Bot, projects: FolderKanban, invoices: ReceiptText, timeline: Clock, inbox: InboxIcon, rules: Tags, settings: Gear };
+const UNIT_NAMES = { day: "Day", week: "Week", month: "Month" } as const;
 
 /** useTick changes once a minute, so live views refresh. */
 function useTick(ms = 60_000) {
@@ -48,7 +50,7 @@ export default function App() {
   setDateStyle(status.data?.date);
   setNumbers(status.data?.numbers);
   const inbox = useApi<InboxT>("/api/inbox?days=7", tick);
-  const unit = DATED[route.view];
+  const unit = unitOf(route);
   const step = (k: number) => unit && go({ date: stepDate(route.date, unit, k) });
   const reload = () => setN((x) => x + 1);
   const inboxN = inbox.data?.items.length ?? 0;
@@ -70,7 +72,7 @@ export default function App() {
       else if (e.key === "ArrowRight" && unit && !holdsToday(route.date, unit)) step(1);
       else if (e.key === "t" && unit) go({ date: isoDate(new Date()) });
       else if (e.key === "f") {
-        if (route.view !== "today" || !holdsToday(route.date, "day")) go({ view: "today", date: isoDate(new Date()) });
+        if (route.view !== "timeline" || !holdsToday(route.date, "day")) go({ view: "timeline", date: isoDate(new Date()) });
         setTimeout(focusField, 60);
       } else return;
       e.preventDefault();
@@ -88,8 +90,8 @@ export default function App() {
       <div className="flex min-h-full">
         <aside className="sticky top-0 hidden h-screen w-[228px] shrink-0 flex-col border-r bg-card/50 md:flex">
           <div className={cn("flex h-14 shrink-0 items-center px-5 [-webkit-app-region:drag]", NATIVE && "h-[76px] items-end pb-3")}>
-            <button onClick={() => go({ view: "today", date: isoDate(new Date()) })}
-              className={cn("flex items-center gap-2 rounded-md text-[15px] font-semibold tracking-tight [-webkit-app-region:no-drag] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")} title="Today">
+            <button onClick={() => go({ view: "agents", unit: "day", date: isoDate(new Date()) })}
+              className={cn("flex items-center gap-2 rounded-md text-[15px] font-semibold tracking-tight [-webkit-app-region:no-drag] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")} title="Agents, today">
               <Mark /> hourdial
             </button>
           </div>
@@ -111,6 +113,12 @@ export default function App() {
           <header className={cn("sticky top-0 z-20 flex h-14 shrink-0 items-center gap-4 border-b bg-background/85 px-6 backdrop-blur [-webkit-app-region:drag]")}>
             <h1 className={cn("text-[20px] font-semibold tracking-[-0.01em]", NATIVE && "ml-16 md:ml-0")}>{TITLES[route.view]}</h1>
             <div className="ml-auto flex items-center gap-1 [-webkit-app-region:no-drag]">
+              {ranged(route.view) && (
+                <ToggleGroup type="single" size="sm" variant="outline" className="mr-2" aria-label="Range" value={route.unit}
+                  onValueChange={(v) => v && go({ unit: v as (typeof UNITS)[number] })}>
+                  {UNITS.map((u) => <ToggleGroupItem key={u} value={u} className="h-7 px-2.5 text-xs">{UNIT_NAMES[u]}</ToggleGroupItem>)}
+                </ToggleGroup>
+              )}
               {unit && <DateControl date={route.date} unit={unit} onDate={(d) => go({ date: d })} />}
               {unit && <span className="mx-2 h-4 w-px bg-border" aria-hidden />}
               <button onClick={openPalette}
@@ -132,12 +140,12 @@ export default function App() {
             })}
           </nav>
           <main key={route.view} className="mx-auto w-full max-w-[1400px] flex-1 px-6 py-6 animate-in fade-in-0 slide-in-from-bottom-1 duration-200 motion-reduce:animate-none">
-            {route.view === "today" && <Today date={route.date} tick={tick} />}
-            {route.view === "week" && <Week date={route.date} tick={tick} />}
-            {route.view === "trends" && <Trends date={route.date} />}
-            {route.view === "top" && <Top tick={tick} />}
+            {route.view === "agents" && <Agents route={route} tick={tick} />}
+            {route.view === "projects" && <Projects route={route} tick={tick} />}
+            {route.view === "invoices" && <Invoices tick={tick} />}
+            {route.view === "timeline" && <Today date={route.date} tick={tick} />}
             {route.view === "inbox" && <Inbox onChange={inbox.reload} />}
-            {route.view === "library" && <Library tick={tick} sub={route.sub} />}
+            {route.view === "rules" && <Library tick={tick} sub={route.sub} />}
             {route.view === "settings" && <Settings onChange={reload} />}
           </main>
         </div>
@@ -220,7 +228,7 @@ function Health({ s }: { s: Status | null }) {
           {!s ? "Waiting for hourdial" : rec ? `trackd last wrote at ${hhmm(s.lastSeenMS)} · ${dur(Date.now() - s.lastSeenMS)} ago` : s.paused ? s.paused : "Start it from the menu bar app, or run tock doctor"}
         </TooltipContent>
       </Tooltip>
-      {s?.rulesError && <button className={cn(link, "block text-bad")} onClick={() => go({ view: "library", sub: "rules" })} title={s.rulesError}>Rules have an error</button>}
+      {s?.rulesError && <button className={cn(link, "block text-bad")} onClick={() => go({ view: "rules" })} title={s.rulesError}>Rules have an error</button>}
       {s?.configError && <button className={cn(link, "block text-bad")} onClick={() => go({ view: "settings" })} title={s.configError}>Config has an error</button>}
     </div>
   );

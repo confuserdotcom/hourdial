@@ -61,8 +61,8 @@ export default function Library({ tick, sub }: { tick: number; sub: LibSection }
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-xl font-semibold tracking-tight">Library</h1>
-        <ToggleGroup type="single" value={sub} onValueChange={(v) => v && go({ view: "library", sub: v as LibSection })} variant="outline" size="sm">
+        <h1 className="text-xl font-semibold tracking-tight">Labels and rules</h1>
+        <ToggleGroup type="single" value={sub} onValueChange={(v) => v && go({ view: "rules", sub: v as LibSection })} variant="outline" size="sm">
           {LIB_SECTIONS.map((s) => <ToggleGroupItem key={s} value={s}>{TITLE[s]}</ToggleGroupItem>)}
         </ToggleGroup>
       </div>

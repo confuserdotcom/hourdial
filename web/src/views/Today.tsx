@@ -222,13 +222,13 @@ export default function Today({ date, tick }: { date: string; tick: number }) {
         <Panel label="Goals" aside={
           <span className="flex items-center gap-3">
             {d.goals.length > 0 && <GoalsHelp goals={d.goals} />}
-            <button className="underline-offset-2 hover:text-foreground hover:underline" onClick={() => go({ view: "library", sub: "goals" })}>Edit</button>
+            <button className="underline-offset-2 hover:text-foreground hover:underline" onClick={() => go({ view: "rules", sub: "goals" })}>Edit</button>
           </span>
         }>
           {d.goals.length ? <GoalRings goals={d.goals} /> : (
             <div className="py-6 text-center">
               <p className="text-sm text-muted-foreground">No goals yet: set a time to reach, or a limit, for a category or a project.</p>
-              <Button variant="outline" size="sm" className="mt-3" onClick={() => go({ view: "library", sub: "goals" })}>Add a goal</Button>
+              <Button variant="outline" size="sm" className="mt-3" onClick={() => go({ view: "rules", sub: "goals" })}>Add a goal</Button>
             </div>
           )}
         </Panel>

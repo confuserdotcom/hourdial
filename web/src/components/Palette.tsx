@@ -5,7 +5,7 @@ import { go, VIEWS } from "@/lib/route";
 import { setTheme, type Theme } from "@/lib/theme";
 import { openShortcuts } from "@/components/Shortcuts";
 
-const NAMES: Record<string, string> = { today: "Today", week: "Week", trends: "Trends", top: "Top", inbox: "Inbox", library: "Library" };
+const NAMES: Record<string, string> = { agents: "Agents", projects: "Projects", invoices: "Invoices", timeline: "Timeline", inbox: "Inbox", rules: "Rules" };
 
 /** openPalette opens ⌘K from a button. */
 export function openPalette() {
@@ -37,7 +37,7 @@ export default function Palette() {
         <CommandEmpty>Nothing matches.</CommandEmpty>
         {typed && (
           <CommandGroup heading="Date">
-            <CommandItem value={typed} onSelect={run(() => go({ view: "today", date: typed }))}>Open {typed}</CommandItem>
+            <CommandItem value={typed} onSelect={run(() => go({ view: "timeline", date: typed }))}>Open {typed}</CommandItem>
           </CommandGroup>
         )}
         <CommandGroup heading="Views">
@@ -47,7 +47,7 @@ export default function Palette() {
         </CommandGroup>
         <CommandGroup heading="Days">
           <CommandItem value="Go to today" onSelect={run(() => go({ date: isoDate(new Date()) }))}>Go to today</CommandItem>
-          <CommandItem value="Go to yesterday" onSelect={run(() => go({ view: "today", date: isoDate(addDays(new Date(), -1)) }))}>Go to yesterday</CommandItem>
+          <CommandItem value="Go to yesterday" onSelect={run(() => go({ view: "timeline", date: isoDate(addDays(new Date(), -1)) }))}>Go to yesterday</CommandItem>
         </CommandGroup>
         <CommandGroup heading="Settings">
           <CommandItem value="Settings features notifications privacy" onSelect={run(() => go({ view: "settings" }))}>Open settings</CommandItem>

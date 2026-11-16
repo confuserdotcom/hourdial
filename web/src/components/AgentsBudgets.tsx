@@ -19,7 +19,7 @@ export function AgentsAndBudgets({ date, tick }: { date: string; tick: number })
   );
 }
 
-function AgentsPanel({ ag }: { ag: Agents }) {
+export function AgentsPanel({ ag, rows = 6 }: { ag: Agents; rows?: number }) {
   const lev = ag.youMS > 0 ? ag.agentMS / ag.youMS : 0;
   return (
     <Panel label="Agents" aside={<span className="num">{dur(ag.agentMS)} worked{lev >= 1 ? ` · ${num(lev, 1)}× your time` : ""}</span>}>
@@ -33,7 +33,7 @@ function AgentsPanel({ ag }: { ag: Agents }) {
           </tr>
         </thead>
         <tbody className="num">
-          {ag.rows.slice(0, 6).map((r) => (
+          {ag.rows.slice(0, rows).map((r) => (
             <tr key={r.project} className="border-t">
               <td className="max-w-0 truncate py-1.5 pr-3 font-sans" title={r.project}>{r.project}</td>
               <td className="py-1.5 text-right">{dur(r.agentMS)}</td>
@@ -51,7 +51,7 @@ function AgentsPanel({ ag }: { ag: Agents }) {
   );
 }
 
-function BudgetsPanel({ bs }: { bs: Budget[] }) {
+export function BudgetsPanel({ bs }: { bs: Budget[] }) {
   return (
     <Panel label="Budgets">
       <ul className="space-y-3">

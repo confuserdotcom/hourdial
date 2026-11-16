@@ -17,7 +17,7 @@ test("labelling an inbox item takes it out of the inbox", async ({ page }) => {
 });
 
 test("a rule added in the rule sheet shows in the rules", async ({ page }) => {
-  await open(page, "library/rules");
+  await open(page, "rules");
   await page.getByRole("button", { name: "Add", exact: true }).click();
   const sheet = page.getByRole("dialog", { name: "Add rule" });
   await sheet.getByLabel("Title").fill("^Quarterly report");
@@ -28,15 +28,15 @@ test("a rule added in the rule sheet shows in the rules", async ({ page }) => {
 });
 
 test("the date control steps to the day before", async ({ page }) => {
-  await open(page, `today/${DAY}`);
+  await open(page, `timeline/${DAY}`);
   await page.getByRole("button", { name: /^Previous day/ }).click();
-  await expect(page).toHaveURL(/#today\/2026-11-04$/);
+  await expect(page).toHaveURL(/#timeline\/2026-11-04$/);
   await ready(page);
   await expect(page.locator('button[title="Pick a date"]')).toContainText("4 Nov");
 });
 
 test("the focus score opens its explanation", async ({ page }) => {
-  await open(page, `today/${DAY}`);
+  await open(page, `timeline/${DAY}`);
   await page.getByRole("button", { name: "How it's scored" }).click();
   const why = page.getByRole("dialog", { name: /^Focus score \d+$/ });
   await expect(why).toBeVisible();
@@ -44,7 +44,7 @@ test("the focus score opens its explanation", async ({ page }) => {
 });
 
 test("an hour picked on the minutes-per-hour chart with the keyboard zooms the timeline", async ({ page }) => {
-  await open(page, `today/${DAY}`);
+  await open(page, `timeline/${DAY}`);
   const whole = page.getByRole("button", { name: "Show the whole day (0)" });
   await expect(whole).toBeDisabled();
   const hours = page.getByRole("group", { name: /^Minutes per hour/ });
@@ -58,17 +58,17 @@ test("an hour picked on the minutes-per-hour chart with the keyboard zooms the t
 });
 
 test("a day picked on the week chart with the keyboard opens it", async ({ page }) => {
-  await open(page, `week/${DAY}`);
+  await open(page, `projects/week/${DAY}`);
   const days = page.getByRole("group", { name: /^Hours per day/ });
   await days.locator('[tabindex="0"]').focus();
   await page.keyboard.press("ArrowRight");
   await expect(days.locator(":focus")).toHaveAccessibleName(/^Tue 3 Nov, \d+h\d\d: /);
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/#today\/2026-11-03$/);
+  await expect(page).toHaveURL(/#timeline\/2026-11-03$/);
 });
 
 test("an invoice for a rated project previews and issues with its number and total", async ({ page }) => {
-  await open(page, `week/${DAY}`);
+  await open(page, `projects/week/${DAY}`);
   await page.getByRole("button", { name: "Export" }).click();
   await page.getByRole("button", { name: /^Invoice…/ }).click();
   const dialog = page.getByRole("dialog", { name: "Invoice" });
@@ -81,3 +81,22 @@ test("an invoice for a rated project previews and issues with its number and tot
   // The toast names the number the invoice got and the total it was issued for.
   const issued = page.getByText(/^Issued \S+ · /);
   await expect(issued).toHaveText(new RegExp(`^Issued [A-Za-z0-9-]*\\d[A-Za-z0-9-]* · ${total.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));});
+
+test("the old tabs' addresses open the tabs that took them over", async ({ page }) => {
+  await open(page, `week/${DAY}`);
+  await expect(page).toHaveURL(new RegExp(`#projects/week/${DAY}$`));
+  await expect(page.getByRole("heading", { level: 1, name: "Projects" })).toBeVisible();
+  await page.goto(`/#today/${DAY}`);
+  await expect(page).toHaveURL(new RegExp(`#timeline/${DAY}$`));
+  await page.goto("/#library/goals");
+  await expect(page).toHaveURL(/#rules\/goals$/);
+});
+
+test("the sidebar leads with agents, and the range carries over to projects", async ({ page }) => {
+  await open(page, "");
+  await expect(page.getByRole("heading", { level: 1, name: "Agents" })).toBeVisible();
+  await page.getByRole("radio", { name: "Week" }).click();
+  await expect(page).toHaveURL(/#agents\/week/);
+  await page.getByRole("navigation", { name: "Views" }).first().getByRole("button", { name: /^Projects/ }).click();
+  await expect(page).toHaveURL(/#projects\/week/);
+});

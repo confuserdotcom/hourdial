@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 
 const GROUPS: [string, [string, string][]][] = [
   ["Anywhere", [
-    ["1 – 6", "Today, Week, Trends, Top, Inbox, Library"],
+    ["1 – 6", "Agents, Projects, Invoices, Timeline, Inbox, Rules"],
     [",", "Settings"],
     ["← →", "Previous or next day, week or month"],
     ["t", "Back to today"],

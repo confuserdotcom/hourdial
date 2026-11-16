@@ -15,6 +15,9 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["github"]] : "list",
   use: {
     ...devices["Desktop Chrome"],
+    // TOCK_E2E_CHANNEL=chrome runs in the installed Chrome, with no browser
+    // download (npx playwright install).
+    channel: process.env.TOCK_E2E_CHANNEL || undefined,
     baseURL: `http://127.0.0.1:${port}`,
     // The showcase day is 5 Nov 2026 in UTC+2 (apptest.Zone).
     timezoneId: "Etc/GMT-2",

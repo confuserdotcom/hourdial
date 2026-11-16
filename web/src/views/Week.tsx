@@ -32,7 +32,7 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
 
   const mon = parseDate(w.start ?? w.monday);
   const days = w.days.map((d) => ({ label: shortDay(parseDate(d.date)), title: dayTitle(parseDate(d.date)), byKind: d.byKind, faint: d.future }));
-  const openDay = (i: number) => w.days[i] && !w.days[i].future && go({ view: "today", date: w.days[i].date });
+  const openDay = (i: number) => w.days[i] && !w.days[i].future && go({ view: "timeline", date: w.days[i].date });
   const scores = w.days.map((d) => ({ label: shortDay(parseDate(d.date)), title: dayTitle(parseDate(d.date)), score: d.future || d.trackedMS < 3_600_000 ? null : d.score }));
   const projects = w.projects.slice(0, 6);
   const billed = w.days.reduce((n, d) => n + (d.billedMS ?? 0), 0);
@@ -87,13 +87,13 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
       </div>
       <div className="grid gap-5 lg:grid-cols-3">
         <Panel label="Projects" aside={billed > 0 ? `${dur(billed)} on issued invoices` : undefined}>
-          {projects.length ? <Donut data={projects.map((p, i) => ({ name: p.name || "No project", ms: p.ms, color: colors[i] }))} center={String(w.projects.length)} sub="projects" onSelect={() => go({ view: "library", sub: "projects" })} /> : <Empty>No projects this week.</Empty>}
+          {projects.length ? <Donut data={projects.map((p, i) => ({ name: p.name || "No project", ms: p.ms, color: colors[i] }))} center={String(w.projects.length)} sub="projects" onSelect={() => go({ view: "rules", sub: "projects" })} /> : <Empty>No projects this week.</Empty>}
         </Panel>
-        <Panel label="Goals" aside={<button className="underline-offset-2 hover:text-foreground hover:underline" onClick={() => go({ view: "library", sub: "goals" })}>Edit</button>}>
+        <Panel label="Goals" aside={<button className="underline-offset-2 hover:text-foreground hover:underline" onClick={() => go({ view: "rules", sub: "goals" })}>Edit</button>}>
           {w.goals.length ? <GoalRings goals={w.goals} /> : (
             <div className="py-6 text-center">
               <p className="text-sm text-muted-foreground">No goals yet.</p>
-              <Button variant="outline" size="sm" className="mt-3" onClick={() => go({ view: "library", sub: "goals" })}>Add a goal</Button>
+              <Button variant="outline" size="sm" className="mt-3" onClick={() => go({ view: "rules", sub: "goals" })}>Add a goal</Button>
             </div>
           )}
         </Panel>

@@ -43,8 +43,8 @@ export default function Top({ tick }: { tick: number }) {
 /** open is what a click on a row does: unlabelled time goes to the inbox,
  *  a category or a project to its place in the Library. */
 function open(section: string): (r: TopRow) => (() => void) | null {
-  if (section === "category") return (r) => () => go(r.name === "(unlabelled)" ? { view: "inbox" } : { view: "library", sub: "categories" });
-  if (section === "project") return () => () => go({ view: "library", sub: "projects" });
+  if (section === "category") return (r) => () => go(r.name === "(unlabelled)" ? { view: "inbox" } : { view: "rules", sub: "categories" });
+  if (section === "project") return () => () => go({ view: "rules", sub: "projects" });
   return (r) => (r.mostly === "(unlabelled)" ? () => go({ view: "inbox" }) : null);
 }
 

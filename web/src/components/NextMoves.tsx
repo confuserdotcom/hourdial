@@ -17,7 +17,7 @@ export function NextMoves({ moves }: { moves: Move[] }) {
     <ul className="flex flex-wrap gap-2" aria-label="Next moves">
       {moves.slice(0, 4).map((m) => (
         <li key={m.id}>
-          <button onClick={() => m.to && go(m.to === "inbox" ? { view: "inbox" } : { view: "library", sub: "goals" })}
+          <button onClick={() => m.to && go(m.to === "inbox" ? { view: "inbox" } : { view: "rules", sub: "goals" })}
             className="group flex h-9 items-center gap-2.5 rounded-full border bg-card pl-3 pr-3.5 text-[13px] transition-[background-color,border-color,transform] hover:-translate-y-px hover:border-foreground/20 hover:bg-accent active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <i className={cn("h-1.5 w-1.5 rounded-full", TONE[m.tone])} />
             <span className="num">{m.text}</span>

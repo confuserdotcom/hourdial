@@ -5,15 +5,18 @@ import { DAY, open } from "./helpers";
 // Every view, as wide as a laptop and as narrow as a small window, in both
 // themes: axe-core must find nothing.
 const VIEWS = [
-  ["Today", `today/${DAY}`],
-  ["Week", `week/${DAY}`],
-  ["Trends", `trends/${DAY}`],
-  ["Top", "top"],
+  ["Agents", `agents/${DAY}`],
+  ["Agents week", `agents/week/${DAY}`],
+  ["Projects day", `projects/${DAY}`],
+  ["Projects week", `projects/week/${DAY}`],
+  ["Projects month", `projects/month/${DAY}`],
+  ["Invoices", "invoices"],
+  ["Timeline", `timeline/${DAY}`],
   ["Inbox", "inbox"],
-  ["Library projects", "library"],
-  ["Library categories", "library/categories"],
-  ["Library goals", "library/goals"],
-  ["Library rules", "library/rules"],
+  ["Rules", "rules"],
+  ["Rules projects", "rules/projects"],
+  ["Rules categories", "rules/categories"],
+  ["Rules goals", "rules/goals"],
   ["Settings", "settings"],
 ] as const;
 

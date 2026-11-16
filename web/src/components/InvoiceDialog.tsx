@@ -100,7 +100,7 @@ export function InvoiceDialog({ open, monday, onClose }: { open: boolean; monday
         {lib && !rated.length ? (
           <p className="text-sm text-muted-foreground">
             No project has an hourly rate yet.{" "}
-            <button className="underline underline-offset-2" onClick={() => (onClose(), go({ view: "library", sub: "projects" }))}>Set one in Library</button>.
+            <button className="underline underline-offset-2" onClick={() => (onClose(), go({ view: "rules", sub: "projects" }))}>Set one in Rules</button>.
           </p>
         ) : (
           <form className="space-y-4" onSubmit={(e) => (e.preventDefault(), save())}>
