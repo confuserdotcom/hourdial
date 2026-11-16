@@ -5,25 +5,25 @@ first so we can agree on the shape before you write it.
 
 ## Feature freeze
 
-tock already does more than its users have asked for, so until ten people
+hourdial already does more than its users have asked for, so until ten people
 other than the author use it, it grows no wider. Until then:
 
 - **Welcome:** bug fixes, accuracy, speed and memory, install and first-run
   problems, docs, tests, and polish of what is already there.
-- **Not taken:** new platforms, new integrations (services tock talks to or
+- **Not taken:** new platforms, new integrations (services hourdial talks to or
   imports from), new interfaces, and new feature areas. Open an issue
   instead; it is a vote for what comes after the freeze.
 
-A user counts once they have run tock for a week and said so in an issue
+A user counts once they have run hourdial for a week and said so in an issue
 or a discussion. The README says when the freeze ends.
 
 ## Where new work goes
 
-tock has five faces: the CLI, the dashboard, the terminal UI, the menu bar
+hourdial has five faces: the CLI, the dashboard, the terminal UI, the menu bar
 app and the notch. One person maintains them in evenings and weekends, so
 they are not equal:
 
-- **Primary: the CLI and the dashboard.** Everything tock can do works
+- **Primary: the CLI and the dashboard.** Everything hourdial can do works
   here first, and stays working.
 - **Secondary: the terminal UI, the menu bar app and the notch.** They get
   fixes and polish, and show what the primary two already do. A change

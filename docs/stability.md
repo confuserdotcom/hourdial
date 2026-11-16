@@ -1,13 +1,13 @@
 # Stability and support
 
-This page says what you can rely on from one tock release to the next, how
+This page says what you can rely on from one hourdial release to the next, how
 the version number tells you when that changes, and which platforms are
 supported how well. It is a promise: a release that breaks it without a new
 major version is a bug.
 
 ## Version numbers
 
-tock uses [semantic versioning](https://semver.org) from v1.0.0 on:
+hourdial uses [semantic versioning](https://semver.org) from v1.0.0 on:
 
 - **Patch** (1.2.3 to 1.2.4): fixes only. Nothing you rely on changes.
 - **Minor** (1.2 to 1.3): new commands, flags, config keys, API fields and
@@ -32,7 +32,7 @@ Within one major version:
 - A key may gain new accepted values. Its default may change only in a
   minor release that says so in the CHANGELOG, and never in a way that
   sends more data off the machine or records more than before.
-- tock rejects unknown keys. A config written for 1.N loads in every later
+- hourdial rejects unknown keys. A config written for 1.N loads in every later
   1.x; one written for a later minor may not load in an earlier one.
 
 ### Command line
@@ -52,12 +52,12 @@ Within one major version:
 ### Database
 
 - `tock.db` only moves forward through numbered migrations, applied when a
-  newer tock or trackd opens it. A shipped migration is never changed, and
+  newer hourdial or trackd opens it. A shipped migration is never changed, and
   schema changes are batched: at most one new migration per release. A
   test pins each shipped migration so an edit fails the build.
 - Additive migrations (new tables, columns, indexes) leave the database
   usable by older 1.x binaries: an older trackd keeps recording into a
-  database a newer tock migrated.
+  database a newer hourdial migrated.
 - A migration that older binaries cannot work with raises the database's
   compat level. That only happens in a major release; older binaries then
   refuse to write and `tock status` says why.

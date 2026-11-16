@@ -1,6 +1,6 @@
 # Accessibility
 
-This page says what tock does for people who use a screen reader, the
+This page says what hourdial does for people who use a screen reader, the
 keyboard or reduced motion, and how far that has been checked. If something
 here does not match what you hear or see, please open an issue.
 
@@ -8,15 +8,15 @@ here does not match what you hear or see, please open an issue.
 
 The menu bar app and the notch were checked by reading their code and the
 accessibility attributes it sets (labels, roles, values, actions), and the
-words VoiceOver is given are pinned by tests. **Nobody has yet used tock end
+words VoiceOver is given are pinned by tests. **Nobody has yet used hourdial end
 to end with VoiceOver running and listened to it.** Until that happens, treat
 what follows as what the code is built to do, not as a tested experience.
 
 ## Menu bar item
 
 - The status item has a spoken label that says the state, not the glyph:
-  "tock, 2 hours 54 minutes tracked today", "tock, TD 3, 19 minutes left",
-  "tock, 1 hour tracked today, trackd is not running", "tock, not set up
+  "hourdial, 2 hours 54 minutes tracked today", "hourdial, TD 3, 19 minutes left",
+  "hourdial, 1 hour tracked today, trackd is not running", "hourdial, not set up
   yet". The label changes once a minute during a session, not every second.
 - The menu is a standard macOS menu, so VoiceOver reads it natively. Rows
   whose titles use short forms carry their own spoken label: "Rate ★4" is
@@ -34,10 +34,10 @@ what follows as what the code is built to do, not as a tested experience.
 The notch draws most of what it shows itself, which VoiceOver cannot see
 unless the code describes it. Every drawn part now does:
 
-- The notch is a group named "tock notch". VoiceOver's press opens or closes
+- The notch is a group named "hourdial notch". VoiceOver's press opens or closes
   the panel; Escape (or VoiceOver's cancel) closes it.
 - The face either side of the camera reads as one line ("Focus session: TD
-  3", "Standup, in 4 minutes", "tock, 85% of its budget"), with a running
+  3", "Standup, in 4 minutes", "hourdial, 85% of its budget"), with a running
   countdown given as its value ("19 minutes left").
 - Every panel button is a button with a press action that does what a click
   does. Start buttons say what they do ("Start a 25 minute focus session",

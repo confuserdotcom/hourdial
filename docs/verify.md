@@ -1,6 +1,6 @@
 # Checking a download
 
-Every file on the [releases page](https://github.com/confuserdotcom/tock/releases)
+Every file on the [releases page](https://github.com/confuserdotcom/hourdial/releases)
 is built by GitHub Actions from the tagged source, never on a laptop. Two
 checks, from weakest to strongest. Run them in the folder you downloaded to.
 
@@ -31,7 +31,7 @@ becomes as strong as step 2 for every file it lists.
 
 ## The built-in updater
 
-tock never downloads itself from GitHub, and no command replaces the
+hourdial never downloads itself from GitHub, and no command replaces the
 installed binaries with a release asset. Releases are checked by you,
 with the two steps above.
 
@@ -69,7 +69,7 @@ with `govulncheck` before every release.
 
 ## macOS
 
-The app is signed ad hoc, not notarized: tock has no Apple Developer ID.
+The app is signed ad hoc, not notarized: hourdial has no Apple Developer ID.
 macOS will say it cannot check the app for malicious software. The checks
 above are what stands in for notarization: run them on the `.dmg`, then
 System Settings → Privacy & Security → Open Anyway. `tock setup` then signs
@@ -83,7 +83,7 @@ Homebrew builds from the source tarball, whose sha256 is in `tock.rb`.
 The surest check is not to download a binary at all:
 
 ```sh
-git clone https://github.com/confuserdotcom/tock && cd tock
+git clone https://github.com/confuserdotcom/hourdial && cd hourdial
 git checkout <version>   # a release tag, e.g. the newest on the releases page
 make install          # macOS; Linux: make install-linux
 ```

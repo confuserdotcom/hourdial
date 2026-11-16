@@ -1,12 +1,12 @@
 # Security
 
-tock records which apps and sites you use, so a bug that leaks that data is
+hourdial records which apps and sites you use, so a bug that leaks that data is
 a security bug even if it needs local access.
 
 ## Reporting
 
 Please report privately through GitHub:
-[Report a vulnerability](https://github.com/confuserdotcom/tock/security/advisories/new).
+[Report a vulnerability](https://github.com/confuserdotcom/hourdial/security/advisories/new).
 Don't open a public issue. You should hear back within a week.
 
 Useful things to include: the version (`tock version` and `tock doctor`), the OS, what an

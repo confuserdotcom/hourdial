@@ -1,6 +1,6 @@
-# tock guide
+# hourdial guide
 
-Everything tock does, in detail. The [README](https://github.com/confuserdotcom/tock#readme) covers install
+Everything hourdial does, in detail. The [README](https://github.com/confuserdotcom/tock#readme) covers install
 and the first day.
 
 Sections:
@@ -28,10 +28,10 @@ Sections:
   when `ANTHROPIC_API_KEY` is set in the shell that runs `tock`. They are off
   until you turn them on with `tock choice claude on`, which also lists what
   is sent. Having Claude Code or an API key is not enough on its own.
-  - When on, at most once an hour, tock sends the grouped inbox keys: app name, URL host, cleaned title and minutes. It also sends your category and project names.
+  - When on, at most once an hour, hourdial sends the grouped inbox keys: app name, URL host, cleaned title and minutes. It also sends your category and project names.
   - Password managers, mail and messaging apps, banks and webmail are never sent. Extend the deny lists in `config.toml [llm]`.
   - `tock summary` runs only when you type it. It sends the day's work blocks: the weekday (never the date), clock times, minutes, labels and, per block, at most 8 apps with their URL host or cleaned title, through the same deny lists. The answer is saved in tock.db.
-  - `tock ask` sends only your question, today's date and your category and project names. Claude answers with a query, and tock runs it on this machine: no activity is sent.
+  - `tock ask` sends only your question, today's date and your category and project names. Claude answers with a query, and hourdial runs it on this machine: no activity is sent.
   - `--dry-run` on `tock suggest`, `tock summary` and `tock ask` prints the exact payload without sending it.
   - The key is read from the environment only and is never written anywhere.
 - Slack status (opt-in) is the only other network use: `tock slack`, run by
@@ -122,7 +122,7 @@ its kind, AFK window and 30 days of time. Click a kind or an AFK window to
 change it. The label picker (`t`) offers a module as you type its name or
 an alias: `ana` → `Study / Analyse 1`.
 
-While tock has the mouse, dragging no longer selects text. Hold Shift (WezTerm,
+While hourdial has the mouse, dragging no longer selects text. Hold Shift (WezTerm,
 kitty, most terminals) or Option (Terminal.app, iTerm2) while you drag to
 select text anyway.
 
@@ -314,7 +314,7 @@ removes that line, so the file is as it was.
 | `~/.local/share/tock/tock.db` | the spans (SQLite) |
 | `~/.local/state/tock/trackd.log` | trackd's log |
 | `~/.local/state/tock/*-crash.log` | crashes of `trackd`, `tock` and the menu bar app, if any: the panic and its stack, written by the program as it dies; empty when nothing crashed. A file over 256 KB is moved to `.1` at the next start |
-| `~/.local/state/tock/shell.log` | working directories from the shell hook, see [docs/shell-hook.md](https://github.com/confuserdotcom/tock/blob/main/docs/shell-hook.md) |
+| `~/.local/state/tock/shell.log` | working directories from the shell hook, see [docs/shell-hook.md](https://github.com/confuserdotcom/hourdial/blob/main/docs/shell-hook.md) |
 | `~/.local/state/tock/agents.index` | times, directories and titles read from coding agents' session logs (see [Agents](#agents)); safe to delete |
 
 `TOCK_CONFIG_DIR`, `TOCK_DATA_DIR` and `TOCK_STATE_DIR` override the three
@@ -513,7 +513,7 @@ rolls missed tasks over, imports ticks). Its output shows above the list:
 plain lines, or JSON `{"lines": ["…"], "seen": {"project": seconds}}`,
 where `seen` puts the time you spent on a `+project` next to its first open
 task today. Edits re-read the file and find the line by its text, so a
-command rewriting the file never makes tock tick the wrong task.
+command rewriting the file never makes hourdial tick the wrong task.
 
 ## Focus guard
 
@@ -536,12 +536,12 @@ in front for 10 seconds (`block_grace`) during a session is taken away:
   shows that site;
 - any other app (and Firefox) is hidden. On Hyprland its windows move to
   the special workspace `tock` (`hyprctl dispatch togglespecialworkspace
-  tock` brings them back), on Sway and i3 to the scratchpad; X11 has no
+  hourdial` brings them back), on Sway and i3 to the scratchpad; X11 has no
   way to hide them.
 
 A distraction is time whose category has `kind = "distract"`, plus the apps
 in `block_apps` and the sites in `block_hosts`. Nothing is blocked during a
-call or a meeting, and Finder and tock never are. A notification names the
+call or a meeting, and Finder and hourdial never are. A notification names the
 app, never the site. Closing a tab uses the same Automation permission trackd
 already has for reading URLs.
 
@@ -560,11 +560,11 @@ runs.
   run `tock category set <name> --interrupt on` or delete the line. Marked
   time still counts as distraction in the score and the session's quality;
   only the notice stops. With `block = true` a quiet category is still closed
-  or hidden. A `rules.toml` containing `interrupt` is refused by older tock
+  or hidden. A `rules.toml` containing `interrupt` is refused by older hourdial
   builds on another machine until they update.
 - With `urge_surf = true` the notice reads "Pause. Breathe. Name the urge."
   and offers *Back to work* or *Open anyway (counted)*. Nothing is opened or
-  blocked either way; tock counts your answer on the session. The last-session
+  blocked either way; hourdial counts your answer on the session. The last-session
   card in the TUI and the menu bar's Last session submenu show
   `urges 2 resisted · 1 given in`.
 
@@ -583,7 +583,7 @@ trackd runs them when a session starts and when it ends, whether you
 started it in the TUI, the menu bar or `tock session`. `tock doctor` checks
 that both shortcuts exist.
 
-**Slack.** tock can set your Slack status and pause Slack notifications
+**Slack.** hourdial can set your Slack status and pause Slack notifications
 for the session:
 
 1. Create a Slack app for your workspace at api.slack.com/apps, add the
@@ -595,7 +595,7 @@ for the session:
 3. `[slack] enabled = true` in config.toml. `tock slack` checks the token.
 
 The status expires on its own at the planned end. When the session ends,
-tock clears it only if it is still tock's status, so a status you set
+hourdial clears it only if it is still hourdial's status, so a status you set
 yourself in the meantime stays. trackd never talks to the network itself: it
 runs `tock slack start` and `tock slack stop`.
 
@@ -715,7 +715,7 @@ between two stretches of activity: 10 minutes to 4 hours by default
 notification. Label the absence with `a` on the today tab, `t` on its idle
 row, or `tock away 12:10 Meeting`; `A` or `tock away --skip 12:10` leaves it
 idle. When the time before the absence had a label (often reading with no
-input past its AFK window), tock asks whether you were still on it: `y`, the
+input past its AFK window), hourdial asks whether you were still on it: `y`, the
 notification's first button or `tock away 12:10 same` gives the absence that
 label. A labelled absence counts towards totals and goals, but not towards
 focus blocks, context switches or break reminders. Absences that cross
@@ -739,7 +739,7 @@ day in the TUI, a lane under the timeline in the dashboard, and a
 When trackd stopped that way and the computer restarted before trackd ran
 again, the time up to the restart is shown with *(until the restart; the
 computer may have been off for part of it)*: nothing records when the
-computer went off, so tock does not hide that time.
+computer went off, so hourdial does not hide that time.
 
 Logging out, restarting and shutting down are not "not recording": as
 trackd stops, macOS (loginwindow, or `kern.willshutdown` for `shutdown`
@@ -754,7 +754,7 @@ apart, as *apps only*, and does not count as "not recorded".
 Sleep, a locked screen and nothing in front are not "not recording".
 Gaps under a minute are not shown. This time is never counted as tracked
 or idle; the time-away prompt still covers it, so you can label what you
-did. tock has no record of trackd before this version, so older days show
+did. hourdial has no record of trackd before this version, so older days show
 nothing here.
 
 ## Categories
@@ -879,7 +879,7 @@ category = "Study"
 aliases = ["ana1", "Nombres réels", "Suites numériques"]
 ```
 
-- tock finds a module by its name and aliases in window titles and terminal
+- hourdial finds a module by its name and aliases in window titles and terminal
   directories, whatever the app: `Cours Complet ALGEBRE 1.pdf` is Algèbre
   1 and `~/Licence/S1/Analyse 1` in a terminal is Analyse 1. Case and
   accents don't matter, and words match whole (`Analyse 1` never matches
@@ -924,7 +924,7 @@ afk = "10m"          # 5m to 2h; the default is 5m
 
 A pause shorter than the window of what was in front stays with it: eight
 minutes on one page of a book is still Reading. A longer one is AFK, and all
-of it, back to your last input, is idle. This is decided when tock reads the
+of it, back to your last input, is idle. This is decided when hourdial reads the
 day, so changing `afk` changes past days too.
 
 While a video plays in the front app (it keeps the display awake), trackd
@@ -934,8 +934,8 @@ does not count. During a call you are never AFK (see Calls).
 **Machines that report no input.** On Hyprland and Sway trackd only
 learns about input through the hypridle or swayidle hook (see Linux); X11
 and i3 report it themselves. Without it, and for another
-machine whose sync folder doesn't say it reports input (an older tock),
-tock guesses: one window left unchanged for longer than `[afk] stale`
+machine whose sync folder doesn't say it reports input (an older hourdial),
+hourdial guesses: one window left unchanged for longer than `[afk] stale`
 minutes (20) keeps its category's window and the rest is idle. A page turn
 in a PDF reader changes the title, so reading still counts. `tock doctor`
 names those machines.
@@ -980,10 +980,10 @@ sheet shows its times (type to change them) and **Label**, **Add entry** or
 ## Undo
 
 `tock undo` reverses the last change: a tag, a learned rule (learned.toml
-goes back as it was; tock refuses if you edited the file since), an ignore,
+goes back as it was; hourdial refuses if you edited the file since), an ignore,
 a label for time away, or a timeline edit. Run it again to go further back;
 `tock undo --list` shows the last 20 changes. `u` does the same in the TUI
-and in `tock web`. tock keeps the last 200 changes. `tock rules merge`
+and in `tock web`. hourdial keeps the last 200 changes. `tock rules merge`
 is not in the list: it keeps `rules.toml.bak` instead.
 
 ## Work blocks, summaries and questions
@@ -1003,7 +1003,7 @@ where and for how long without leaving your machine.
 
 `tock ask "how much video last week?"` answers questions about your time:
 totals by category, project, app, site, kind or day, over a range. Claude
-only turns the question into a query; tock runs it on your data.
+only turns the question into a query; hourdial runs it on your data.
 
 Both need Claude turned on (`tock choice claude on`) and Claude Code (the
 `claude` command, logged in) or `ANTHROPIC_API_KEY`; see Privacy for what
@@ -1015,7 +1015,7 @@ they send.
 one: the whole month for a past month, the same days so far for the
 current one. It shows tracked and focus time, the average workday score
 with a daily sparkline, switches per hour and each category's change. For
-the current month it ends with what tock learned about you: see
+the current month it ends with what hourdial learned about you: see
 Recommendations.
 
 `tock review` recaps a week (this week on its last two days, the weekend
@@ -1059,17 +1059,17 @@ project` lists projects.
 
 ## Web dashboard
 
-The menu bar's **Open dashboard** shows the dashboard in its own tock
-window. While the window is open tock has a Dock icon and a menu (⌘W
+The menu bar's **Open dashboard** shows the dashboard in its own hourdial
+window. While the window is open hourdial has a Dock icon and a menu (⌘W
 closes it, ⌘R reloads, ⌘+ and ⌘− zoom and ⌘0 sets the size back; the
-window keeps the size you pick); closing it puts tock back in the menu bar
+window keeps the size you pick); closing it puts hourdial back in the menu bar
 only.
 Links that leave the page open in your browser. `tock web` serves the same
 page to your browser and runs until you press ctrl-c.
 
 - **Today:** the timeline, with one row per category on a shared hour axis
   (hover a bar for its app and title, click it to label or delete it, drag
-  across the lanes to edit a range, **Add time** for time tock didn't see;
+  across the lanes to edit a range, **Add time** for time hourdial didn't see;
   see [Editing the timeline](#editing-the-timeline)). It zooms down to a
   quarter of an hour: ⌘-scroll or pinch around the pointer, the − + buttons
   (or `-`, `+` and `0` with the timeline focused), a double click, or a
@@ -1128,7 +1128,7 @@ page to your browser and runs until you press ctrl-c.
   which invoices and `tock export --by project` use), or **Add**. Adding,
   changing and removing can be undone from the toast; a rename moves past
   entries too, and a merge asks first because it can't be undone.
-  **Rules** lists every rule in the order tock checks them, learned ones
+  **Rules** lists every rule in the order hourdial checks them, learned ones
   first, with the time each labelled in the last 30 days; a rule that never
   matched or is always beaten by an earlier one says so. Click a rule to
   change its patterns or what it files time as, or to delete it (a wrong
@@ -1232,7 +1232,7 @@ labelled.
 
 ## Commits
 
-List a project's local git repositories in `rules.toml` and tock counts
+List a project's local git repositories in `rules.toml` and hourdial counts
 your commits beside its time:
 
 ```toml
@@ -1242,7 +1242,7 @@ repos = ["~/tock"]
 ```
 
 The today tab and `tock today` show `commits  tock 4 · ATLAS 1`, and the
-week tab and `tock review` show the week's commits. tock runs
+week tab and `tock review` show the week's commits. hourdial runs
 `git log --all --no-merges` and counts only commits by the repo's
 `user.email`, including ones fetched from another machine. It reads
 author times only and never fetches. `tock doctor` checks every repo.
@@ -1287,7 +1287,7 @@ agents worked 4h36 · you 1h51 in their windows · 2.5× leverage
   the clock time too.
 - **you:** your time in windows whose title holds the session's title,
   which Claude Code puts in the terminal title.
-- **prompts:** how many prompts you typed. tock counts them from each
+- **prompts:** how many prompts you typed. hourdial counts them from each
   entry's type; it never reads their text.
 
 `--days N` and `--week` widen the range. The dashboard's Today page has
@@ -1300,7 +1300,7 @@ project (below your rules and tags, like a [shell hook](shell-hook.md)
 directory does). `agents = false` under `[shell]` in `config.toml` turns
 that off.
 
-tock reads each entry's type, time and directory and the session's title,
+hourdial reads each entry's type, time and directory and the session's title,
 never the text of a prompt, reply or tool result. It keeps those in `agents.index` in its state folder
 so the next run reads only new lines; delete the file to read everything
 again.
@@ -1387,7 +1387,7 @@ relabelling time, a new rate or a new address change nothing in it:
 totals and the PDF's hash. `--json` prints the stored record byte for
 byte, then its status; `--pdf` writes the PDF as it was issued (`-o FILE`,
 else to stdout). The database refuses
-any other change to it, from tock or anything else using SQL. It does not
+any other change to it, from hourdial or anything else using SQL. It does not
 stop someone editing the file, restoring an older copy or a disk fault;
 `tock invoice verify` notices those (exit 4) by comparing each invoice
 with the hashes stored when it was issued and with its files.
@@ -1456,7 +1456,7 @@ browser. The page has no scripts and loads nothing, so it can be mailed or
 archived as it is; window titles never appear in it. The dashboard's week
 view has the same page under **Export**, next to the week's entries as CSV
 or JSON and its hours by project (what `tock export` and
-`tock export --by project` write). In the tock window a save sheet asks
+`tock export --by project` write). In the hourdial window a save sheet asks
 where each file goes.
 
 ## Deleting old titles
@@ -1480,9 +1480,9 @@ from a backup made before.
 ## Calendar
 
 Calendar events can label the time you spend away from the Mac in a
-meeting. tock reads them through macOS Calendar, so a Google Calendar
+meeting. hourdial reads them through macOS Calendar, so a Google Calendar
 works once its account is added under System Settings › Internet Accounts
-(Calendars on). No Google credential ever reaches tock.
+(Calendars on). No Google credential ever reaches hourdial.
 
 1. In `config.toml`: `[calendar]` `enabled = true` (and optionally
    `calendars = ["Work"]`).
@@ -1514,14 +1514,14 @@ project = "ATLAS"
 ```
 
 `t` on a meeting row relabels it. Answered time away wins over an event,
-and tock does not ask about time an event explains.
+and hourdial does not ask about time an event explains.
 
 ## Planned sessions and meetings
 
 A slot is a timed plan item for today (a time context such as `@14h00`
 and a `due:` of today, not yet ticked) or, with `[calendar]` on, a timed
 calendar event. A plan item ends at the next timed item of that day, at
-most 3 hours later. tock tells you about each slot twice:
+most 3 hours later. hourdial tells you about each slot twice:
 
 | Notice | When | Title | Body |
 |---|---|---|---|
@@ -1562,7 +1562,7 @@ anything else is ignored, with no button and no log line. With
 the starting notice, once, but only for an event you organize or accepted (or
 that has no other attendee): an invite you have not answered, or answered
 "maybe", still offers `Join` and waits for your click. trackd never opens
-anything, and tock never blocks.
+anything, and hourdial never blocks.
 
 The menu bar menu shows `Next: 14:00 Review (in 12 min)` when a slot starts
 within the hour (`now` while it runs), and `Join Standup` when that slot is an
@@ -1570,7 +1570,7 @@ event with a link starting within 10 minutes or running.
 
 ## Recommendations
 
-tock learns from your own history when you focus best and for how long, and
+hourdial learns from your own history when you focus best and for how long, and
 uses it for two things: a suggestion to start a focus session at a good
 moment, and a break reminder that follows how long you usually keep focus.
 Everything is computed on this machine from your own data, with no network
@@ -1655,7 +1655,7 @@ run is measured from its end. When the break ends, trackd sends one `Break
 over` notice (`10 min break done. Back to it.`); a trackd that first sees the
 end more than 5 minutes late, because it was not running, sends none.
 *Not now* changes nothing about when the next reminder comes. *Snooze*
-closes the suggestion without an answer: it is not counted when tock learns
+closes the suggestion without an answer: it is not counted when hourdial learns
 which hours you refuse.
 
 **Answering.** Every suggestion and break reminder is kept as a row in
@@ -1752,7 +1752,7 @@ window stays in front; raise `interval` to read less. Nothing runs while
 ## Menu bar and notifications
 
 `make install` also installs `tock.app`, a small menu bar app that runs at
-login. The first time it starts, macOS asks whether **tock** may send
+login. The first time it starts, macOS asks whether **hourdial** may send
 notifications; allow it.
 
 The menu bar shows today's tracked time (`◷ 2h54`), or the countdown while
@@ -1780,9 +1780,9 @@ menu stays short and shows a row only when it matters:
 - **Settings**: the same switches as `tock choice`, ticked when on;
   **Privacy**, which offers **Hide &lt;app&gt;** and **Hide &lt;site&gt;** for what was
   just in front and lists what is hidden (click one to show it again);
-  **Notifications…**, **Accessibility…** and **Quit tock menu bar**.
+  **Notifications…**, **Accessibility…** and **Quit hourdial menu bar**.
 
-**Set up tock** replaces all this while there are no rules yet (it writes
+**Set up hourdial** replaces all this while there are no rules yet (it writes
 the starter rules, as `tock init` does).
 
 A hidden app or site goes to `[privacy] hide_apps` and `hide_sites` in
@@ -1800,7 +1800,7 @@ screen. Shortcuts, Raycast and scripts can do the same with links:
 `tock session start --goal "…"` sets it from the terminal.
 
 With the app running and allowed to notify, focus notifications come from
-tock with buttons:
+hourdial with buttons:
 
 | Notification | Buttons |
 |---|---|
@@ -1817,7 +1817,7 @@ Routine notices (start of day, midday check-in, recap, overworking) and
 Up-next notices of plan items come without buttons too.
 
 Without the app, or with its notifications turned off, trackd sends plain
-notifications as before. `tock doctor` says which is in use. **Quit tock
+notifications as before. `tock doctor` says which is in use. **Quit hourdial
 menu bar** keeps it closed until the next login; `make install` starts it
 again. Its log is `~/.local/state/tock/tockbar.log`, and it never logs
 notification text.
@@ -1923,7 +1923,7 @@ trackd runs as the systemd user unit `trackd.service` and starts with your
 graphical session. Its log is `~/.local/state/tock/trackd.log`, and
 `systemctl --user status trackd` shows the unit.
 
-The desktop gives a window's title but no browser's address. A small tock
+The desktop gives a window's title but no browser's address. A small hourdial
 extension sends the tab in front to trackd through the browser's native
 messaging (trackd is started by the browser and reads its stdin; nothing
 goes over the network). Run
@@ -2062,8 +2062,8 @@ Blocking cannot hide windows on X11; the drift notice still goes out.
 
 ## Sync between machines
 
-tock can merge the time you spend on two machines, for example the Mac and
-a Linux desktop, into one view on each. tock does not move any data itself.
+hourdial can merge the time you spend on two machines, for example the Mac and
+a Linux desktop, into one view on each. hourdial does not move any data itself.
 Pick a folder that your own tool keeps in sync, such as Syncthing or a
 network share, and name it on both machines in `config.toml`:
 
@@ -2091,7 +2091,7 @@ Every minute, trackd writes this machine's last two days to
   Its time never enters this machine's inbox or Claude suggestions.
 - **Rules.** Each machine also shares its `rules.toml`. When another
   machine's copy changed later than yours, has fully arrived and parses with
-  your `learned.toml`, tock takes it and keeps yours as `rules.toml.bak`.
+  your `learned.toml`, hourdial takes it and keeps yours as `rules.toml.bak`.
   `learned.toml` stays per machine, but a category or project merged or
   renamed on the other machine is renamed in yours too (kept as
   `learned.toml.bak`), and in your hand tags, so the new rules still parse.
@@ -2114,12 +2114,12 @@ do not run `make install` or copy files.
   `main` runs `make update` in the background and logs to
   `~/.local/state/tock/update.log`; git never waits for it. It builds from a
   clean checkout of `main` (never your working tree), runs `go vet` and the
-  tests there, and only if they pass reinstalls trackd, tock and tockbar. A
+  tests there, and only if they pass reinstalls trackd, hourdial and tockbar. A
   `main` that fails them is neither installed nor published; the log says
   why, and the next commit tries again (`UPDATE_SKIP_TESTS=1 make update`
   skips the tests in an emergency). It does nothing when `main` is already
   installed. You can run `make update` by hand too.
-- **Publishing.** The same run builds trackd and tock for linux-amd64 and
+- **Publishing.** The same run builds trackd and hourdial for linux-amd64 and
   linux-arm64 and publishes them, signed, to `<sync dir>/bin`
   (`make publish-linux` does only this). The signing key is
   `~/.local/share/tock/update.key`, made on the first run. It never goes in
@@ -2141,7 +2141,7 @@ do not run `make install` or copy files.
   back) and restarts itself. A different key in the folder is refused and
   shown by `tock doctor`; if you made a new key on the Mac, trust its
   fingerprint the same way. `tock update` shows the trusted key.
-- **Once on a Linux machine without tock, or with one from before
+- **Once on a Linux machine without hourdial, or with one from before
   updates,** run the command `make bootstrap-hint` prints there
   (`make bootstrap-hint ARCH=arm64` for an ARM machine). It copies the
   build out of the sync folder, checks both files against sums written in
@@ -2157,7 +2157,7 @@ do not run `make install` or copy files.
 trackd keeps a copy of `tock.db` every day, while you're away from the
 computer, in `~/.local/share/tock/backups/auto/`. It keeps the newest 7;
 `[backup] keep` in `config.toml` changes that, and `keep = 0` turns the
-daily copies off. Before a new version changes the database, tock also
+daily copies off. Before a new version changes the database, hourdial also
 keeps a copy of it as it was (`pre-v0023-to-v0024.db.gz`) for 14 days. If
 that copy can't be made, for example because the disk is full, the new
 version doesn't change the database and says why.
@@ -2183,7 +2183,7 @@ titles up to 7 days past `[privacy] keep_titles`.
 
 `tock status` starts with a word and `!` when trackd needs a look:
 
-- `old!` trackd stopped because a newer tock changed the database in a
+- `old!` trackd stopped because a newer hourdial changed the database in a
   way it can't follow. `tock status` prints the command that updates it.
 - `write failed!` a write to the database failed in the last 24 hours.
   trackd restarts itself and records it; the time it lost shows as not
@@ -2207,7 +2207,7 @@ When a program crashes, the panic and its stack also go to
 your `tock backup` archives, newest first. `tock restore 2` puts the
 second one back:
 
-1. It checks the copy, and refuses one made by a newer tock.
+1. It checks the copy, and refuses one made by a newer hourdial.
 2. It says what you lose (activity recorded after the copy was made) and
    asks; `--yes` skips the question. If the copy lacks invoices you issued
    since, it names them and goes on only with `--yes`. Their files stay in
@@ -2226,7 +2226,7 @@ config are in the archive, to copy back by hand if you want them.
 ## Import
 
 `tock import activitywatch <export.json>` reads your ActivityWatch history
-into tock. Get the file from ActivityWatch's web UI (**Raw Data ▸ Export all
+into hourdial. Get the file from ActivityWatch's web UI (**Raw Data ▸ Export all
 buckets as JSON**), or with ActivityWatch running:
 
 ```sh
@@ -2243,7 +2243,7 @@ tock import activitywatch aw.json
 - URLs are stored like trackd stores them (host and path, no query), and
   `[privacy]` hide lists apply.
 - Importing again replaces the days in the file, so a newer export never
-  counts twice. tock reads the file only; it never talks to ActivityWatch.
+  counts twice. hourdial reads the file only; it never talks to ActivityWatch.
 
 ## Uninstall
 

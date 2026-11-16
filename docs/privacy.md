@@ -1,6 +1,6 @@
 # Privacy
 
-tock records which app and window are in front, all day. That is private by
+hourdial records which app and window are in front, all day. That is private by
 nature, so this page says exactly what is kept, where, and what can leave
 your machine. Everything here is checked against the code; if you find a
 difference, it is a bug (see [SECURITY.md](../SECURITY.md)).
@@ -27,7 +27,7 @@ window. Optional extras, each off until you turn it on:
 ## What is never stored
 
 - **Private browser windows:** recorded as `<app> (private)`, with no
-  title and no URL. On macOS tock reads the URL from Chrome, Arc,
+  title and no URL. On macOS hourdial reads the URL from Chrome, Arc,
   Brave, Edge, Vivaldi, Chromium and Safari (beta and nightly builds
   included), and only titles from Firefox and its forks (Zen, LibreWolf,
   Waterfox, Floorp). Browsers whose private windows it cannot recognise
@@ -42,7 +42,7 @@ window. Optional extras, each off until you turn it on:
 `[privacy] keep_titles = N` deletes titles and URL paths older than N days.
 
 `tock commits` reads your repos' history when you run it and stores
-nothing from it; it prints each commit's short hash and subject. tock
+nothing from it; it prints each commit's short hash and subject. hourdial
 (not trackd or the menu bar app) reads Claude Code's session logs in
 `~/.claude/projects` for each entry's type, time and working directory
 and each session's title, never the text of prompts, replies or tool
@@ -58,7 +58,7 @@ The data dir (`~/.local/share/tock`) and the state dir (`~/.local/state/tock`)
 are readable by you only (0700 folders, 0600 files); trackd closes either
 folder to other users at start if it finds it open. That covers the
 database, its snapshots in `backups/`, the logs, and the invoice previews
-and week reports tock writes for you (`drafts/`, `reports/` in the state
+and week reports hourdial writes for you (`drafts/`, `reports/` in the state
 dir). Snapshots and `tock
 backup` archives hold your titles and URLs too, so keep them out of git and
 shared folders.
@@ -83,8 +83,8 @@ would add well under 1 %. trackd writes a span every few seconds, far
 inside its 1 % idle CPU budget either way.
 
 **Whole-file (SQLCipher-style) does not fit the build.** SQLCipher is C,
-and trackd and tock are pure Go with no cgo (the Linux builds use
-`CGO_ENABLED=0`). The SQLite driver tock uses (`modernc.org/sqlite`) has
+and trackd and hourdial are pure Go with no cgo (the Linux builds use
+`CGO_ENABLED=0`). The SQLite driver hourdial uses (`modernc.org/sqlite`) has
 no encrypting storage layer. The pure-Go route would be a different
 driver with an encrypting VFS, which means replacing the database layer
 and re-measuring trackd's memory, for the whole data set.
@@ -105,7 +105,7 @@ macOS and a running keyring on Linux (headless machines have none).
 
 **Decision.** No encryption at rest in 1.x for now. What protects the data
 today: full-disk encryption (FileVault, LUKS), which covers a lost or
-stolen machine better than anything tock could add; 0600 files in 0700
+stolen machine better than anything hourdial could add; 0600 files in 0700
 folders; `keep_titles` and `tock prune`, which delete titles after N
 days; and `[privacy] hide_apps` and `hide_sites`, which keep titles and
 URLs from being stored at all.
@@ -138,11 +138,11 @@ token, and loads nothing from the internet.
 
 With `[sync] dir` set, each machine writes its spans (titles and URLs
 included), its `machine.json` and, unless `rules = false`, its
-`rules.toml` to that folder. tock does not upload it anywhere: whatever
+`rules.toml` to that folder. hourdial does not upload it anywhere: whatever
 syncs the folder (Syncthing, iCloud Drive, Dropbox) decides where it goes.
 Pick one you trust with your activity.
 
-On Linux, the sync folder can also carry new tock builds from the Mac, if
+On Linux, the sync folder can also carry new hourdial builds from the Mac, if
 you turn that on (`[sync] update = true`). A build is installed only when
 it is signed by the key you trusted by fingerprint with `tock update
 trust`; the folder alone can never make a machine trust a key. See
@@ -159,32 +159,32 @@ does and does not cover.
 |---|---|
 | Another user account on the same machine | No, unless they are an administrator. |
 | An administrator or root | Yes. |
-| Any program running as you (including malware) | Yes. tock cannot defend against your own account. |
+| Any program running as you (including malware) | Yes. hourdial cannot defend against your own account. |
 | Someone with your unlocked machine | Yes. |
 | Someone with your powered-off or stolen machine | Only if the disk is not encrypted. Turn on FileVault (macOS) or LUKS (Linux). |
 | Your backup tool (Time Machine, a cloud backup of your home folder) | Yes, the data dir is backed up like any other folder unless you exclude it. |
 | Whatever syncs your sync folder | Yes, if you set `[sync] dir`: spans go there with titles and URLs. |
 | Anthropic or Slack | Only what the table above lists, and only after you turn the feature on. |
 | Other sites or programs, through the dashboard | No. It listens on 127.0.0.1, needs a per-run token and checks the Host header. |
-| The author of tock | No. Nothing is sent, and there is no account or server. |
+| The author of hourdial | No. Nothing is sent, and there is no account or server. |
 
 To keep less: `hide_apps` and `hide_sites` keep only the time,
 `keep_titles = N` deletes titles and URL paths after N days, `tock prune`
 does that now (the spans and their labels stay), and `tock uninstall
 --purge` removes everything.
 
-## What tock is for
+## What hourdial is for
 
-tock is a tool for looking at your own time. It is not built for watching
+hourdial is a tool for looking at your own time. It is not built for watching
 anyone else, and it is not to be used that way: do not install it on a
 machine another person uses without them knowing and agreeing. It has no
 remote view, no hidden mode and no central server, on purpose. An employer
 who records staff activity takes on legal duties (GDPR in the EU, and
-similar laws elsewhere) that tock does nothing to meet.
+similar laws elsewhere) that hourdial does nothing to meet.
 
 ## No telemetry
 
-tock sends no usage data, crash reports or analytics. `tock bug-report`
+hourdial sends no usage data, crash reports or analytics. `tock bug-report`
 writes a file for you to look through and attach to an issue yourself:
 `tock doctor --json`, `config.toml` with every text value removed, the
 end of the logs without lines that could hold a title or URL, the crash

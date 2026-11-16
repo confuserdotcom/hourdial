@@ -36,7 +36,7 @@ if they existed; the database, its WAL and SHM, backups (VACUUM INTO then
 chmod), sync files, tokens and keys are 0600 (`internal/store/store.go`,
 `internal/snapshot/file.go`, `internal/syncdir`, `cmd/tock/cmd_slack.go`).
 
-**Updates** (`internal/update`, `cmd/trackd/update.go`) — tock has no
+**Updates** (`internal/update`, `cmd/trackd/update.go`) — hourdial has no
 self-update from GitHub; release downloads are checked by hand
 ([verify.md](verify.md)). The one updater is the opt-in Linux one, which
 installs what the Mac publishes to the sync folder. The sums come from
@@ -146,7 +146,7 @@ Found in the 2026-11-14 pass and not changed:
 - The Sway/i3 reply cap is 4 MiB, set from real trees measured in the
   e2e job and below trackd's memory budget. Only your own window manager
   can send one.
-- A tock built without a build time accepts older signed Linux builds
+- An hourdial built without a build time accepts older signed Linux builds
   (see Updates).
 
 ## Not covered

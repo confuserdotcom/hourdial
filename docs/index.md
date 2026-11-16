@@ -1,19 +1,19 @@
-# tock
+# hourdial
 
-<p class="lead">Know where the day went. Decide where it goes. tock records your working time without a timer, labels it with rules you can read, and turns it into invoices that don't change once issued. Free and open source, on a Mac or on Linux under Hyprland, Sway, i3 or X11; your data stays on your machine, in one SQLite file.</p>
+<p class="lead">Know where the day went. Decide where it goes. hourdial records your working time without a timer, labels it with rules you can read, and turns it into invoices that don't change once issued. Free and open source, on a Mac or on Linux under Hyprland, Sway, i3 or X11; your data stays on your machine, in one SQLite file.</p>
 
 <video class="shot" controls playsinline preload="none" poster="assets/film-poster.jpg" width="1280" height="720">
   <source src="assets/film.mp4" type="video/mp4">
 </video>
 
-tock is for people who work at a computer for themselves and want an honest
+hourdial is for people who work at a computer for themselves and want an honest
 record of the day. If you work with coding agents, `tock agents` keeps the
 other half of the ledger: what your agents worked on today, and what you
 did while they ran.
 
 <picture class="shot">
   <source media="(prefers-color-scheme: dark)" srcset="readme/web-dark.png">
-  <img src="readme/web-light.png" alt="The tock dashboard for one day: a timeline with one row per category, a focus score compared with a usual Thursday, minutes per hour, a donut of the kinds of time, goal rings, and tables of categories and apps.">
+  <img src="readme/web-light.png" alt="The hourdial dashboard for one day: a timeline with one row per category, a focus score compared with a usual Thursday, minutes per hour, a donut of the kinds of time, goal rings, and tables of categories and apps.">
 </picture>
 
 <picture class="shot">
@@ -41,7 +41,7 @@ did while they ran.
 - **Shows the day plainly.** A terminal UI, a dashboard on 127.0.0.1, and a
   menu bar app. Every number is compared with your usual same weekday.
 - **Focus sessions, if you want them.** `tock session start 50` or `⌥⌘F`
-  from any app. tock calls you back when you drift. `tock choice focus off`
+  from any app. hourdial calls you back when you drift. `tock choice focus off`
   hides all of it.
 
 ## Install
@@ -55,23 +55,23 @@ brew install tock
 tock setup
 ```
 
-Homebrew builds tock on your Mac, so there is no "unidentified developer"
+Homebrew builds hourdial on your Mac, so there is no "unidentified developer"
 warning. `tock setup` makes a local code-signing certificate, installs
 trackd and the menu bar app, and starts them.
 
 Without Homebrew, download the `.dmg` from
-[Releases](https://github.com/confuserdotcom/tock/releases). It isn't
+[Releases](https://github.com/confuserdotcom/hourdial/releases). It isn't
 notarized, so the first time you open it, allow it under System Settings,
 Privacy & Security, Open Anyway. To build from source, see the
 [README](https://github.com/confuserdotcom/tock#install).
 
 On Linux under Hyprland, Sway, i3 or X11, run `make install-linux`, or download a tarball
-from [Releases](https://github.com/confuserdotcom/tock/releases). Coming from
+from [Releases](https://github.com/confuserdotcom/hourdial/releases). Coming from
 ActivityWatch? `tock import activitywatch export.json` brings your history.
 
 ## How it fits together
 
-<img class="shot" src="assets/diagrams/pieces.svg" alt="trackd takes events from the desktop and writes spans to tock.db. tock and tockbar read tock.db and label it with rules.toml, learned.toml and config.toml. Only tock reaches the internet, for Claude and Slack, when you turn them on.">
+<img class="shot" src="assets/diagrams/pieces.svg" alt="trackd takes events from the desktop and writes spans to tock.db. hourdial and tockbar read tock.db and label it with rules.toml, learned.toml and config.toml. Only hourdial reaches the internet, for Claude and Slack, when you turn them on.">
 
 More in [Architecture](architecture).
 
@@ -92,4 +92,4 @@ The whole list is in [Privacy in detail](guide#privacy-in-detail).
 
 - [Guide](guide): every command, file and setting.
 - [Architecture](architecture): how the pieces fit, and what they cost.
-- [Changelog](https://github.com/confuserdotcom/tock/blob/main/CHANGELOG.md).
+- [Changelog](https://github.com/confuserdotcom/hourdial/blob/main/CHANGELOG.md).

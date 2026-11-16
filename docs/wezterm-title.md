@@ -1,6 +1,6 @@
 # WezTerm window title with the project directory
 
-tock sees only the terminal's window title. By default WezTerm shows the
+hourdial sees only the terminal's window title. By default WezTerm shows the
 running program's title (for example a Claude Code task name), which says
 nothing about which project you are in. This hook prefixes the title with the
 basename of the active pane's working directory, so rules can map terminal
@@ -30,7 +30,7 @@ wezterm.on('format-window-title', function(tab, pane, tabs, panes, config)
 end)
 ```
 
-The separator is `│` (U+2502, box drawing), surrounded by spaces. tock's
+The separator is `│` (U+2502, box drawing), surrounded by spaces. hourdial's
 title cleaner keeps it, and the starter rules match titles like `^tock │`.
 
 WezTerm learns the working directory from the shell (OSC 7) or, for local

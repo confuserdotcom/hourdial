@@ -1,5 +1,5 @@
-title: tock
-description: Records what you work on and labels it with rules you write. Local, one SQLite file.
+title: hourdial
+description: A local time tracker for developers. What you and your coding agents worked on, per project, ready to bill. Nothing leaves your machine.
 markdown: kramdown
 kramdown:
   input: GFM

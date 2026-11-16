@@ -1,6 +1,6 @@
 # Shell hook: terminal time by working directory
 
-tock sees a terminal's window title, not where your shell is. The shell hook
+hourdial sees a terminal's window title, not where your shell is. The shell hook
 records the working directory each time zsh shows a prompt or starts a
 command, so rules can map terminal time to projects in any terminal, even
 while a program such as Claude Code or nvim owns the title.
