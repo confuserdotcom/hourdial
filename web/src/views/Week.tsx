@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,6 @@ import { TimeTable } from "@/components/Tables";
 import { Explain, Sum, Why } from "@/components/Explain";
 import { STATS } from "@/lib/explain";
 import { KindsHelp } from "@/components/KindsHelp";
-import { InvoiceDialog } from "@/components/InvoiceDialog";
 import { useApi, type Hours, type Week as WeekT } from "@/lib/api";
 import { dur, hhmm, parseDate, shortDay, dayTitle, addDays, isoDate } from "@/lib/format";
 import { download } from "@/lib/download";
@@ -115,7 +113,6 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
 
 /** Export saves the week as tock report and tock export write it. */
 function Export({ monday }: { monday: string }) {
-  const [inv, setInv] = useState(false);
   const { items, invoice } = weekExports(useGroups().billing);
   const sun = isoDate(addDays(parseDate(monday), 6));
   async function save(e: WeekExport) {
@@ -144,14 +141,13 @@ function Export({ monday }: { monday: string }) {
           </button>
         ))}
         {invoice && (
-          <button onClick={() => setInv(true)} className="flex w-full flex-col items-start rounded-md px-2.5 py-2 text-left hover:bg-accent">
+          <button onClick={() => go({ view: "invoices", unit: "custom", date: monday, to: sun })} className="flex w-full flex-col items-start rounded-md px-2.5 py-2 text-left hover:bg-accent">
             <span className="text-sm">Invoice…</span>
-            <span className="text-xs text-muted-foreground">Preview one project's invoice, then issue it</span>
+            <span className="text-xs text-muted-foreground">Draft one project's invoice for this week in Invoices</span>
           </button>
         )}
       </PopoverContent>
     </Popover>
-    {invoice && <InvoiceDialog open={inv} monday={monday} onClose={() => setInv(false)} />}
     </>
   );
 }

@@ -156,7 +156,7 @@ export default function App() {
           <main key={route.view} className="mx-auto w-full max-w-[1400px] flex-1 px-6 py-6 animate-in fade-in-0 slide-in-from-bottom-1 duration-200 motion-reduce:animate-none">
             {route.view === "agents" && <Agents route={route} tick={tick} />}
             {route.view === "projects" && <Projects route={route} tick={tick} />}
-            {route.view === "invoices" && <Invoices tick={tick} />}
+            {route.view === "invoices" && <Invoices route={route} tick={tick} />}
             {route.view === "timeline" && <Today date={route.date} tick={tick} />}
             {route.view === "inbox" && <Inbox onChange={inbox.reload} />}
             {route.view === "rules" && <Library tick={tick} sub={route.sub} />}

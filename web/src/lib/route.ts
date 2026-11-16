@@ -80,7 +80,7 @@ export function parse(): Route {
 /** format is the hash of a route, without what its view does not use. */
 export function format(r: Route): string {
   const at = r.project && (r.view === "projects" || r.view === "invoices") ? `/@${encodeURIComponent(r.project)}` : "";
-  if (r.view === "invoices") return `invoices${at && r.unit === "custom" ? `/${r.date}..${r.to}` : ""}${at}`;
+  if (r.view === "invoices") return `invoices${r.unit === "custom" ? `/${r.date}..${r.to}` : ""}${at}`;
   return place(r) + at;
 }
 

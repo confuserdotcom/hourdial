@@ -196,6 +196,12 @@ export type InvoicePreview = {
   project: string; number: string; seconds: number; total: number; currency: string; totalText: string; days: number;
   modelOnlyS: number; overlaps: string[];
 };
+/** IssuedInvoice is one row of GET /api/invoices: dates and total as the
+ *  invoice's own document writes them. */
+export type IssuedInvoice = {
+  number: string; status: "issued" | "void"; issued: string; issuedMS: number; project: string; client: string;
+  from: string; to: string; seconds: number; total: string; voidReason?: string; supersedes?: string; replacedBy?: string;
+};
 export type InvoiceIssued = { number: string; total: number; currency: string; totalText: string };
 export type Feature = {
   id: string; group: string; name: string; note: string; on: boolean; live: boolean;

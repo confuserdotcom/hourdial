@@ -67,20 +67,33 @@ test("a day picked on the week chart with the keyboard opens it", async ({ page 
   await expect(page).toHaveURL(/#timeline\/2026-11-03$/);
 });
 
-test("an invoice for a rated project previews and issues with its number and total", async ({ page }) => {
+test("an invoice for a rated project previews, issues after a confirmation, and joins the list", async ({ page }) => {
   await open(page, `projects/week/${DAY}`);
   await page.getByRole("button", { name: "Export" }).click();
   await page.getByRole("button", { name: /^Invoice…/ }).click();
-  const dialog = page.getByRole("dialog", { name: "Invoice" });
-  await expect(dialog.getByLabel("Project")).toHaveValue(/.+/);
-  const preview = dialog.locator("p.num");
-  await expect(preview).toContainText(/\d[\d,.]*\.\d\d EUR/);
-  const total = /(\d[\d,.]*\.\d\d EUR)/.exec(await preview.innerText())![1];
-  await dialog.getByRole("button", { name: "Issue", exact: true }).click();
-  await expect(dialog).toBeHidden();
+  await expect(page).toHaveURL(/#invoices\/2026-11-02\.\.2026-11-08$/);
+  const draft = page.getByRole("region", { name: "Draft" });
+  await expect(draft.getByLabel("Project")).toHaveValue(/.+/);
+  await expect(draft.getByLabel("First day")).toHaveValue("2026-11-02");
+  const preview = draft.locator("[data-preview] span");
+  await expect(preview).toHaveText(/\d[\d,.]*\.\d\d EUR/);
+  const total = (await preview.innerText()).trim();
+  await draft.getByRole("button", { name: "Issue…" }).click();
+  const confirm = page.getByRole("dialog", { name: "Issue this invoice?" });
+  await expect(confirm).toContainText("permanent and numbered");
+  await confirm.getByRole("button", { name: "Issue it" }).click();
+  await expect(confirm).toBeHidden();
   // The toast names the number the invoice got and the total it was issued for.
-  const issued = page.getByText(/^Issued \S+ · /);
-  await expect(issued).toHaveText(new RegExp(`^Issued [A-Za-z0-9-]*\\d[A-Za-z0-9-]* · ${total.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`));});
+  const said = page.getByText(/^Issued \S+ · /);
+  await expect(said).toContainText(total);
+  const number = /^Issued (\S+) · /.exec(await said.innerText())![1];
+  const row = page.getByRole("region", { name: "Issued" }).locator("li").filter({ hasText: number });
+  await expect(row).toContainText("issued");
+  await expect(row).toContainText(total);
+  const dl = page.waitForEvent("download");
+  await row.getByRole("button", { name: `Save the PDF of ${number}` }).click();
+  expect((await dl).suggestedFilename()).toBe(`${number}.pdf`);
+});
 
 test("the old tabs' addresses open the tabs that took them over", async ({ page }) => {
   await open(page, `week/${DAY}`);
