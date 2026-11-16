@@ -7,6 +7,7 @@ import { DAY, open } from "./helpers";
 const VIEWS = [
   ["Agents", `agents/${DAY}`],
   ["Agents week", `agents/week/${DAY}`],
+  ["Agents custom", "agents/2026-10-20..2026-11-05"],
   ["Projects day", `projects/${DAY}`],
   ["Projects week", `projects/week/${DAY}`],
   ["Projects month", `projects/month/${DAY}`],

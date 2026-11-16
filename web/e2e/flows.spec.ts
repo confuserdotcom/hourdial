@@ -100,3 +100,23 @@ test("the sidebar leads with agents, and the range carries over to projects", as
   await page.getByRole("navigation", { name: "Views" }).first().getByRole("button", { name: /^Projects/ }).click();
   await expect(page).toHaveURL(/#projects\/week/);
 });
+
+test("the agent ledger shows leverage and your time, and a project opens Projects", async ({ page }) => {
+  await open(page, `agents/${DAY}`);
+  const rows = page.locator("main tbody tr");
+  await expect(rows).toHaveCount(3);
+  await expect(page.getByRole("region", { name: "Totals" })).toContainText(/Leverage\d+[.,]\d×/);
+  await expect(rows.filter({ hasText: "tock" }).getByRole("img", { name: /^You \d+h\d\d$/ })).toBeVisible();
+  await rows.filter({ hasText: "tock" }).getByRole("button").click();
+  await expect(page).toHaveURL(new RegExp(`#projects/${DAY}$`));
+});
+
+test("a custom range shows on its button and in the address", async ({ page }) => {
+  await open(page, `agents/${DAY}`);
+  await page.getByRole("button", { name: "Custom" }).click();
+  await page.getByLabel("From", { exact: true }).fill("2026-10-20");
+  await page.getByLabel("To", { exact: true }).fill("2026-11-05");
+  await page.getByRole("button", { name: "Show" }).click();
+  await expect(page).toHaveURL(/#agents\/2026-10-20\.\.2026-11-05$/);
+  await expect(page.getByRole("button", { name: /20 Oct – .*5 Nov/ })).toBeVisible();
+});

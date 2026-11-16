@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Bot, CircleQuestionMark, Clock, FolderKanban, Inbox as InboxIcon, ReceiptText, Search, Settings as Gear, Tags } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useApi, type Inbox as InboxT, type Status } from "@/lib/api";
-import { holdsToday, hhmm, isoDate, setClock, setDateStyle, setNumbers, setWeekStart, stepDate, dur } from "@/lib/format";
+import { dayTitle, holdsToday, hhmm, isoDate, parseDate, setClock, setDateStyle, setNumbers, setWeekStart, stepDate, dur } from "@/lib/format";
 import { go, ranged, unitOf, UNITS, useRoute, VIEWS, type View } from "@/lib/route";
 import { cn } from "@/lib/utils";
 import { GroupsContext, groupsOf } from "@/lib/groups";
@@ -28,6 +29,13 @@ const NATIVE = /tock-app/.test(navigator.userAgent);
 
 const TITLES: Record<View, string> = { agents: "Agents", projects: "Projects", invoices: "Invoices", timeline: "Timeline", inbox: "Inbox", rules: "Rules", settings: "Settings" };
 const ICONS: Record<View, typeof Bot> = { agents: Bot, projects: FolderKanban, invoices: ReceiptText, timeline: Clock, inbox: InboxIcon, rules: Tags, settings: Gear };
+/** GROUPS are the sidebar's sections: the ledger that is billed from, the
+ *  record it is built on, and how that record gets its labels. */
+const GROUPS: [string, (typeof VIEWS)[number][]][] = [
+  ["Ledger", ["agents", "projects", "invoices"]],
+  ["Record", ["timeline", "inbox"]],
+  ["Setup", ["rules"]],
+];
 const UNIT_NAMES = { day: "Day", week: "Week", month: "Month" } as const;
 
 /** useTick changes once a minute, so live views refresh. */
@@ -95,8 +103,13 @@ export default function App() {
               <Mark /> hourdial
             </button>
           </div>
-          <nav className="mt-2 flex flex-col gap-0.5 px-3" aria-label="Views">
-            {VIEWS.map((v, i) => <NavItem key={v} v={v} k={String(i + 1)} active={route.view === v} count={v === "inbox" ? inboxN : 0} />)}
+          <nav className="mt-2 flex flex-col gap-4 px-3" aria-label="Views">
+            {GROUPS.map(([name, views]) => (
+              <div key={name} className="flex flex-col gap-0.5" role="group" aria-label={name}>
+                <div className="lbl px-2.5 pb-1" aria-hidden>{name}</div>
+                {views.map((v) => <NavItem key={v} v={v} k={String(VIEWS.indexOf(v) + 1)} active={route.view === v} count={v === "inbox" ? inboxN : 0} />)}
+              </div>
+            ))}
           </nav>
           <div className="mt-auto space-y-3 p-3">
             <FocusDock />
@@ -119,6 +132,7 @@ export default function App() {
                   {UNITS.map((u) => <ToggleGroupItem key={u} value={u} className="h-7 px-2.5 text-xs">{UNIT_NAMES[u]}</ToggleGroupItem>)}
                 </ToggleGroup>
               )}
+              {ranged(route.view) && <CustomRange from={route.date} to={route.to} on={route.unit === "custom"} />}
               {unit && <DateControl date={route.date} unit={unit} onDate={(d) => go({ date: d })} />}
               {unit && <span className="mx-2 h-4 w-px bg-border" aria-hidden />}
               <button onClick={openPalette}
@@ -157,6 +171,37 @@ export default function App() {
     </TooltipProvider>
     </GroupsContext.Provider>
     </LiveContext.Provider>
+  );
+}
+
+/** CustomRange picks any days for Agents and Projects: from, to, a year at
+ *  most. Its button names the range while it is the one shown. */
+function CustomRange({ from, to, on }: { from: string; to: string; on: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [a, setA] = useState(from);
+  const [b, setB] = useState(to);
+  useEffect(() => (setA(from), setB(to)), [from, to, open]);
+  const today = isoDate(new Date());
+  const bad = !a || !b ? "Pick both days." : a > b ? "The first day is after the last." : b > today ? "The last day is in the future." : "";
+  const field = "num h-8 rounded-md border bg-background px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button aria-pressed={on}
+          className={cn("mr-2 h-7 rounded-md border px-2.5 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", on && "bg-accent font-medium text-foreground")}>
+          {on ? `${dayTitle(parseDate(from))} – ${dayTitle(parseDate(to))}` : "Custom"}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-auto p-3">
+        <form className="flex items-end gap-2" onSubmit={(e) => { e.preventDefault(); if (!bad) { go({ unit: "custom", date: a, to: b }); setOpen(false); } }}>
+          <label className="grid gap-1 text-xs text-muted-foreground">From<input type="date" className={field} value={a} max={today} onChange={(e) => setA(e.target.value)} /></label>
+          <label className="grid gap-1 text-xs text-muted-foreground">To<input type="date" className={field} value={b} max={today} onChange={(e) => setB(e.target.value)} /></label>
+          <button type="submit" disabled={!!bad}
+            className="h-8 rounded-md bg-foreground px-3 text-xs font-medium text-background transition-colors hover:bg-foreground/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40">Show</button>
+        </form>
+        {bad && <p className="mt-2 text-xs text-muted-foreground" role="status">{bad}</p>}
+      </PopoverContent>
+    </Popover>
   );
 }
 
