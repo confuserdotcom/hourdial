@@ -35,7 +35,7 @@ function FirstDayPanel({ f }: { f: FirstDay }) {
     <Panel className="anim-rise" label="Your first day">
       <div className="space-y-2 text-sm">
         <p>
-          tock has recorded <span className="num font-medium">{f.recorded}</span> so far
+          hourdial has recorded <span className="num font-medium">{f.recorded}</span> so far
           {f.top.length > 0 && <>, most of it in {f.top.join(", ")}</>}. It notes the app, window title and site in front of you, and keeps it on this computer.
         </p>
         <p className="text-muted-foreground">
@@ -81,7 +81,7 @@ export default function Today({ date, tick }: { date: string; tick: number }) {
   if (error) return <Empty>Couldn't load this day: {error}</Empty>;
   if (loading && !d) return <TodaySkeleton />;
   if (!d) return null;
-  if (d.firstRun) return <Empty>Nothing recorded yet. Leave tock running for a few minutes and this page fills in.</Empty>;
+  if (d.firstRun) return <Empty>Nothing recorded yet. Leave hourdial running for a few minutes and this page fills in.</Empty>;
 
   const u = d.usual;
   const now = Date.now();
@@ -156,6 +156,8 @@ export default function Today({ date, tick }: { date: string; tick: number }) {
       </div>
 
       <NextMoves moves={moves({ inboxMS, goals: d.goals, today: d.today })} />
+
+      <AgentsAndBudgets date={d.date} tick={tick} />
 
       <div ref={timelineRef} className="scroll-mt-4">
       <Panel
@@ -270,7 +272,6 @@ export default function Today({ date, tick }: { date: string; tick: number }) {
           </ul>
         </Panel>
       )}
-      <AgentsAndBudgets date={d.date} tick={tick} />
       <LabelSheet target={target} onClose={() => setTarget(null)} onDone={reload} />
     </div>
   );
@@ -375,7 +376,7 @@ function TotalsHelp({ d, notRec }: { d: Day; notRec: number }) {
   return (
     <Explain title="Tracked, away and not recorded" align="end"
       label={<span className="num">{dur(d.trackedMS)} tracked · {dur(d.idleMS)} away{notRec > 0 && ` · ${dur(notRec)} not recorded`}</span>}>
-      <Why>Tracked is the time tock saw you at the computer, labelled or not, by kind of time:</Why>
+      <Why>Tracked is the time hourdial saw you at the computer, labelled or not, by kind of time:</Why>
       <Sum rows={kinds.map((k) => [kindLabel(k.kind), dur(k.ms)])} total={["Tracked", dur(d.trackedMS)]} />
       <Why>Away is time with no keyboard or mouse input. It is left out of the totals until you label it as work.</Why>
       {notRec > 0 && <Why>Not recorded is time trackd was not running or could not see the screen. It is never part of the totals.</Why>}
