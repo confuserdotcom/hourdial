@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 import type { Agents, Library } from "./api";
-import { ledger } from "./agents";
+import { lanes, ledger } from "./agents";
 
 const H = 3_600_000;
 const ag: Agents = {
@@ -35,4 +35,19 @@ test("no time of yours gives no leverage, and nothing divides by zero", () => {
   const l = ledger({ ...ag, youMS: 0, rows: [] }, null);
   expect(l.leverage).toBe(0);
   expect(l.rows).toEqual([]);
+});
+
+test("a day's spans become lanes over whole hours, in the ledger's order", () => {
+  const at = (h: number, m = 0) => new Date(2026, 10, 5, h, m).getTime();
+  const l = lanes([
+    { project: "Atlas", start: at(10), end: at(11) },
+    { project: "tock", start: at(9, 30), end: at(10, 30) },
+    { project: "tock", start: at(12), end: at(12, 45), you: true },
+  ], ["tock", "Atlas"])!;
+  expect([l.fromH, l.toH]).toEqual([9, 13]);
+  expect(l.lanes.map((x) => x.project)).toEqual(["tock", "Atlas"]);
+  expect(l.lanes[0].agent).toEqual([[12.5, 37.5]]);
+  expect(l.lanes[0].you).toEqual([[75, 93.75]]);
+  expect(l.lanes[1].agent).toEqual([[25, 50]]);
+  expect(lanes([], [])).toBeNull();
 });

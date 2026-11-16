@@ -181,7 +181,9 @@ export type Rule = {
 };
 export type Rules = { rules: Rule[]; days: number };
 export type AgentRow = { project: string; agentMS: number; youMS: number; prompts: number; sessions: number };
-export type Agents = { from: string; to: string; rows: AgentRow[]; agentMS: number; wallMS: number; youMS: number; peak: number };
+/** AgentSpan is a stretch an agent worked, or (you) one you spent with it. */
+export type AgentSpan = { project: string; start: number; end: number; you?: boolean };
+export type Agents = { from: string; to: string; rows: AgentRow[]; agentMS: number; wallMS: number; youMS: number; peak: number; spans?: AgentSpan[] };
 export type Budget = {
   project: string; budgetMS: number; budget: string; since?: string; spentMS: number; perDayMS: number;
   runsOutMS?: number; pct: number; over: boolean;

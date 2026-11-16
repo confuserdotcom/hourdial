@@ -221,10 +221,11 @@ function NavItem({ v, k, active, count }: { v: View; k: string; active: boolean;
   return (
     <button onClick={() => go({ view: v })} aria-current={active ? "page" : undefined} title={`${TITLES[v]} (${k})`}
       className={cn(
-        "group flex h-9 flex-1 items-center gap-3 rounded-md px-2.5 text-[13px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "press group relative flex h-9 flex-1 items-center gap-3 rounded-md px-2.5 text-[13px] text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         active && "bg-secondary font-medium text-foreground",
       )}>
-      <I className={cn("h-4 w-4 shrink-0", active ? "text-foreground" : "text-faint group-hover:text-muted-foreground")} />
+      {active && <span className="nav-mark absolute -left-3 top-2 h-5 w-[3px] rounded-r-full bg-agent" aria-hidden />}
+      <I className={cn("h-4 w-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5", active ? "text-agent" : "text-faint group-hover:text-muted-foreground")} />
       <span className="flex-1 text-left">{TITLES[v]}</span>
       {count > 0 && <span className="num rounded-full bg-foreground/10 px-1.5 text-[11px] font-medium text-foreground">{count}</span>}
       <kbd className="hidden font-sans text-[10px] text-faint opacity-0 transition-opacity group-hover:opacity-100 lg:block">{k}</kbd>

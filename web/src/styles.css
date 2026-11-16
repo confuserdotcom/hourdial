@@ -34,6 +34,7 @@
     --good: 158 41% 59%;          /* #6cc3a3 */
     --bad: 5 56% 66%;             /* #d98078 */
     --k-deep: 172 36% 48%;        /* #4fa89a */
+    --agent: 172 52% 58%;         /* agents' own time: the brand mint */
     --k-shallow: 220 32% 57%;     /* #6f86b5 */
     --k-browse: 286 24% 59%;      /* #a07fb0 */
     --k-neutral: 225 4% 51%;      /* #7d8088 */
@@ -50,7 +51,7 @@
       --popover: 0 0% 100%; --popover-foreground: 228 9% 10%; --primary: 228 9% 10%; --primary-foreground: 0 0% 100%;
       --secondary: 220 13% 94%; --secondary-foreground: 228 9% 10%; --muted: 220 13% 95%; --muted-foreground: 225 6% 40%;
       --faint: 225 5% 48%; --faint-text: 225 5% 43%; --accent: 220 13% 94%; --accent-foreground: 228 9% 10%; --border: 220 13% 89%; --input: 220 13% 86%;
-      --good: 158 45% 32%; --bad: 5 55% 45%; --k-deep: 172 45% 36%; --k-shallow: 220 38% 48%; --k-browse: 286 28% 48%;
+      --good: 158 45% 32%; --bad: 5 55% 45%; --k-deep: 172 45% 36%; --agent: 172 60% 30%; --k-shallow: 220 38% 48%; --k-browse: 286 28% 48%;
       --k-neutral: 225 5% 52%; --k-distract: 5 55% 50%; --hatch-a: 220 13% 88%; --hatch-b: 220 13% 95%; color-scheme: light;
       --on-k-deep: 0 0% 0%; --on-k-shallow: 0 0% 100%; --on-k-browse: 0 0% 100%; --on-k-neutral: 0 0% 0%; --on-k-distract: 0 0% 100%;
     }
@@ -60,7 +61,7 @@
     --popover: 0 0% 100%; --popover-foreground: 228 9% 10%; --primary: 228 9% 10%; --primary-foreground: 0 0% 100%;
     --secondary: 220 13% 94%; --secondary-foreground: 228 9% 10%; --muted: 220 13% 95%; --muted-foreground: 225 6% 40%;
     --faint: 225 5% 48%; --faint-text: 225 5% 43%; --accent: 220 13% 94%; --accent-foreground: 228 9% 10%; --border: 220 13% 89%; --input: 220 13% 86%;
-    --good: 158 45% 32%; --bad: 5 55% 45%; --k-deep: 172 45% 36%; --k-shallow: 220 38% 48%; --k-browse: 286 28% 48%;
+    --good: 158 45% 32%; --bad: 5 55% 45%; --k-deep: 172 45% 36%; --agent: 172 60% 30%; --k-shallow: 220 38% 48%; --k-browse: 286 28% 48%;
     --k-neutral: 225 5% 52%; --k-distract: 5 55% 50%; --hatch-a: 220 13% 88%; --hatch-b: 220 13% 95%; color-scheme: light;
     --on-k-deep: 0 0% 0%; --on-k-shallow: 0 0% 100%; --on-k-browse: 0 0% 100%; --on-k-neutral: 0 0% 0%; --on-k-distract: 0 0% 100%;
   }
@@ -93,6 +94,32 @@
   .k-pat-distract { background-image: repeating-linear-gradient(45deg, hsl(var(--background) / 0.55) 0 1.5px, transparent 1.5px 5px); }
   .k-pat-browse { background-image: radial-gradient(hsl(var(--background) / 0.6) 1px, transparent 1.3px); background-size: 4px 4px; }
   /* The first cards of a page rise in once, on load. */
-  .anim-rise { animation: tock-rise 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-  @keyframes tock-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .anim-rise { animation: tock-rise 420ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 55ms); }
+  @keyframes tock-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  /* Panels of a page come in one after the other. */
+  .anim-rise:nth-child(2) { --i: 1; } .anim-rise:nth-child(3) { --i: 2; } .anim-rise:nth-child(4) { --i: 3; }
+  .anim-rise:nth-child(5) { --i: 4; } .anim-rise:nth-child(n+6) { --i: 5; }
+  /* A bar grows from its zero; --i staggers the rows of a chart. */
+  .anim-grow { transform-origin: left center; animation: tock-grow 760ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 70ms + 140ms); }
+  @keyframes tock-grow { from { transform: scaleX(0); } to { transform: none; } }
+  .anim-grow-y { transform-origin: center bottom; animation: tock-grow-y 620ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 30ms + 120ms); }
+  @keyframes tock-grow-y { from { transform: scaleY(0); } to { transform: none; } }
+  /* An arc draws itself: pathLength is 1 on the element. */
+  .anim-draw { stroke-dasharray: 1; animation: tock-draw 1100ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 140ms + 160ms); }
+  @keyframes tock-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+  /* The leverage dial's arcs: each keeps its own length and sweeps in. */
+  .anim-dial > path { animation: tock-sweep 1100ms cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(var(--i, 0) * 160ms + 160ms); }
+  @keyframes tock-sweep { from { stroke-dasharray: 0 1; } }
+  .anim-fade { animation: tock-fade 500ms ease-out both; animation-delay: calc(var(--i, 0) * 70ms + 200ms); }
+  @keyframes tock-fade { from { opacity: 0; } to { opacity: 1; } }
+  /* Controls answer the pointer: a step up on hover, down on press. */
+  .press { transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 140ms, color 140ms, border-color 140ms, box-shadow 140ms; }
+  .press:active { transform: scale(0.97); }
+  .lift { transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), border-color 180ms, box-shadow 180ms; }
+  .lift:hover { transform: translateY(-2px); border-color: hsl(var(--foreground) / 0.22); box-shadow: 0 10px 30px -18px hsl(var(--agent) / 0.45); }
+  /* The lead card of a page: a little light from the corner. */
+  .glow { background-image: radial-gradient(120% 140% at 0% 0%, hsl(var(--agent) / 0.13), transparent 55%), radial-gradient(90% 120% at 100% 100%, hsl(var(--k-shallow) / 0.08), transparent 60%); }
+  /* The nav's place marker slides in. */
+  .nav-mark { animation: tock-mark 260ms cubic-bezier(0.16, 1, 0.3, 1) both; transform-origin: center; }
+  @keyframes tock-mark { from { transform: scaleY(0); opacity: 0; } to { transform: none; opacity: 1; } }
 }

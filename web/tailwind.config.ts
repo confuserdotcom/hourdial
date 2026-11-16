@@ -21,6 +21,7 @@ export default {
         popover: { DEFAULT: "hsl(var(--popover))", foreground: "hsl(var(--popover-foreground))" },
         card: { DEFAULT: "hsl(var(--card))", foreground: "hsl(var(--card-foreground))" },
         faint: "hsl(var(--faint))",
+        agent: "hsl(var(--agent))",
         good: "hsl(var(--good))",
         bad: "hsl(var(--bad))",
         k: {
