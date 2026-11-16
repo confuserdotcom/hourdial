@@ -147,7 +147,7 @@ export type Week = {
  *  partial: apps were recorded without window titles (Accessibility off). */
 export type Outage = { from: number; to: number; kind: string; why: string; partial: boolean };
 export type TopRow = { name: string; ms: number; kind: string; mostly: string };
-export type Top = { from: string; to: string; totalMS: number; sections: Record<string, TopRow[]> };
+export type Top = { from: string; to: string; totalMS: number; sections: Record<string, TopRow[]>; projectDays?: { name: string; ms: number[] }[] };
 export type MonthSide = { trackedMS: number; focusMS: number; workdays: number; avgScore: number; switchesPerHour: number };
 export type MonthDay = { date: string; trackedMS: number; focusMS: number; deepMS: number; longestMS: number; score: number };
 export type Month = {

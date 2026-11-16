@@ -72,3 +72,16 @@ test("the range of a route, as the API takes it", async () => {
   expect(rangeQuery({ ...base, unit: "month", date: "2026-10-01" })).toBe("date=2026-10-01&range=month");
   expect(rangeQuery({ ...base, unit: "custom", date: "2026-10-01", to: "2026-10-20" })).toBe("from=2026-10-01&to=2026-10-20");
 });
+
+test("a project rides last, on Projects and Invoices only", async () => {
+  expect(await parseAt("#projects/week/@Atlas")).toMatchObject({ view: "projects", unit: "week", project: "Atlas" });
+  expect(await parseAt("#projects/@My%20app")).toMatchObject({ view: "projects", unit: "day", project: "My app" });
+  expect(await parseAt("#invoices/2026-10-01..2026-10-31/@Atlas")).toMatchObject({ view: "invoices", unit: "custom", date: "2026-10-01", to: "2026-10-31", project: "Atlas" });
+  expect(await parseAt("#agents/@Atlas")).toMatchObject({ view: "agents", project: "" });
+  const { format, parse } = await at("");
+  const base = parse();
+  expect(format({ ...base, view: "projects", unit: "month", date: "2026-10-01", project: "My app" })).toBe("projects/month/2026-10-01/@My%20app");
+  expect(format({ ...base, view: "invoices", unit: "custom", date: "2026-10-01", to: "2026-10-31", project: "Atlas" })).toBe("invoices/2026-10-01..2026-10-31/@Atlas");
+  expect(format({ ...base, view: "invoices" })).toBe("invoices");
+  expect(format({ ...base, view: "agents", project: "Atlas" })).toBe("agents");
+});

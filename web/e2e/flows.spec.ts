@@ -108,7 +108,8 @@ test("the agent ledger shows leverage and your time, and a project opens Project
   await expect(page.getByRole("region", { name: "Totals" })).toContainText(/Leverage\d+[.,]\d×/);
   await expect(rows.filter({ hasText: "tock" }).getByRole("img", { name: /^You \d+h\d\d$/ })).toBeVisible();
   await rows.filter({ hasText: "tock" }).getByRole("button").click();
-  await expect(page).toHaveURL(new RegExp(`#projects/${DAY}$`));
+  await expect(page).toHaveURL(new RegExp(`#projects/${DAY}/@tock$`));
+  await expect(page.locator("main button[aria-controls]").filter({ hasText: "tock" })).toHaveAttribute("aria-expanded", "true");
 });
 
 test("a custom range shows on its button and in the address", async ({ page }) => {
@@ -119,4 +120,15 @@ test("a custom range shows on its button and in the address", async ({ page }) =
   await page.getByRole("button", { name: "Show" }).click();
   await expect(page).toHaveURL(/#agents\/2026-10-20\.\.2026-11-05$/);
   await expect(page.getByRole("button", { name: /20 Oct – .*5 Nov/ })).toBeVisible();
+});
+
+test("a project opens to its days and hands its range to an invoice draft", async ({ page }) => {
+  await open(page, `projects/week/${DAY}`);
+  const row = page.locator("main button[aria-controls]").filter({ hasText: "Atlas" });
+  await expect(row).toContainText(/\d[\d,.]*\.\d\d EUR/);
+  await row.click();
+  await expect(page).toHaveURL(/#projects\/week\/2026-11-05\/@Atlas$/);
+  await expect(page.getByRole("img", { name: /^Atlas per day: Mon 2 Nov / })).toBeVisible();
+  await page.getByRole("button", { name: "Draft invoice" }).click();
+  await expect(page).toHaveURL(/#invoices\/2026-11-02\.\.2026-11-05\/@Atlas$/);
 });

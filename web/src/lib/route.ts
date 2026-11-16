@@ -15,7 +15,9 @@ export type Range = Unit | "custom";
 export const UNITS = ["day", "week", "month"] as const;
 export const LIB_SECTIONS = ["projects", "categories", "goals", "rules"] as const;
 export type LibSection = (typeof LIB_SECTIONS)[number];
-export type Route = { view: View; date: string; to: string; unit: Range; sub: LibSection };
+/** project is the one opened in Projects or billed in Invoices: the last
+ *  segment, "@Atlas". */
+export type Route = { view: View; date: string; to: string; unit: Range; sub: LibSection; project: string };
 
 const DAY = /^\d{4}-\d{2}-\d{2}$/;
 const SPAN = /^(\d{4}-\d{2}-\d{2})\.\.(\d{4}-\d{2}-\d{2})$/;
@@ -47,11 +49,21 @@ function segments(): string[] {
 }
 
 export function parse(): Route {
-  const [v, a, b] = segments();
+  const seg = segments();
+  let project = "";
+  if (seg.length > 1 && seg[seg.length - 1].startsWith("@")) {
+    try { project = decodeURIComponent(seg.pop()!.slice(1)); } catch { seg.pop(); }
+  }
+  const [v, a, b] = seg;
   const today = isoDate(new Date());
   const view = (ALL_VIEWS as readonly string[]).includes(v) ? (v as View) : "agents";
-  const r: Route = { view, date: today, to: today, unit: "day", sub: "rules" };
+  const r: Route = { view, date: today, to: today, unit: "day", sub: "rules", project: "" };
+  if (view === "projects" || view === "invoices") r.project = project;
   if (view === "timeline" && DAY.test(a ?? "")) r.date = r.to = a;
+  if (view === "invoices") {
+    const span = SPAN.exec(a ?? "");
+    if (span && span[1] <= span[2]) [r.unit, r.date, r.to] = ["custom", span[1], span[2]];
+  }
   if (view === "rules" && (LIB_SECTIONS as readonly string[]).includes(a ?? "")) r.sub = a as LibSection;
   if (ranged(view)) {
     const span = SPAN.exec(a ?? "");
@@ -67,6 +79,12 @@ export function parse(): Route {
 
 /** format is the hash of a route, without what its view does not use. */
 export function format(r: Route): string {
+  const at = r.project && (r.view === "projects" || r.view === "invoices") ? `/@${encodeURIComponent(r.project)}` : "";
+  if (r.view === "invoices") return `invoices${at && r.unit === "custom" ? `/${r.date}..${r.to}` : ""}${at}`;
+  return place(r) + at;
+}
+
+function place(r: Route): string {
   if (r.view === "rules") return r.sub === "rules" ? "rules" : `rules/${r.sub}`;
   if (r.view === "timeline") return r.date === isoDate(new Date()) ? "timeline" : `timeline/${r.date}`;
   if (!ranged(r.view)) return r.view;
@@ -96,6 +114,8 @@ export function go(r: Partial<Route>) {
   if (r.date && !r.to) next.to = r.date;
   if (r.date && !r.unit && next.unit === "custom") next.unit = "day";
   if (next.view === "timeline" && cur.unit !== "day" && !r.date) next.date = isoDate(new Date());
+  // The opened project stays while its range changes, and goes with the view.
+  if (r.view && r.view !== cur.view && r.project === undefined) next.project = "";
   location.hash = format(next);
 }
 

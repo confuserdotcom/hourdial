@@ -10,9 +10,11 @@ import { go } from "@/lib/route";
 
 const SECTIONS: [string, string][] = [["category", "Categories"], ["app", "Apps"], ["site", "Sites"], ["project", "Projects"]];
 
-export default function Top({ tick }: { tick: number }) {
+/** Top ranks categories, apps, sites and projects. On its own it picks
+ *  its range; under Projects it shows the range given as query. */
+export default function Top({ tick, query }: { tick: number; query?: string }) {
   const [range, setRange] = useState("week");
-  const { data: t, error, loading } = useApi<TopT>(`/api/top?range=${range}`, tick);
+  const { data: t, error, loading } = useApi<TopT>(`/api/top?${query ?? `range=${range}`}`, tick);
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between gap-4">
@@ -21,11 +23,11 @@ export default function Top({ tick }: { tick: number }) {
             <Why>The time hourdial saw you at the computer from {t.from} to {t.to}, labelled or not. Each list ranks its rows by time; the shares are of this total.</Why>
           </Explain>
         )}</h1>
-        <ToggleGroup type="single" value={range} onValueChange={(v) => v && setRange(v)} variant="outline" size="sm">
+        {!query && <ToggleGroup type="single" value={range} onValueChange={(v) => v && setRange(v)} variant="outline" size="sm">
           <ToggleGroupItem value="today">Today</ToggleGroupItem>
           <ToggleGroupItem value="week">Week</ToggleGroupItem>
           <ToggleGroupItem value="month">Month</ToggleGroupItem>
-        </ToggleGroup>
+        </ToggleGroup>}
       </div>
       {error ? <Empty>Couldn't load: {error}</Empty> : loading && !t ? <Skeleton className="h-96" /> : t && (
         <div className="grid gap-5 lg:grid-cols-2">

@@ -1,12 +1,12 @@
 import { ArrowUpRight } from "lucide-react";
 import { AgentLanes } from "@/components/charts/AgentLanes";
 import { LeverageDial } from "@/components/charts/LeverageDial";
+import { Amount, Dur, Figure } from "@/components/Figure";
 import { Empty, Panel } from "@/components/Panel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ledger, type LedgerRow } from "@/lib/agents";
 import { useApi, type Agents as AgentsT, type Library } from "@/lib/api";
 import { dur, num } from "@/lib/format";
-import { useCountUp } from "@/lib/motion";
 import { go, rangeQuery, type Route } from "@/lib/route";
 
 /** Agents is the agent ledger of the range: what the coding agents worked
@@ -36,12 +36,14 @@ export default function Agents({ route, tick }: { route: Route; tick: number }) 
         <div className="flex flex-wrap items-center gap-x-10 gap-y-4 p-6">
           <LeverageDial agentMS={ag.agentMS} youMS={ag.youMS} />
           <div className="grid min-w-0 flex-1 gap-x-10 gap-y-5 sm:grid-cols-3">
-            <Figure i={0} label="Agent time" ms={ag.agentMS} mark="agent"
-              note={`${l.sessions} ${l.sessions === 1 ? "session" : "sessions"}${ag.peak > 1 ? ` · up to ${ag.peak} at once` : ""} · ${dur(ag.wallMS)} on the clock`} />
-            <Figure i={1} label="Your time with them" ms={ag.youMS} mark="you"
-              note={l.value ? `${num(l.value, 2)} ${l.currency} at your rates` : "with an agent's terminal in front of you"} />
-            <Figure i={2} label="Leverage" text={l.leverage > 0 ? `${num(l.leverage, 1)}×` : "–"}
-              note={l.leverage > 0 ? `${dur(ag.agentMS)} of agent work ÷ ${dur(ag.youMS)} of yours` : "none of your own time in their windows"} />
+            <Figure i={0} label="Agent time" mark="agent"
+              note={`${l.sessions} ${l.sessions === 1 ? "session" : "sessions"}${ag.peak > 1 ? ` · up to ${ag.peak} at once` : ""} · ${dur(ag.wallMS)} on the clock`}><Dur ms={ag.agentMS} /></Figure>
+            <Figure i={1} label="Your time with them" mark="you"
+              note={l.value ? `${num(l.value, 2)} ${l.currency} at your rates` : "with an agent's terminal in front of you"}><Dur ms={ag.youMS} /></Figure>
+            <Figure i={2} label="Leverage"
+              note={l.leverage > 0 ? `${dur(ag.agentMS)} of agent work ÷ ${dur(ag.youMS)} of yours` : "none of your own time in their windows"}>
+              {l.leverage > 0 ? <Amount v={l.leverage} digits={1} unit="×" /> : "–"}
+            </Figure>
           </div>
         </div>
       </section>
@@ -76,21 +78,6 @@ export default function Agents({ route, tick }: { route: Route; tick: number }) 
   );
 }
 
-/** Figure is one headline number; a duration counts up to its value. */
-function Figure({ i, label, ms, text, note, mark }: { i: number; label: string; ms?: number; text?: string; note: string; mark?: "agent" | "you" }) {
-  const shown = useCountUp(ms ?? 0);
-  return (
-    <div className="anim-rise min-w-0" style={{ ["--i" as string]: i + 1 }}>
-      <div className="lbl flex items-center gap-1.5">
-        {mark && <i className={mark === "agent" ? "h-2 w-2 rounded-full bg-agent" : "h-2 w-2 rounded-full border border-foreground/70"} aria-hidden />}
-        {label}
-      </div>
-      <div className="num mt-1.5 text-[32px] font-semibold leading-9 tracking-[-0.02em]">{text ?? dur(shown)}</div>
-      <div className="num mt-1 text-xs text-muted-foreground">{note}</div>
-    </div>
-  );
-}
-
 /** Key says which mark is which: solid is the agent, outlined is you. */
 function Key() {
   return (
@@ -105,7 +92,7 @@ function Row({ i, r, priced, currency }: { i: number; r: LedgerRow; priced: bool
   return (
     <tr className="group border-t align-middle transition-colors duration-150 hover:bg-accent/50">
       <td className="max-w-0 py-2.5 pr-3">
-        <button onClick={() => go({ view: "projects" })} title={`Open ${r.project} in Projects`}
+        <button onClick={() => go({ view: "projects", project: r.project })} title={`Open ${r.project} in Projects`}
           className="flex max-w-full items-center gap-1 rounded-sm text-left font-medium underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
           <span className="truncate">{r.project}</span>
           <ArrowUpRight className="h-3.5 w-3.5 shrink-0 -translate-x-1 text-muted-foreground opacity-0 transition duration-200 group-hover:translate-x-0 group-hover:opacity-100 group-focus-within:translate-x-0 group-focus-within:opacity-100" aria-hidden />

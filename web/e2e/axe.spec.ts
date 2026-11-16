@@ -11,6 +11,7 @@ const VIEWS = [
   ["Projects day", `projects/${DAY}`],
   ["Projects week", `projects/week/${DAY}`],
   ["Projects month", `projects/month/${DAY}`],
+  ["Projects opened", `projects/week/${DAY}/@Atlas`],
   ["Invoices", "invoices"],
   ["Timeline", `timeline/${DAY}`],
   ["Inbox", "inbox"],
