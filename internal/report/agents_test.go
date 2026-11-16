@@ -30,6 +30,15 @@ func TestAgentLedger(t *testing.T) {
 			{Project: "~/notes", AgentMS: 60_000, YouMS: 5 * 60_000, Prompts: 1, Sessions: 1},
 		},
 		AgentMS: 43 * 60_000, WallMS: 33 * 60_000, YouMS: 20 * 60_000, Peak: 2,
+		Spans: []AgentSpan{
+			{Project: "tock", Start: min("10:00"), End: min("10:02")},
+			{Project: "tock", Start: min("10:00"), End: min("10:10"), You: true},
+			{Project: "tock", Start: min("10:10"), End: min("10:30")},
+			{Project: "tock", Start: min("10:20"), End: min("10:40")},
+			{Project: "tock", Start: min("10:40"), End: min("10:45"), You: true},
+			{Project: "~/notes", Start: min("11:00"), End: min("11:01")},
+			{Project: "~/notes", Start: min("11:00"), End: min("11:05"), You: true},
+		},
 	}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("got  %+v\nwant %+v", got, want)

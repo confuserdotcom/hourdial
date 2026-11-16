@@ -32,6 +32,16 @@ type Agents struct {
 	Rows                   []AgentRow
 	AgentMS, WallMS, YouMS int64
 	Peak                   int
+	// Spans is when it happened: each stretch a session worked and each
+	// view of yours that counted, by start, an agent's before yours.
+	Spans []AgentSpan
+}
+
+// AgentSpan is one stretch of a project's agent time, or of yours with it.
+type AgentSpan struct {
+	Project    string
+	Start, End int64
+	You        bool
 }
 
 // AgentLedger measures what agents did in [from, to). A session works from
@@ -56,6 +66,7 @@ func AgentLedger(sessions []AgentSession, views []classify.SpanView, labels []cl
 		r.Sessions++
 		for _, b := range busy {
 			r.AgentMS += b[1] - b[0]
+			a.Spans = append(a.Spans, AgentSpan{Project: s.Project, Start: b[0], End: b[1]})
 		}
 		for _, p := range s.Prompts {
 			if p >= from && p < to {
@@ -74,6 +85,7 @@ func AgentLedger(sessions []AgentSession, views []classify.SpanView, labels []cl
 			if st, e := max(v.Start, from), min(v.End, to); e > st {
 				used[i] = true
 				r.YouMS += e - st
+				a.Spans = append(a.Spans, AgentSpan{Project: s.Project, Start: st, End: e, You: true})
 			}
 		}
 	}
@@ -90,6 +102,13 @@ func AgentLedger(sessions []AgentSession, views []classify.SpanView, labels []cl
 			return a.Rows[i].AgentMS > a.Rows[j].AgentMS
 		}
 		return a.Rows[i].Project < a.Rows[j].Project
+	})
+	sort.SliceStable(a.Spans, func(i, j int) bool {
+		x, y := a.Spans[i], a.Spans[j]
+		if x.Start != y.Start {
+			return x.Start < y.Start
+		}
+		return !x.You && y.You
 	})
 	a.WallMS, a.Peak = sweep(all)
 	return a

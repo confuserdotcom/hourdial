@@ -40,7 +40,14 @@ func TestAgentsAndBudgets(t *testing.T) {
 	if len(ag.Rows) != 1 || ag.Rows[0].Project != "tock" || ag.Rows[0].AgentMS != 30*60_000 || ag.From != "2026-10-10" {
 		t.Fatalf("agents = %+v", ag)
 	}
+	if len(ag.Spans) == 0 || ag.Spans[0].Project != "tock" || ag.Spans[0].You || ag.Spans[0].Start != apptest.At(t, "09:00", 0) || ag.Spans[0].End != apptest.At(t, "09:30", 0) {
+		t.Fatalf("day spans = %+v", ag.Spans)
+	}
+	ag = agentsJSON{}
 	f.get("/api/agents?range=week", &ag)
+	if ag.Spans != nil {
+		t.Fatalf("a week carries no spans: %+v", ag.Spans)
+	}
 	if ag.From != "2026-10-05" || ag.To != "2026-10-11" || len(ag.Rows) != 1 {
 		t.Fatalf("week = %+v", ag)
 	}

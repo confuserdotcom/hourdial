@@ -23,6 +23,16 @@ type agentsJSON struct {
 	WallMS  int64          `json:"wallMS"`
 	YouMS   int64          `json:"youMS"`
 	Peak    int            `json:"peak"`
+	// Spans is when the agents worked and when you were with them, for a
+	// range of one day only.
+	Spans []agentSpanJSON `json:"spans,omitempty"`
+}
+
+type agentSpanJSON struct {
+	Project string `json:"project"`
+	Start   int64  `json:"start"`
+	End     int64  `json:"end"`
+	You     bool   `json:"you,omitempty"`
 }
 
 // agents is the agent ledger of a day (date=YYYY-MM-DD, default today), of
@@ -67,6 +77,11 @@ func (s *Server) agents(r *http.Request) (any, error) {
 		AgentMS: ag.AgentMS, WallMS: ag.WallMS, YouMS: ag.YouMS, Peak: ag.Peak}
 	for _, row := range ag.Rows {
 		out.Rows = append(out.Rows, agentRowJSON{row.Project, row.AgentMS, row.YouMS, row.Prompts, row.Sessions})
+	}
+	if to.Equal(from.AddDate(0, 0, 1)) {
+		for _, sp := range ag.Spans {
+			out.Spans = append(out.Spans, agentSpanJSON{sp.Project, sp.Start, sp.End, sp.You})
+		}
 	}
 	return out, nil
 }
