@@ -71,7 +71,7 @@ ActivityWatch? `tock import activitywatch export.json` brings your history.
 
 ## How it fits together
 
-<img class="shot" src="assets/diagrams/pieces.svg" alt="trackd takes events from the desktop and writes spans to tock.db. hourdial and tockbar read tock.db and label it with rules.toml, learned.toml and config.toml. Only hourdial reaches the internet, for Claude and Slack, when you turn them on.">
+<img class="shot" src="assets/diagrams/pieces.svg" alt="trackd takes events from the desktop and writes spans to tock.db. The tock command and tockbar read tock.db and label it with rules.toml, learned.toml and config.toml. Only the tock command reaches the internet, for Claude and Slack, when you turn them on.">
 
 More in [Architecture](architecture).
 

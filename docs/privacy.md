@@ -83,7 +83,7 @@ would add well under 1 %. trackd writes a span every few seconds, far
 inside its 1 % idle CPU budget either way.
 
 **Whole-file (SQLCipher-style) does not fit the build.** SQLCipher is C,
-and trackd and hourdial are pure Go with no cgo (the Linux builds use
+and trackd and tock are pure Go with no cgo (the Linux builds use
 `CGO_ENABLED=0`). The SQLite driver hourdial uses (`modernc.org/sqlite`) has
 no encrypting storage layer. The pure-Go route would be a different
 driver with an encrypting VFS, which means replacing the database layer

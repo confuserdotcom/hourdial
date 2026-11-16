@@ -11,7 +11,7 @@ does, how data moves between them, and what it costs to run.
 | `tock` | when you call it | the CLI, the terminal UI, and `tock web` for the dashboard |
 | `tockbar` | at login, macOS only | the menu bar and the notch: today's time, sessions, `⌥⌘F`, the dashboard window |
 
-<img src="assets/diagrams/pieces.svg" width="100%" alt="trackd takes events from the desktop (NSWorkspace, the Accessibility API, AppleScript, or Hyprland's socket) and writes spans to tock.db. hourdial and tockbar read tock.db and label it with rules.toml, learned.toml and config.toml. tockbar runs tock web as a child for the dashboard window. Only hourdial reaches the internet, for Claude and Slack, when you turn them on.">
+<img src="assets/diagrams/pieces.svg" width="100%" alt="trackd takes events from the desktop (NSWorkspace, the Accessibility API, AppleScript, or Hyprland's socket) and writes spans to tock.db. The tock command and tockbar read tock.db and label it with rules.toml, learned.toml and config.toml. tockbar runs tock web as a child for the dashboard window. Only the tock command reaches the internet, for Claude and Slack, when you turn them on.">
 
 All three open the same database, `~/.local/share/tock/tock.db`. They don't
 talk to each other over a socket. trackd writes a heartbeat to the database
