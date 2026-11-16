@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src="docs/readme/banner.webp" width="100%" alt="hourdial: what you and your coding agents worked on today.">
+  <img src="docs/readme/banner.svg" width="100%" alt="hourdial: know where the day went. decide where it goes.">
 </h1>
 
 <p align="center">
@@ -29,7 +29,10 @@ hourdial   4h36    1h51       54         7
 agents worked 4h36 · you 1h51 in their windows · 2.5× leverage
 ```
 
-<img src="docs/readme/today.webp" width="100%" alt="The hourdial dashboard for one day: a timeline with one row per category, a focus score, minutes per hour, a donut of the kinds of time, and goals.">
+<picture>
+  <source srcset="docs/readme/today.avif" type="image/avif">
+  <img src="docs/readme/today.webp" width="100%" alt="The hourdial dashboard for one day: a timeline with one row per category, a focus score, minutes per hour, a donut of the kinds of time, and goals.">
+</picture>
 
 What you get:
 
@@ -114,7 +117,10 @@ tock web                  # the dashboard
 tock                      # terminal UI (? for keys)
 ```
 
-<img src="docs/readme/inbox.webp" width="100%" alt="The inbox in the dashboard: two groups of unlabelled time; labelling one as Research writes a rule, and the group leaves the inbox.">
+<picture>
+  <source srcset="docs/readme/inbox.avif" type="image/avif">
+  <img src="docs/readme/inbox.webp" width="100%" alt="The inbox in the dashboard: two groups of unlabelled time; labelling one as Research writes a rule, and the group leaves the inbox.">
+</picture>
 
 ## Why not ActivityWatch
 
