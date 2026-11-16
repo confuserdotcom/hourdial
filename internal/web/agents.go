@@ -46,16 +46,9 @@ func (s *Server) agents(r *http.Request) (any, error) {
 	q := r.URL.Query()
 	from, to := day, day.AddDate(0, 0, 1)
 	if q.Has("from") || q.Has("to") {
-		loc := s.now().Location()
-		f, err1 := time.ParseInLocation(dateLayout, q.Get("from"), loc)
-		t, err2 := time.ParseInLocation(dateLayout, q.Get("to"), loc)
-		if err1 != nil || err2 != nil {
-			return nil, badRequest("from and to must both be YYYY-MM-DD")
+		if from, to, err = s.fromTo(q.Get("from"), q.Get("to")); err != nil {
+			return nil, err
 		}
-		if t.Before(f) || t.After(f.AddDate(1, 0, 0)) {
-			return nil, badRequest("to must be on or after from, within a year of it")
-		}
-		from, to = f, t.AddDate(0, 0, 1)
 	} else {
 		switch q.Get("range") {
 		case "", "day":

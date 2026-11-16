@@ -82,3 +82,18 @@ func (a *App) Top(from, to time.Time) (report.Top, error) {
 	}
 	return report.BuildTop(from, to, vs, labels), nil
 }
+
+// TopProjects is Top, and with days each project's time on each day of
+// the range.
+func (a *App) TopProjects(from, to time.Time, days bool) (report.Top, []report.ProjectDayRow, error) {
+	from, to = a.midnight(from), a.midnight(to)
+	vs, labels, err := a.labelled(from.UnixMilli(), to.UnixMilli(), a.nowMS())
+	if err != nil {
+		return report.Top{}, nil, err
+	}
+	t := report.BuildTop(from, to, vs, labels)
+	if !days {
+		return t, nil, nil
+	}
+	return t, report.ProjectDays(from, to, vs, labels), nil
+}

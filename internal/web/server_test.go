@@ -210,6 +210,38 @@ func TestDayWeekTop(t *testing.T) {
 	if code, _, _ := f.do("GET", "/api/top?days=0", testToken, nil); code != 400 {
 		t.Fatalf("days=0: %d", code)
 	}
+	// A range around any day, or from one day to another, as /api/agents takes it.
+	var at topJSON
+	f.get("/api/top?range=day&date=2026-10-10", &at)
+	if at.From != "2026-10-10" || at.To != "2026-10-10" || at.TotalMS != top.TotalMS {
+		t.Fatalf("top of a day %+v", at)
+	}
+	f.get("/api/top?range=week&date=2026-10-01", &at)
+	if at.From != "2026-09-28" || at.To != "2026-10-04" || at.TotalMS != 0 {
+		t.Fatalf("top of a past week %+v", at)
+	}
+	f.get("/api/top?range=month&date=2026-10-10", &at)
+	if at.From != "2026-10-01" || at.To != "2026-10-10" {
+		t.Fatalf("top of a month %+v", at)
+	}
+	at = topJSON{}
+	f.get("/api/top?from=2026-10-09&to=2026-10-10&series=project", &at)
+	if at.From != "2026-10-09" || at.To != "2026-10-10" || at.TotalMS != top.TotalMS || at.ProjectDays == nil || len(at.ProjectDays) != len(at.Sections["project"]) {
+		t.Fatalf("top from-to %+v", at)
+	}
+	for i, row := range at.ProjectDays {
+		if len(row.MS) != 2 || row.MS[0] != 0 || row.MS[1] != at.Sections["project"][i].MS || row.Name != at.Sections["project"][i].Name {
+			t.Fatalf("project days %+v vs %+v", at.ProjectDays, at.Sections["project"])
+		}
+	}
+	if top.ProjectDays != nil {
+		t.Fatalf("series not asked for: %+v", top.ProjectDays)
+	}
+	for _, q := range []string{"from=2026-10-10&to=2026-10-09", "from=2026-10-09", "from=2025-01-01&to=2026-10-09", "date=x&range=week", "series=app"} {
+		if code, _, _ := f.do("GET", "/api/top?"+q, testToken, nil); code != 400 {
+			t.Fatalf("%s: %d", q, code)
+		}
+	}
 }
 
 func inboxKeys(f *fixture) []string {

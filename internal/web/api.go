@@ -241,6 +241,14 @@ type topJSON struct {
 	To       string                  `json:"to"`
 	TotalMS  int64                   `json:"totalMS"`
 	Sections map[string][]topRowJSON `json:"sections"`
+	// ProjectDays is each project's time on each day from From to To, in
+	// the order of the project section; with ?series=project only.
+	ProjectDays []projectDaysJSON `json:"projectDays,omitempty"`
+}
+
+type projectDaysJSON struct {
+	Name string  `json:"name"`
+	MS   []int64 `json:"ms"`
 }
 
 type suggestionJSON struct {
@@ -450,30 +458,49 @@ func (s *Server) week(r *http.Request) (any, error) {
 	return out, nil
 }
 
-// top reads ?range=today|week|month or ?days=N (default 7).
+// top reads ?range=today|day|week|month around ?date= (default today), or
+// ?from= and ?to= (days, both included, a year at most), or ?days=N up to
+// today (default 7). ?series=project adds each project's time per day.
 func (s *Server) top(r *http.Request) (any, error) {
-	now := s.now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
-	to := today.AddDate(0, 0, 1)
-	var from time.Time
 	q := r.URL.Query()
-	switch q.Get("range") {
-	case "today":
-		from = today
-	case "week":
-		from = s.a.WeekOf(today)
-	case "month":
-		from = today.AddDate(0, 0, 1-today.Day())
-	case "":
-		days, err := intParam(q.Get("days"), 7, 1, 366)
-		if err != nil {
+	day, err := s.date(r)
+	if err != nil {
+		return nil, err
+	}
+	from, to := day, day.AddDate(0, 0, 1)
+	if q.Has("from") || q.Has("to") {
+		if from, to, err = s.fromTo(q.Get("from"), q.Get("to")); err != nil {
 			return nil, err
 		}
-		from = to.AddDate(0, 0, -days)
-	default:
-		return nil, badRequest("range must be today, week or month")
+	} else {
+		switch q.Get("range") {
+		case "today", "day":
+		case "week":
+			from = s.a.WeekOf(day)
+			to = from.AddDate(0, 0, 7)
+		case "month":
+			from = time.Date(day.Year(), day.Month(), 1, 0, 0, 0, 0, day.Location())
+			to = from.AddDate(0, 1, 0)
+		case "":
+			days, err := intParam(q.Get("days"), 7, 1, 366)
+			if err != nil {
+				return nil, err
+			}
+			from = to.AddDate(0, 0, -days)
+		default:
+			return nil, badRequest("range must be today, day, week or month")
+		}
 	}
-	t, err := s.a.Top(from, to)
+	// Nothing is recorded after today: a week or month still running ends there.
+	now := s.now()
+	if tomorrow := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location()); to.After(tomorrow) && from.Before(tomorrow) {
+		to = tomorrow
+	}
+	series := q.Get("series")
+	if series != "" && series != "project" {
+		return nil, badRequest("series must be project")
+	}
+	t, days, err := s.a.TopProjects(from, to, series == "project")
 	if err != nil {
 		return nil, err
 	}
@@ -486,7 +513,25 @@ func (s *Server) top(r *http.Request) (any, error) {
 		}
 		out.Sections[sec] = rows
 	}
+	for _, d := range days {
+		out.ProjectDays = append(out.ProjectDays, projectDaysJSON{report.Safe(d.Name), d.MS})
+	}
 	return out, nil
+}
+
+// fromTo reads two days, both included, a year apart at most, as the
+// half-open range of their midnights.
+func (s *Server) fromTo(a, b string) (time.Time, time.Time, error) {
+	loc := s.now().Location()
+	f, err1 := time.ParseInLocation(dateLayout, a, loc)
+	t, err2 := time.ParseInLocation(dateLayout, b, loc)
+	if err1 != nil || err2 != nil {
+		return f, t, badRequest("from and to must both be YYYY-MM-DD")
+	}
+	if t.Before(f) || t.After(f.AddDate(1, 0, 0)) {
+		return f, t, badRequest("to must be on or after from, within a year of it")
+	}
+	return f, t.AddDate(0, 0, 1), nil
 }
 
 func intParam(v string, def, lo, hi int) (int, error) {
