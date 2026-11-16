@@ -18,7 +18,7 @@ export default function Top({ tick }: { tick: number }) {
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-xl font-semibold tracking-tight">Top {t && (
           <Explain title="Tracked in this range" className="num ml-2 text-base font-normal text-muted-foreground" label={dur(t.totalMS)}>
-            <Why>The time tock saw you at the computer from {t.from} to {t.to}, labelled or not. Each list ranks its rows by time; the shares are of this total.</Why>
+            <Why>The time hourdial saw you at the computer from {t.from} to {t.to}, labelled or not. Each list ranks its rows by time; the shares are of this total.</Why>
           </Explain>
         )}</h1>
         <ToggleGroup type="single" value={range} onValueChange={(v) => v && setRange(v)} variant="outline" size="sm">

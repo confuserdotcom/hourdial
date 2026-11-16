@@ -50,7 +50,7 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
         <h1 className="text-xl font-semibold tracking-tight">{dayTitle(mon)} – {dayTitle(addDays(mon, 6))}</h1>
         <span className="flex items-center gap-3">
           <Explain title="Tracked this week" align="end" className="text-muted-foreground" label={<span className="num">{dur(w.trackedMS)} tracked</span>}>
-            <Why>The time tock saw you at the computer each day, labelled or not. Away time is left out until you label it as work.</Why>
+            <Why>The time hourdial saw you at the computer each day, labelled or not. Away time is left out until you label it as work.</Why>
             <Sum rows={w.days.filter((d) => !d.future).map((d) => [dayTitle(parseDate(d.date)), dur(d.trackedMS)])} total={["Week", dur(w.trackedMS)]} />
           </Explain>
           <Export monday={w.start ?? w.monday} />
@@ -82,7 +82,7 @@ export default function Week({ date, tick }: { date: string; tick: number }) {
           </Panel>
         )}
         <Panel label="When you focus" aside={hours.data ? `mean focus minutes, last ${hours.data.activeDays} active days` : undefined}>
-          {hours.data ? hours.data.thin ? <Empty>tock needs a few more days to see a pattern.</Empty> : <HeatGrid grid={hours.data.grid} /> : <Skeleton className="h-40" />}
+          {hours.data ? hours.data.thin ? <Empty>hourdial needs a few more days to see a pattern.</Empty> : <HeatGrid grid={hours.data.grid} /> : <Skeleton className="h-40" />}
         </Panel>
       </div>
       <div className="grid gap-5 lg:grid-cols-3">

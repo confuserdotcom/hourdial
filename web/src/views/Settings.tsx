@@ -82,7 +82,7 @@ export default function Settings({ onChange }: { onChange: () => void }) {
 
       <Panel id="set-features" label="What hourdial does">
         <p className="-mt-1 mb-4 text-sm text-muted-foreground">
-          Turn off a whole part of tock with its group: its settings below are kept and come back when you turn it on.
+          Turn off a whole part of hourdial with its group: its settings below are kept and come back when you turn it on.
         </p>
         <div className="divide-y">
           {groups.map((g) => (
@@ -131,7 +131,7 @@ export default function Settings({ onChange }: { onChange: () => void }) {
           <DialogHeader>
             <DialogTitle>Send snippets to Claude?</DialogTitle>
             <DialogDescription>
-              At most once an hour, tock sends what it couldn't label (app names, site hosts, cleaned titles and minutes) and your category and
+              At most once an hour, hourdial sends what it couldn't label (app names, site hosts, cleaned titles and minutes) and your category and
               project names to Claude. Password managers, mail, messaging, banks and the apps and sites you hide are never sent.
             </DialogDescription>
           </DialogHeader>
@@ -163,7 +163,7 @@ function Privacy({ s, setS, disabled }: { s: SettingsT; setS: (s: SettingsT) => 
   async function set(kind: "app" | "site", value: string, hide: boolean) {
     try {
       setS(await post<SettingsT>("/api/settings/hide", { kind, value, hide }));
-      toast(hide ? `tock won't record ${value}` : `tock records ${value} again`, hide ? undefined : { action: { label: "Undo", onClick: () => set(kind, value, true) } });
+      toast(hide ? `hourdial won't record ${value}` : `hourdial records ${value} again`, hide ? undefined : { action: { label: "Undo", onClick: () => set(kind, value, true) } });
     } catch (e) {
       toast.error((e as Error).message);
     }
@@ -171,7 +171,7 @@ function Privacy({ s, setS, disabled }: { s: SettingsT; setS: (s: SettingsT) => 
   return (
     <Panel id="set-privacy" label="Never record">
       <p className="-mt-1 mb-4 text-sm text-muted-foreground">
-        tock records these as private time only: no title, no URL, no screen text, never sent to Claude. Time already recorded stays as it was.
+        hourdial records these as private time only: no title, no URL, no screen text, never sent to Claude. Time already recorded stays as it was.
       </p>
       <div className="grid gap-6 sm:grid-cols-2">
         <HideList title="Apps" hint="Bundle id, like com.apple.MobileSMS" items={s.hideApps} onAdd={(v) => set("app", v, true)} onRemove={(v) => set("app", v, false)} disabled={disabled} />

@@ -59,7 +59,7 @@ function MonthBody({ m }: { m: Month }) {
     <>
       <div className={cn("grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2", focus ? "lg:grid-cols-4" : "lg:grid-cols-3")}>
         <Card hasPrev={hasPrev} k="Tracked" v={dur(c.trackedMS)} d={c.trackedMS - p.trackedMS} t={delta(c.trackedMS - p.trackedMS)}
-          help={<Why>All the time tock saw you at the computer this month, labelled or not, against the whole of last month. Away time is left out until you label it as work.</Why>} />
+          help={<Why>All the time hourdial saw you at the computer this month, labelled or not, against the whole of last month. Away time is left out until you label it as work.</Why>} />
         <Card hasPrev={hasPrev} k="Focus" v={dur(c.focusMS)} d={c.focusMS - p.focusMS} t={delta(c.focusMS - p.focusMS)}
           help={<Why>Each day's Focus time added up: Deep time in runs that hold at least {STATS.blockMinMin}m of it, where a break under {STATS.toleranceS / 60}m does not end the run.</Why>} />
         {focus && <Card hasPrev={hasPrev} k="Average score" v={c.workdays ? c.avgScore.toFixed(0) : "–"} d={c.avgScore - p.avgScore} t={(c.avgScore - p.avgScore >= 0 ? "+" : "−") + Math.abs(c.avgScore - p.avgScore).toFixed(0)}
