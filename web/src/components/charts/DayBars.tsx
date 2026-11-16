@@ -5,6 +5,7 @@ import { dur } from "@/lib/format";
 import { dayName } from "@/lib/roving";
 import { KindTable } from "./KindTable";
 import { Marks, plotInset } from "./Marks";
+import { reducedMotion } from "@/lib/motion";
 
 /** title, when set, names the day in full for the keyboard ("Mon 3 Nov"). */
 export type DayPoint = { label: string; title?: string; byKind: Record<string, number>; faint?: boolean };
@@ -46,7 +47,7 @@ export function DayBars({ days, height = 240, onDay }: { days: DayPoint[]; heigh
           }
         />
         {SERIES.map((k, i) => (
-          <Bar key={k || "unlabelled"} dataKey={k || "unlabelled"} stackId="a" fill={kindFill(k)} radius={i === SERIES.length - 1 ? [2, 2, 0, 0] : 0} isAnimationActive={false} />
+          <Bar key={k || "unlabelled"} dataKey={k || "unlabelled"} stackId="a" fill={kindFill(k)} radius={i === SERIES.length - 1 ? [2, 2, 0, 0] : 0} isAnimationActive={!reducedMotion()} animationDuration={720} animationEasing="ease-out" />
         ))}
       </BarChart>
     </ChartContainer>

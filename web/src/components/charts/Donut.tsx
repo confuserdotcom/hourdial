@@ -3,6 +3,7 @@ import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { dur, pct } from "@/lib/format";
 import { kindClass, kindFill } from "@/lib/kinds";
 import { legendWidth } from "@/lib/lanes";
+import { reducedMotion } from "@/lib/motion";
 
 export type Slice = { name: string; ms: number; color: string; hint?: string; kind?: string };
 
@@ -32,7 +33,7 @@ export function Donut({ data, center, sub, onSelect, active }: { data: Slice[]; 
                 ) : null
               }
             />
-            <Pie data={data} dataKey="ms" nameKey="name" innerRadius="66%" outerRadius="100%" paddingAngle={data.length > 1 ? 1.5 : 0} strokeWidth={0} isAnimationActive={false} rootTabIndex={-1}>
+            <Pie data={data} dataKey="ms" nameKey="name" innerRadius="66%" outerRadius="100%" paddingAngle={data.length > 1 ? 1.5 : 0} strokeWidth={0} isAnimationActive={!reducedMotion()} animationDuration={720} animationEasing="ease-out" rootTabIndex={-1}>
               {data.map((d) => (
                 <Cell key={d.name} fill={d.kind !== undefined ? kindFill(d.kind) : d.color} opacity={active && active !== d.name ? 0.25 : 1} className={onSelect ? "cursor-pointer outline-none" : undefined} onClick={() => onSelect?.(d.name)} />
               ))}

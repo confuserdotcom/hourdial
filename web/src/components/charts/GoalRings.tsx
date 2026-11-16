@@ -2,6 +2,7 @@ import { PolarAngleAxis, RadialBar, RadialBarChart } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
 import type { Goal } from "@/lib/api";
 import { dur } from "@/lib/format";
+import { reducedMotion } from "@/lib/motion";
 
 /** GoalRings: one ring per goal, filled to done/target. "At most" goals
  *  turn red once they pass their limit. */
@@ -16,7 +17,7 @@ export function GoalRings({ goals }: { goals: Goal[] }) {
       <ChartContainer config={{}} className="aspect-square h-[168px] w-[168px] shrink-0" aria-hidden>
         <RadialBarChart data={data} innerRadius="30%" outerRadius="100%" startAngle={90} endAngle={-270} barSize={11}>
           <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-          <RadialBar dataKey="v" background={{ fill: "hsl(var(--secondary))" }} cornerRadius={6} isAnimationActive={false} />
+          <RadialBar dataKey="v" background={{ fill: "hsl(var(--secondary))" }} cornerRadius={6} isAnimationActive={!reducedMotion()} animationDuration={720} animationEasing="ease-out" />
         </RadialBarChart>
       </ChartContainer>
       <ul className="min-w-0 flex-1 space-y-2.5">

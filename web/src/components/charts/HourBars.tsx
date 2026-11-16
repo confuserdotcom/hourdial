@@ -5,6 +5,7 @@ import { dur, hourLabel, minClock } from "@/lib/format";
 import { hourName } from "@/lib/roving";
 import { KindTable } from "./KindTable";
 import { Marks, plotInset } from "./Marks";
+import { reducedMotion } from "@/lib/motion";
 
 /** HourBars: minutes per hour, stacked by kind, from hourFirst to hourLast. */
 /** onHour gets the hour of a clicked bar; with it the bars can be picked
@@ -45,7 +46,7 @@ export function HourBars({ hours, first, last, height = 220, onHour }: { hours: 
           }
         />
         {SERIES.map((k, i) => (
-          <Bar key={k || "unlabelled"} dataKey={k || "unlabelled"} stackId="a" fill={kindFill(k)} radius={i === SERIES.length - 1 ? [2, 2, 0, 0] : 0} isAnimationActive={false} />
+          <Bar key={k || "unlabelled"} dataKey={k || "unlabelled"} stackId="a" fill={kindFill(k)} radius={i === SERIES.length - 1 ? [2, 2, 0, 0] : 0} isAnimationActive={!reducedMotion()} animationDuration={720} animationEasing="ease-out" />
         ))}
       </BarChart>
     </ChartContainer>

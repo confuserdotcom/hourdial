@@ -14,6 +14,7 @@ import { dayTitle, delta, dur, hourLabel, monthTitle, num, parseDate } from "@/l
 import { go } from "@/lib/route";
 import { useGroups } from "@/lib/groups";
 import { cn } from "@/lib/utils";
+import { reducedMotion } from "@/lib/motion";
 
 export default function Trends({ date }: { date: string }) {
   // The month is the route's: the date control in the top bar steps it.
@@ -39,7 +40,7 @@ export default function Trends({ date }: { date: string }) {
               <XAxis dataKey="h" tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--faint-text))", fontSize: 11 }} />
               <YAxis tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--faint-text))", fontSize: 11 }} />
               <ChartTooltip cursor={{ fill: "hsl(var(--secondary))" }} content={({ active, payload, label }) => active && payload?.length ? <div className="rounded-md border bg-popover px-2.5 py-1.5 text-xs shadow">{label}:00 · {payload[0].value} min</div> : null} />
-              <Bar dataKey="min" fill="hsl(var(--k-deep))" radius={[2, 2, 0, 0]} isAnimationActive={false} />
+              <Bar dataKey="min" fill="hsl(var(--k-deep))" radius={[2, 2, 0, 0]} isAnimationActive={!reducedMotion()} animationDuration={720} animationEasing="ease-out" />
             </BarChart>
           </ChartContainer>
         ) : (

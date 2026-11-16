@@ -1,6 +1,7 @@
 import { Area, CartesianGrid, ComposedChart, Line, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { dur } from "@/lib/format";
+import { reducedMotion } from "@/lib/motion";
 
 /** DeepArea: deep time per day with its 7-day mean. */
 export function DeepArea({ points, height = 220 }: { points: { label: string; ms: number }[]; height?: number }) {
@@ -31,8 +32,8 @@ export function DeepArea({ points, height = 220 }: { points: { label: string; ms
             ) : null
           }
         />
-        <Area dataKey="h" type="monotone" stroke="hsl(var(--k-deep))" strokeWidth={1.75} fill="url(#deepFill)" isAnimationActive={false} />
-        <Line dataKey="mean" type="monotone" stroke="hsl(var(--muted-foreground))" strokeDasharray="4 4" dot={false} strokeWidth={1.25} isAnimationActive={false} />
+        <Area dataKey="h" type="monotone" stroke="hsl(var(--k-deep))" strokeWidth={1.75} fill="url(#deepFill)" isAnimationActive={!reducedMotion()} animationDuration={720} animationEasing="ease-out" />
+        <Line dataKey="mean" type="monotone" stroke="hsl(var(--muted-foreground))" strokeDasharray="4 4" dot={false} strokeWidth={1.25} isAnimationActive={!reducedMotion()} animationDuration={720} animationEasing="ease-out" />
       </ComposedChart>
     </ChartContainer>
   );

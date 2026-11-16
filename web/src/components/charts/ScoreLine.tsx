@@ -1,6 +1,7 @@
 import { CartesianGrid, Line, LineChart, ReferenceLine, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { Marks, plotInset } from "./Marks";
+import { reducedMotion } from "@/lib/motion";
 
 /** ScoreLine: the score per day; days that are not workdays are gaps.
  *  onPoint gets the index of a clicked day; with it the days can be
@@ -28,7 +29,7 @@ export function ScoreLine({ points, height = 200, onPoint }: { points: { label: 
             ) : null
           }
         />
-        <Line dataKey="score" stroke="hsl(var(--foreground))" strokeWidth={1.75} dot={{ r: 2.5, fill: "hsl(var(--foreground))" }} connectNulls={false} isAnimationActive={false} />
+        <Line dataKey="score" stroke="hsl(var(--foreground))" strokeWidth={1.75} dot={{ r: 2.5, fill: "hsl(var(--foreground))" }} connectNulls={false} isAnimationActive={!reducedMotion()} animationDuration={720} animationEasing="ease-out" />
       </LineChart>
     </ChartContainer>
     {onPoint && (

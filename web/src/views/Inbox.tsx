@@ -95,7 +95,7 @@ export default function Inbox({ onChange }: { onChange: () => void }) {
                 key={it.key}
                 onClick={() => setAt(i)}
                 onDoubleClick={() => setTarget({ title: it.key, sub: it.example, key: it.key })}
-                className={cn("grid cursor-pointer grid-cols-[1fr_auto_auto] items-center gap-x-4 rounded-md px-3 py-2.5 hover:bg-secondary/60", i === at && "bg-secondary hover:bg-secondary")}
+                className={cn("anim-rise relative grid cursor-pointer grid-cols-[1fr_auto_auto] items-center gap-x-4 rounded-md px-3 py-2.5 transition-colors hover:bg-secondary/60", i === at && "bg-secondary shadow-[inset_3px_0_0_hsl(var(--agent))] hover:bg-secondary")}
               >
                 <div className="min-w-0">
                   <div className="truncate font-medium">{it.key}</div>
