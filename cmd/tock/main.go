@@ -31,18 +31,21 @@ import (
 // task. usage, below, lists them all (tock help all).
 const shortUsage = `usage: tock <command> [flags]
 
+Agents and projects:
+  tock agents [--week]                   what your coding agents worked on, next to your time
+  tock today                             the day so far, per project
+  tock inbox                             unlabelled activity, numbered
+  tock tag <n> [<Category>[/<Project>]]  label it and learn a rule (no label: accept the suggestion)
+
+Billing:
+  tock project set <name> --rate N       an hourly rate for a project
+  tock invoice issue --project P         a numbered invoice that stays as issued
+
 Every day:
   tock                                   open the TUI (today, week, inbox, focus, rules, plan)
-  tock today                             the day so far
-  tock inbox                             unlabelled activity, numbered
-  tock tag <n> [<Category>[/<Project>]]  label it (no label: accept the suggestion)
   tock edit                              fix the timeline: add, label or delete time
   tock undo                              reverse the last change
   tock web                               the dashboard in your browser
-
-Focus:
-  tock session [start [MIN] | stop]      a focus session
-  tock goal                              goals per day or week
 
 Looking back:
   tock top [--week]                      where the time went

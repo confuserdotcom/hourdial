@@ -140,8 +140,9 @@ func TestHelpShortAndAll(t *testing.T) {
 	te := newTestEnv(t, "")
 	for _, args := range [][]string{{"help"}, {"--help"}, {}} {
 		code, out := te.run(t, "", args...)
-		if code != 0 || !strings.Contains(out, "tock help all") || strings.Contains(out, "tock invoice") ||
-			strings.Count(out, "\n") > 35 || !strings.Contains(out, "Every day:") {
+		// The short help leads with the agent ledger, then billing.
+		if code != 0 || !strings.Contains(out, "tock help all") || !strings.HasPrefix(out, "usage: tock <command> [flags]\n\nAgents and projects:\n  tock agents") ||
+			!strings.Contains(out, "tock invoice issue") || strings.Count(out, "\n") > 35 || !strings.Contains(out, "Every day:") {
 			t.Errorf("%v: code %d, want the short help:\n%s", args, code, out)
 		}
 	}
