@@ -79,12 +79,3 @@ func (m *Model) helpBody(w int) []string {
 	body = append(body, legend)
 	return card("Keys", body, cw)
 }
-
-// ansiWidthMax is the widest line of lines.
-func ansiWidthMax(lines []string) int {
-	w := 0
-	for _, l := range lines {
-		w = max(w, ansiWidth(l))
-	}
-	return w
-}

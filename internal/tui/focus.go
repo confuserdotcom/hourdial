@@ -637,12 +637,3 @@ func (t focusTab) sessionRows(ss []focus.Session, first int, loc *time.Location,
 	}
 	return out
 }
-
-// progress draws done out of total as a bar of cells blocks.
-func progress(done, total int64, cells int) string {
-	if total <= 0 || cells <= 0 {
-		return ""
-	}
-	n := int(min(max(done, 0), total) * int64(cells) / total)
-	return sBright.Render(strings.Repeat("█", n)) + sFaint.Render(strings.Repeat("░", cells-n))
-}

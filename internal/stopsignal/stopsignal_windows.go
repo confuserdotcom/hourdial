@@ -14,12 +14,8 @@ import (
 // userSID is the current user's SID, which names the event and is the
 // only account its security descriptor lets in.
 func userSID() (string, error) {
-	tok, err := windows.OpenCurrentProcessToken()
-	if err != nil {
-		return "", err
-	}
-	defer tok.Close()
-	u, err := tok.GetTokenUser()
+	// A pseudo-handle: nothing to close.
+	u, err := windows.GetCurrentProcessToken().GetTokenUser()
 	if err != nil {
 		return "", err
 	}

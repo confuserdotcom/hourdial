@@ -305,14 +305,14 @@ func (m Model) planUndoLast() tea.Cmd {
 	}
 }
 
-// noPlanFile is the error for keys that need a file.
-var noPlanFile = errors.New("no plan file · set [plan] file in config.toml")
+// errNoPlanFile is the error for keys that need a file.
+var errNoPlanFile = errors.New("no plan file · set [plan] file in config.toml")
 
 func (m Model) planKey(k string) (tea.Model, tea.Cmd) {
 	t := &m.plan
 	needFile := func() bool {
 		if t.cfg.File == "" {
-			m.setFlash(noPlanFile.Error(), true)
+			m.setFlash(errNoPlanFile.Error(), true)
 			return false
 		}
 		return true

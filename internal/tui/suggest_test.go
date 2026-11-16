@@ -43,7 +43,7 @@ func TestInboxShowsSuggestions(t *testing.T) {
 	if l := line(t, m, "Mail · inbox"); strings.Contains(l, "→") {
 		t.Fatalf("Mail has no suggestion: %q", l)
 	}
-	m = press(t, m, "r")
+	press(t, m, "r")
 	if f.calls != 1 {
 		t.Fatalf("calls = %d, want 1", f.calls)
 	}

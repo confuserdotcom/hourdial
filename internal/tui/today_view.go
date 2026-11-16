@@ -68,12 +68,6 @@ func (t *todayTab) layout(w, h int) int {
 	return max(h-len(t.head(w, h, time.Time{})), 1)
 }
 
-// rowW is the timeline's width in a body w wide.
-func rowW(w int) int {
-	mw, _ := split(w)
-	return mw
-}
-
 // rowAt is the timeline row shown on body line line of a body w×h, if any.
 func (t *todayTab) rowAt(line, w, h int) (int, bool) {
 	if !t.loaded || len(t.day.Timeline) == 0 && t.filter == "" {

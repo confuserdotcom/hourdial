@@ -106,7 +106,7 @@ func TestChoiceToggleThenSave(t *testing.T) {
 		t.Fatalf("Saved = %v", got)
 	}
 	// Toggling back twice is no change: enter writes nothing.
-	m = choicePress(t, m, " ", " ", "enter")
+	choicePress(t, m, " ", " ", "enter")
 	if len(f.saves) != 1 {
 		t.Fatalf("saves = %v", f.saves)
 	}
@@ -169,7 +169,7 @@ func TestChoiceDashboardAsks(t *testing.T) {
 
 func TestChoiceDashboardAlways(t *testing.T) {
 	m, f := newChoiceT(t, true)
-	m = choicePress(t, m, "G", "enter")
+	choicePress(t, m, "G", "enter")
 	if f.opens != 1 {
 		t.Fatalf("opens = %d", f.opens)
 	}

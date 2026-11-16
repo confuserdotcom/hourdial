@@ -14,6 +14,10 @@ import (
 
 const runKey = `Software\Microsoft\Windows\CurrentVersion\Run`
 
+// runKeyName is trackd's value under HKCU\Software\Microsoft\Windows\
+// CurrentVersion\Run: what Windows runs when you sign in, no admin needed.
+const runKeyName = "tock trackd"
+
 // installAutostart makes Windows start trackd when you sign in, through
 // the tock.exe next to this trackd.exe, and starts it now.
 func installAutostart() error {

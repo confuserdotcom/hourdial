@@ -39,5 +39,5 @@ func TestTodaySplitDeleteAddUndo(t *testing.T) {
 	m = typeText(t, m, "14:00-16:00")
 	m = press(t, m, "enter")
 	mustContain(t, m, "the range reaches into the future")
-	m = press(t, m, "esc")
+	press(t, m, "esc")
 }

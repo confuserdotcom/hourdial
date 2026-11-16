@@ -70,7 +70,7 @@ func TestPlanToggleAndUndo(t *testing.T) {
 		t.Fatalf("after undo = %q", got)
 	}
 	mustContain(t, m, "undone", "[ ] A Thermo · TD 1")
-	m = step(t, m, tea.KeyPressMsg{Code: tea.KeySpace, Text: " "})
+	step(t, m, tea.KeyPressMsg{Code: tea.KeySpace, Text: " "})
 	if !strings.HasPrefix(fileLines(t, file)[1], "x 2026-10-10 ") {
 		t.Fatalf("space did not tick: %q", fileLines(t, file)[1])
 	}
@@ -98,7 +98,7 @@ func TestPlanAddDeleteUndo(t *testing.T) {
 		t.Fatal("d did not delete the first line")
 	}
 	mustContain(t, m, "deleted: late one")
-	m = press(t, m, "u")
+	press(t, m, "u")
 	if got := fileLines(t, file)[0]; got != planLines[0] {
 		t.Fatalf("undo delete put back %q at the top", got)
 	}
@@ -117,7 +117,7 @@ func TestPlanCommand(t *testing.T) {
 	if len(fileLines(t, file)) != n {
 		t.Error("the command ran again before a minute")
 	}
-	m = press(t, m, "g", "enter") // an edit reruns it
+	press(t, m, "g", "enter") // an edit reruns it
 	if len(fileLines(t, file)) != n+1 {
 		t.Error("an edit must rerun the command")
 	}

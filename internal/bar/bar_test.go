@@ -1071,9 +1071,9 @@ func TestUrgeButtons(t *testing.T) {
 // notice enqueued at 15:00.
 func urgeEnv(t *testing.T) (*apptest.Env, *app.App, focus.Session, int64) {
 	t.Helper()
-	e, a, s := distractedSession(t)
+	e, _, s := distractedSession(t)
 	e.WriteConfig(t, "[focus]\nurge_surf = true\n")
-	a = openApp(t, e)
+	a := openApp(t, e)
 	at(t, e, "15:00")
 	notes := focusNotes(t, a)
 	if len(notes) != 1 {
